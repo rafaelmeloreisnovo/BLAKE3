@@ -38,15 +38,13 @@
 //! for [`OutputReader`].
 //!
 //! The `rayon` feature (disabled by default, but enabled for [docs.rs]) adds
-//! the [`update_rayon`](Hasher::update_rayon) and (in combination with `mmap`
-//! below) [`update_mmap_rayon`](Hasher::update_mmap_rayon) methods for
-//! multithreaded hashing. However, even if this feature is enabled, all other
-//! APIs remain single-threaded.
+//! the `update_rayon` and (in combination with `mmap` below) `update_mmap_rayon`
+//! methods for multithreaded hashing. However, even if this feature is enabled,
+//! all other APIs remain single-threaded.
 //!
 //! The `mmap` feature (disabled by default, but enabled for [docs.rs]) adds the
-//! [`update_mmap`](Hasher::update_mmap) and (in combination with `rayon` above)
-//! [`update_mmap_rayon`](Hasher::update_mmap_rayon) helper methods for
-//! memory-mapped IO.
+//! `update_mmap` and (in combination with `rayon` above) `update_mmap_rayon`
+//! helper methods for memory-mapped IO.
 //!
 //! The `zeroize` feature (disabled by default, but enabled for [docs.rs])
 //! implements
@@ -1455,8 +1453,8 @@ impl Hasher {
     /// [`std::io::Read`](https://doc.rust-lang.org/std/io/trait.Read.html) might be
     /// [`std::fs::File`](https://doc.rust-lang.org/std/fs/struct.File.html), but note that memory
     /// mapping can be faster than this method for hashing large files. See
-    /// [`update_mmap`](Hasher::update_mmap) and [`update_mmap_rayon`](Hasher::update_mmap_rayon),
-    /// which require the `mmap` and (for the latter) `rayon` Cargo features.
+    /// `update_mmap` and `update_mmap_rayon`, which require the `mmap` and
+    /// (for the latter) `rayon` Cargo features.
     ///
     /// This method requires the `std` Cargo feature, which is enabled by default.
     ///
