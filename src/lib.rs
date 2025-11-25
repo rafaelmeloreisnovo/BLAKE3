@@ -377,15 +377,6 @@ impl PartialEq<[u8]> for Hash {
     }
 }
 
-/// Manual implementation of Hash trait consistent with the constant-time PartialEq.
-/// Using the raw bytes directly is safe since the PartialEq implementation
-/// compares the same bytes in constant time.
-impl core::hash::Hash for Hash {
-    fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
-        self.0.hash(state);
-    }
-}
-
 impl fmt::Display for Hash {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         // Formatting field as `&str` to reduce code size since the `Debug`
