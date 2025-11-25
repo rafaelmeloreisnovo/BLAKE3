@@ -440,8 +440,8 @@ fn merge_subtrees_inner(
     mode: Mode,
 ) -> crate::Output {
     crate::parent_node_output(
-        &left_child,
-        &right_child,
+        left_child,
+        right_child,
         &mode.key_words(),
         mode.flags_byte(),
         Platform::detect(),
