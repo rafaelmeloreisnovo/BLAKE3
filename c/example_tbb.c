@@ -1,8 +1,7 @@
 #include "blake3.h"
-#include <errno.h>
+#include "rmr_lowlevel.h"
 #include <fcntl.h>
 #include <stdio.h>
-#include <string.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -13,17 +12,17 @@ int main(int argc, char **argv) {
     // Open and memory map the file.
     int fd = open(argv[i], O_RDONLY);
     if (fd == -1) {
-      fprintf(stderr, "open failed: %s\n", strerror(errno));
+      fprintf(stderr, "open failed: %s\n", rmr_ll_strerror(errno));
       return 1;
     }
     struct stat statbuf;
     if (fstat(fd, &statbuf) == -1) {
-      fprintf(stderr, "stat failed: %s\n", strerror(errno));
+      fprintf(stderr, "stat failed: %s\n", rmr_ll_strerror(errno));
       return 1;
     }
     void *mapped = mmap(NULL, statbuf.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
     if (mapped == MAP_FAILED) {
-      fprintf(stderr, "mmap failed: %s\n", strerror(errno));
+      fprintf(stderr, "mmap failed: %s\n", rmr_ll_strerror(errno));
       return 1;
     }
 
@@ -36,11 +35,11 @@ int main(int argc, char **argv) {
 
     // Unmap and close the file.
     if (munmap(mapped, statbuf.st_size) == -1) {
-      fprintf(stderr, "munmap failed: %s\n", strerror(errno));
+      fprintf(stderr, "munmap failed: %s\n", rmr_ll_strerror(errno));
       return 1;
     }
     if (close(fd) == -1) {
-      fprintf(stderr, "close failed: %s\n", strerror(errno));
+      fprintf(stderr, "close failed: %s\n", rmr_ll_strerror(errno));
       return 1;
     }
 
@@ -54,4 +53,5 @@ int main(int argc, char **argv) {
     }
     printf("\n");
   }
+  return 0;
 }
