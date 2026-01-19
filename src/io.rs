@@ -1,11 +1,15 @@
 //! Helper functions for efficient IO.
 
 #[cfg(feature = "std")]
+const READ_BUF_LEN: usize = 128 * 1024;
+
+#[cfg(feature = "std")]
+#[inline]
 pub(crate) fn copy_wide(
     mut reader: impl std::io::Read,
     hasher: &mut crate::Hasher,
 ) -> std::io::Result<u64> {
-    let mut buffer = [0; 65536];
+    let mut buffer = [0; READ_BUF_LEN];
     let mut total = 0;
     loop {
         match reader.read(&mut buffer) {
@@ -47,6 +51,7 @@ pub(crate) fn copy_wide(
 // But if you "know what you're doing," I don't think *const i32 and &i32 are fundamentally
 // different here. Feedback needed.
 #[cfg(feature = "mmap")]
+#[inline]
 pub(crate) fn maybe_mmap_file(file: &std::fs::File) -> std::io::Result<Option<memmap2::Mmap>> {
     let metadata = file.metadata()?;
     let file_size = metadata.len();
