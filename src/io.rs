@@ -4,25 +4,36 @@
 const READ_BUF_LEN: usize = 128 * 1024;
 
 #[cfg(feature = "std")]
+thread_local! {
+    static READ_BUF: std::cell::RefCell<Vec<u8>> =
+        std::cell::RefCell::new(vec![0u8; READ_BUF_LEN]);
+}
+
+#[cfg(feature = "std")]
 #[inline]
 pub(crate) fn copy_wide(
     mut reader: impl std::io::Read,
     hasher: &mut crate::Hasher,
 ) -> std::io::Result<u64> {
-    let mut buffer = vec![0u8; READ_BUF_LEN];
-    let mut total = 0;
-    loop {
-        match reader.read(&mut buffer) {
-            Ok(0) => return Ok(total),
-            Ok(n) => {
-                hasher.update(&buffer[..n]);
-                total += n as u64;
-            }
-            // see test_update_reader_interrupted
-            Err(e) if e.kind() == std::io::ErrorKind::Interrupted => continue,
-            Err(e) => return Err(e),
+    READ_BUF.with(|buffer| {
+        let mut buffer = buffer.borrow_mut();
+        if buffer.len() != READ_BUF_LEN {
+            buffer.resize(READ_BUF_LEN, 0);
         }
-    }
+        let mut total = 0;
+        loop {
+            match reader.read(&mut buffer) {
+                Ok(0) => return Ok(total),
+                Ok(n) => {
+                    hasher.update(&buffer[..n]);
+                    total += n as u64;
+                }
+                // see test_update_reader_interrupted
+                Err(e) if e.kind() == std::io::ErrorKind::Interrupted => continue,
+                Err(e) => return Err(e),
+            }
+        }
+    })
 }
 
 // Mmap a file, if it looks like a good idea. Return None in cases where we know mmap will fail, or

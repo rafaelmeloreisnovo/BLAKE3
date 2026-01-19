@@ -73,6 +73,7 @@ RMR_INLINE void rmr_memcpy(void *RMR_RESTRICT dst,
       case 1: out[0] = in[0];
       default: return;
     }
+    return;
   }
   if (((uintptr_t)out | (uintptr_t)in) % sizeof(size_t) == 0) {
     size_t *outw = (size_t *)out;
@@ -114,6 +115,7 @@ RMR_INLINE void rmr_memset(void *RMR_RESTRICT dst, uint8_t value, size_t len) {
       case 1: out[0] = value;
       default: return;
     }
+    return;
   }
   if (((uintptr_t)out) % sizeof(size_t) == 0) {
     size_t pattern = value;
