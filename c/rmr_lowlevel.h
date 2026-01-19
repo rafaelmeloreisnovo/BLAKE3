@@ -89,9 +89,10 @@ RMR_INLINE void rmr_memcpy(void *RMR_RESTRICT dst,
     size_t words = len / sizeof(size_t);
     const size_t prefetch_distance = 16;
     const size_t prefetch_stride = 8;
+    const size_t prefetch_mask = prefetch_stride - 1;
     for (i = 0; i < words; i++) {
       if (RMR_LIKELY(words > prefetch_distance) &&
-          (i % prefetch_stride) == 0) {
+          (i & prefetch_mask) == 0) {
         RMR_PREFETCH_R(inw + i + prefetch_distance);
         RMR_PREFETCH_W(outw + i + prefetch_distance);
       }
