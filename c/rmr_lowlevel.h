@@ -16,6 +16,12 @@
 #define RMR_LIKELY(x) __builtin_expect(!!(x), 1)
 #define RMR_UNLIKELY(x) __builtin_expect(!!(x), 0)
 #define RMR_RESTRICT __restrict__
+#define RMR_ASSUME(x)            \
+  do {                           \
+    if (!(x)) {                  \
+      __builtin_unreachable();   \
+    }                            \
+  } while (0)
 #define RMR_PREFETCH_R(p) __builtin_prefetch((p), 0, 3)
 #define RMR_PREFETCH_W(p) __builtin_prefetch((p), 1, 3)
 #elif defined(_MSC_VER)
@@ -25,6 +31,7 @@
 #define RMR_LIKELY(x) (x)
 #define RMR_UNLIKELY(x) (x)
 #define RMR_RESTRICT
+#define RMR_ASSUME(x) __assume(x)
 #define RMR_PREFETCH_R(p) (void)(p)
 #define RMR_PREFETCH_W(p) (void)(p)
 #else
@@ -37,6 +44,7 @@
 #define RMR_LIKELY(x) (x)
 #define RMR_UNLIKELY(x) (x)
 #define RMR_RESTRICT
+#define RMR_ASSUME(x) (void)(x)
 #define RMR_PREFETCH_R(p) (void)(p)
 #define RMR_PREFETCH_W(p) (void)(p)
 #endif
@@ -89,6 +97,8 @@ RMR_INLINE void rmr_memcpy(void *RMR_RESTRICT dst,
     size_t words = len / sizeof(size_t);
     const size_t prefetch_distance = 16;
     const size_t prefetch_stride = 8;
+    RMR_ASSUME(prefetch_stride != 0);
+    RMR_ASSUME((prefetch_stride & (prefetch_stride - 1)) == 0);
     const size_t prefetch_mask = prefetch_stride - 1;
     for (i = 0; i < words; i++) {
       if (RMR_LIKELY(words > prefetch_distance) &&

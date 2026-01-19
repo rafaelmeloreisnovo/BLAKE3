@@ -9,6 +9,7 @@ documentation = "https://docs.rs/blake3"
 readme = "README.md"
 edition = "2021"
 
+# Release/bench profiles emphasize throughput and stable codegen for hashing.
 [profile.release]
 lto = true
 codegen-units = 1
