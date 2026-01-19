@@ -406,7 +406,7 @@ void blake3_hasher_init_derive_key_raw(blake3_hasher *self, const void *context,
 }
 
 void blake3_hasher_init_derive_key(blake3_hasher *self, const char *context) {
-  blake3_hasher_init_derive_key_raw(self, context, strlen(context));
+  blake3_hasher_init_derive_key_raw(self, context, rmr_ll_strlen(context));
 }
 
 // As described in hasher_push_cv() below, we do "lazy merging", delaying

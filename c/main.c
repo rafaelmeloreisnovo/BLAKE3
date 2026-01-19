@@ -29,7 +29,7 @@ static void hex_char_value(uint8_t c, uint8_t *value, bool *valid) {
 }
 
 static int parse_key(char *hex_key, uint8_t out[BLAKE3_KEY_LEN]) {
-  size_t hex_len = rmr_strlen(hex_key);
+  size_t hex_len = rmr_ll_strlen(hex_key);
   if (hex_len != 64) {
     fprintf(stderr, "Expected a 64-char hexadecimal key, got %zu chars.\n",
             hex_len);
@@ -78,20 +78,20 @@ int main(int argc, char **argv) {
       fprintf(stderr, "Odd number of arguments.\n");
       return 1;
     }
-    if (rmr_strcmp("--length", argv[1]) == 0) {
+    if (rmr_ll_strcmp("--length", argv[1]) == 0) {
       size_t parsed_len = 0;
-      if (!rmr_parse_size(argv[2], &parsed_len)) {
+      if (!rmr_ll_parse_size(argv[2], &parsed_len)) {
         fprintf(stderr, "Bad length argument.\n");
         return 1;
       }
       out_len = parsed_len;
-    } else if (rmr_strcmp("--keyed", argv[1]) == 0) {
+    } else if (rmr_ll_strcmp("--keyed", argv[1]) == 0) {
       mode = KEYED_HASH_MODE;
       int ret = parse_key(argv[2], key);
       if (ret != 0) {
         return ret;
       }
-    } else if (rmr_strcmp("--derive-key", argv[1]) == 0) {
+    } else if (rmr_ll_strcmp("--derive-key", argv[1]) == 0) {
       mode = DERIVE_KEY_MODE;
       context = argv[2];
     } else {
@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
    * than 1 MiB.
    */
   size_t buf_capacity = 1 << 20;
-  uint8_t *buf = rmr_malloc(buf_capacity);
+  uint8_t *buf = rmr_ll_malloc(buf_capacity);
   RMR_ASSERT(buf != NULL);
   size_t buf_len = 0;
   while (1) {
@@ -143,7 +143,7 @@ int main(int argc, char **argv) {
     blake3_hasher_update(&hasher, buf, buf_len);
 
     /* TODO: An incremental output reader API to avoid this allocation. */
-    uint8_t *out = rmr_malloc(out_len);
+    uint8_t *out = rmr_ll_malloc(out_len);
     if (out_len > 0 && out == NULL) {
       fprintf(stderr, "malloc() failed.\n");
       return 1;
@@ -153,9 +153,9 @@ int main(int argc, char **argv) {
       printf("%02x", out[i]);
     }
     printf("\n");
-    rmr_free(out);
+    rmr_ll_free(out);
     feature = (feature - mask) & mask;
   } while (feature != 0);
-  rmr_free(buf);
+  rmr_ll_free(buf);
   return 0;
 }

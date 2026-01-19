@@ -114,17 +114,21 @@ static inline void rmr_memset(void *dst, uint8_t value, size_t len) {
   }
 }
 
-static inline size_t rmr_strlen(const char *value) { return strlen(value); }
+static inline size_t rmr_ll_strlen(const char *value) { return strlen(value); }
 
-static inline int rmr_strcmp(const char *left, const char *right) {
+static inline int rmr_ll_strcmp(const char *left, const char *right) {
   return strcmp(left, right);
 }
 
-static inline void *rmr_malloc(size_t size) { return malloc(size); }
+static inline const char *rmr_ll_strerror(int errnum) {
+  return strerror(errnum);
+}
 
-static inline void rmr_free(void *ptr) { free(ptr); }
+static inline void *rmr_ll_malloc(size_t size) { return malloc(size); }
 
-static inline bool rmr_parse_size(const char *text, size_t *out) {
+static inline void rmr_ll_free(void *ptr) { free(ptr); }
+
+static inline bool rmr_ll_parse_size(const char *text, size_t *out) {
   char *end = NULL;
   errno = 0;
   unsigned long long value = strtoull(text, &end, 10);
