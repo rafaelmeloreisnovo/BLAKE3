@@ -7,6 +7,19 @@
 
 const char *blake3_version(void) { return BLAKE3_VERSION_STRING; }
 
+static const uint32_t IV_MATRIX[2][4] = {
+    {IV[0], IV[1], IV[2], IV[3]},
+    {IV[4], IV[5], IV[6], IV[7]},
+};
+
+BLAKE3_PRIVATE const uint32_t *blake3_iv_matrix_row(size_t row) {
+  return IV_MATRIX[row];
+}
+
+BLAKE3_PRIVATE size_t blake3_iv_matrix_rows(void) { return 2; }
+
+BLAKE3_PRIVATE size_t blake3_iv_matrix_cols(void) { return 4; }
+
 INLINE void chunk_state_init(blake3_chunk_state *self, const uint32_t key[8],
                              uint8_t flags) {
   memcpy(self->cv, key, BLAKE3_KEY_LEN);
