@@ -148,6 +148,8 @@ alternativas sob Apache 2.0 e Apache 2.0 com exceções LLVM.
 
 Esta seção resume onde a documentação de desempenho está concentrada e
 como interpretar comparações de performance no contexto do repositório.
+Ela também traz um guia prático para melhorar velocidade, bandwidth,
+throughput e footprint em medições reais (sem prometer ganhos fixos).
 
 ### Fontes de benchmarks e gráficos
 
@@ -172,6 +174,49 @@ como interpretar comparações de performance no contexto do repositório.
    BLAKE2 etc.), prefira medir no seu ambiente e com seus tamanhos de
    arquivo.
 
+### Checklist de otimização (velocidade, bandwidth e throughput)
+
+Use os itens abaixo para perseguir ganhos agressivos (às vezes da ordem
+de múltiplos *x*, dependendo do hardware, carga e tamanho de entrada):
+
+1. **Garanta SIMD e CPU features habilitadas**: o código seleciona
+   automaticamente SSE2/SSE4.1/AVX2/AVX-512/NEON quando disponíveis.
+2. **Aumente tamanho de lote**: entradas maiores reduzem overhead e
+   aumentam throughput; compare com tamanhos representativos do seu uso.
+3. **Avalie multithreading**: para arquivos grandes, múltiplos threads
+   ampliam o throughput; para pequenos, podem piorar o tempo total.
+4. **Evite cópias desnecessárias**: leituras em buffer e streaming
+   estável melhoram a velocidade observada.
+5. **Meça com afinidade e carga controlada**: CPU throttle e ruído de
+   sistema distorcem resultados (especialmente para metas “17x melhor”).
+6. **Compare apples-to-apples**: mesmos parâmetros, I/O equivalente e
+   ferramentas configuradas de forma consistente.
+
+### Acuracidade, footprint e outras operações
+
+- **Acuracidade de medição**: repita testes, descarte outliers e
+  registre médias/percentis.
+- **Footprint**: use entradas de streaming e buffers dimensionados para
+  reduzir memória pico.
+- **Operações adicionais**: ao medir KDF/MAC/XOF, registre tamanho de
+  saída e formato, pois isso influencia throughput.
+
+### Refatoração e upgrades orientados a performance
+
+Se você pretende evoluir o código localmente, concentre melhorias nos
+seguintes pontos antes de alterar algoritmos:
+
+1. **Fluxo de I/O**: priorize caminhos que evitam cópias e reutilizem
+   buffers (por exemplo, streaming e leitura incremental).
+2. **Granularidade de chunk**: alinhe tamanhos de blocos com o pipeline
+   de SIMD e com o paralelismo disponível.
+3. **Seleção de plataforma**: mantenha a lógica de dispatch enxuta para
+   reduzir overhead na escolha de implementação.
+4. **Multithreading controlado**: ajuste número de threads e limiares
+   para não degradar workloads pequenos.
+5. **Benchmarks antes/depois**: valide qualquer upgrade com o mesmo
+   conjunto de testes e parâmetros.
+
 ### Como medir no seu ambiente
 
 Use a CLI `b3sum` para uma comparação simples contra SHA-256:
@@ -188,3 +233,34 @@ time b3sum /tmp/bigfile
 Para benchmarks mais detalhados (e repetíveis), utilize os targets em
 `benches/` e registre os parâmetros do hardware (CPU, threads,
 instruções SIMD disponíveis) para comparação honesta.
+
+### Registro mínimo para comparações confiáveis
+
+Ao publicar ou comparar resultados, registre pelo menos:
+
+- **CPU e frequência** (modelo, número de núcleos e turbo).
+- **Sistema operacional** e versão.
+- **Compilador e flags** (por exemplo, release vs debug).
+- **Tamanho do input** e **modo** (hash, KDF, MAC, XOF).
+- **Número de threads** e **features SIMD** ativas.
+- **Métrica reportada** (MB/s, tempo total, p50/p95).
+
+### Checklist operacional (passo a passo)
+
+1. Defina o cenário (input, modo, tamanho de saída).
+2. Execute 5–10 repetições e registre média/percentis.
+3. Compare com outra função de hash sob o mesmo I/O.
+4. Ajuste parâmetros (threads, buffer, chunk) e repita.
+5. Documente o ganho e o custo (memória/CPU).
+
+### Escopo de mudanças no repositório
+
+Para evitar alterações desnecessárias, priorize mudanças pontuais nos
+arquivos que realmente influenciam o caminho crítico de hashing:
+
+- **Rust (`src/`)**: otimizações e ajustes de desempenho.
+- **C (`c/`)**: melhorias de SIMD/dispatch e multithreading.
+- **`benches/`**: novos cenários de benchmark.
+
+Evite “codificar em todos os arquivos” sem necessidade. Mudanças
+cirúrgicas tornam o impacto mensurável e reduzem regressões.
