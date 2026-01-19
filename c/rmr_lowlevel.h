@@ -16,6 +16,8 @@
 #define RMR_LIKELY(x) __builtin_expect(!!(x), 1)
 #define RMR_UNLIKELY(x) __builtin_expect(!!(x), 0)
 #define RMR_RESTRICT __restrict__
+#define RMR_PREFETCH_R(p) __builtin_prefetch((p), 0, 3)
+#define RMR_PREFETCH_W(p) __builtin_prefetch((p), 1, 3)
 #elif defined(_MSC_VER)
 #include <intrin.h>
 #define RMR_TRAP() __debugbreak()
@@ -23,6 +25,8 @@
 #define RMR_LIKELY(x) (x)
 #define RMR_UNLIKELY(x) (x)
 #define RMR_RESTRICT
+#define RMR_PREFETCH_R(p) (void)(p)
+#define RMR_PREFETCH_W(p) (void)(p)
 #else
 #define RMR_TRAP()                      \
   do {                                  \
@@ -33,6 +37,8 @@
 #define RMR_LIKELY(x) (x)
 #define RMR_UNLIKELY(x) (x)
 #define RMR_RESTRICT
+#define RMR_PREFETCH_R(p) (void)(p)
+#define RMR_PREFETCH_W(p) (void)(p)
 #endif
 
 #if defined(BLAKE3_TESTING)
@@ -82,6 +88,10 @@ RMR_INLINE void rmr_memcpy(void *RMR_RESTRICT dst,
     const size_t *inw = (const size_t *)in;
     size_t words = len / sizeof(size_t);
     for (i = 0; i < words; i++) {
+      if (RMR_LIKELY(words >= 16) && (i & 7u) == 0) {
+        RMR_PREFETCH_R(inw + i + 16);
+        RMR_PREFETCH_W(outw + i + 16);
+      }
       outw[i] = inw[i];
     }
     i *= sizeof(size_t);
