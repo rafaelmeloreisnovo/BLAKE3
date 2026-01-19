@@ -62,6 +62,7 @@ pub enum Platform {
 
 impl Platform {
     #[allow(unreachable_code)]
+    #[inline]
     pub fn detect() -> Self {
         #[cfg(miri)]
         {
@@ -99,6 +100,7 @@ impl Platform {
         Platform::Portable
     }
 
+    #[inline]
     pub fn simd_degree(&self) -> usize {
         let degree = match self {
             Platform::Portable => 1,
@@ -120,6 +122,7 @@ impl Platform {
         degree
     }
 
+    #[inline]
     pub fn compress_in_place(
         &self,
         cv: &mut CVWords,
@@ -156,6 +159,7 @@ impl Platform {
         }
     }
 
+    #[inline]
     pub fn compress_xof(
         &self,
         cv: &CVWords,

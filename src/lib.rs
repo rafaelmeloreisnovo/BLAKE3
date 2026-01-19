@@ -202,12 +202,12 @@ const KEYED_HASH: u8 = 1 << 4;
 const DERIVE_KEY_CONTEXT: u8 = 1 << 5;
 const DERIVE_KEY_MATERIAL: u8 = 1 << 6;
 
-#[inline]
+#[inline(always)]
 fn counter_low(counter: u64) -> u32 {
     counter as u32
 }
 
-#[inline]
+#[inline(always)]
 fn counter_high(counter: u64) -> u32 {
     (counter >> 32) as u32
 }
@@ -250,6 +250,7 @@ impl Hash {
     }
 
     /// Create a `Hash` from its raw bytes representation.
+    #[inline]
     pub const fn from_bytes(bytes: [u8; OUT_LEN]) -> Self {
         Self(bytes)
     }

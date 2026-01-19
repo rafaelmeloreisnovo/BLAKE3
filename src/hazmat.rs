@@ -523,6 +523,7 @@ pub fn merge_subtrees_root(
 /// hasher.finalize_xof().fill(&mut expected);
 /// assert_eq!(output_bytes, expected);
 /// ```
+#[inline]
 pub fn merge_subtrees_root_xof(
     left_child: &ChainingValue,
     right_child: &ChainingValue,
@@ -556,6 +557,7 @@ pub type ContextKey = [u8; KEY_LEN];
 ///
 /// assert_eq!(derived_key, blake3::derive_key("foo", b"bar"));
 /// ```
+#[inline]
 pub fn hash_derive_key_context(context: &str) -> ContextKey {
     crate::hash_all_at_once::<crate::join::SerialJoin>(
         context.as_bytes(),
