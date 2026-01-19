@@ -143,3 +143,48 @@ alternativas sob Apache 2.0 e Apache 2.0 com exceções LLVM.
 - `c/README.md`: documentação específica da implementação em C.
 - `reference_impl/README.md`: detalhes da implementação de referência.
 - `CONTRIBUTING.md`: guia de contribuição.
+
+## Análise de performance e comparação
+
+Esta seção resume onde a documentação de desempenho está concentrada e
+como interpretar comparações de performance no contexto do repositório.
+
+### Fontes de benchmarks e gráficos
+
+- `README.md`: contém o gráfico principal (`media/speed.svg`) e links
+  para o benchmark exemplificado (16 KiB em Cascade Lake-SP) e para o
+  paper do BLAKE3, onde há resultados mais detalhados.
+- `media/speed.svg`: gráfico de referência usado na documentação.
+- `benches/`: código de benchmarks para avaliar cenários específicos.
+- `c/README.md`: descreve particularidades de performance na
+  implementação em C, especialmente sobre multithreading.
+
+### Como interpretar a comparação
+
+1. **Hardware importa**: benchmarks variam bastante entre CPUs. As
+   comparações oficiais usam uma máquina específica (Cascade Lake-SP).
+2. **Tamanho de entrada**: entradas pequenas favorecem overhead menor;
+   entradas grandes mostram melhor ganho com paralelismo.
+3. **Paralelismo e SIMD**: BLAKE3 aproveita SIMD e múltiplos threads
+   automaticamente, o que costuma ampliar a diferença em relação a
+   hashes mais antigos.
+4. **Comparações reais**: para comparar com outros hashes (SHA-2/3,
+   BLAKE2 etc.), prefira medir no seu ambiente e com seus tamanhos de
+   arquivo.
+
+### Como medir no seu ambiente
+
+Use a CLI `b3sum` para uma comparação simples contra SHA-256:
+
+```bash
+# Crie um arquivo grande (1 GB).
+head -c 1000000000 /dev/zero > /tmp/bigfile
+# Hash com SHA-256.
+time openssl sha256 /tmp/bigfile
+# Hash com BLAKE3.
+time b3sum /tmp/bigfile
+```
+
+Para benchmarks mais detalhados (e repetíveis), utilize os targets em
+`benches/` e registre os parâmetros do hardware (CPU, threads,
+instruções SIMD disponíveis) para comparação honesta.
