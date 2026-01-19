@@ -115,7 +115,7 @@ static
 
   /* If TSAN detects a data race here, try compiling with -DBLAKE3_ATOMICS=1 */
   enum cpu_feature features = ATOMIC_LOAD(g_cpu_features);
-  if (features != UNDEFINED) {
+  if (BLAKE3_LIKELY(features != UNDEFINED)) {
     return features;
   } else {
 #if defined(IS_X86)
@@ -173,7 +173,7 @@ void blake3_compress_in_place(uint32_t cv[8],
   const enum cpu_feature features = get_cpu_features();
   MAYBE_UNUSED(features);
 #if !defined(BLAKE3_NO_AVX512)
-  if (features & AVX512VL) {
+  if (BLAKE3_LIKELY(features & AVX512VL)) {
     blake3_compress_in_place_avx512(cv, block, block_len, counter, flags);
     return;
   }

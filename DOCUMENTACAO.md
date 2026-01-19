@@ -144,6 +144,67 @@ alternativas sob Apache 2.0 e Apache 2.0 com exceções LLVM.
 - `reference_impl/README.md`: detalhes da implementação de referência.
 - `CONTRIBUTING.md`: guia de contribuição.
 
+## Diretrizes low-level (RMR) e integrações bare-metal
+
+Esta seção descreve decisões de baixo nível voltadas a reduzir
+latência, overhead e dependências externas, com foco em integração com
+hardware e sistemas operacionais distintos.
+
+### RMR: escopo, isolamento e parâmetros de ajuste
+
+O módulo **RMR** concentra parâmetros e helpers experimentais de
+performance para evitar espalhar *knobs* e decisões de micro-otimização
+por todo o crate. O objetivo é facilitar ajustes controlados sem
+desestabilizar a API principal.
+
+- **Buffer de leitura para IO amplo**: o tamanho `IO_READ_BUF_LEN`
+  (no RMR) centraliza um parâmetro que afeta throughput e número de
+  syscalls. Ajustes nesse valor devem ser avaliados com *benchmarks* de
+  streaming e tamanhos reais de arquivo, observando efeito sobre
+  *cache hits* e latência de leitura.
+
+### No-libc e bare-metal
+
+Para cenários **bare-metal** ou com runtime mínimo, o header
+`c/rmr_lowlevel.h` oferece um modo sem libc (`RMR_NO_LIBC`), permitindo
+fornecer implementações externas para funções básicas de string,
+alocação e parsing:
+
+- `rmr_ll_strlen`, `rmr_ll_strcmp`, `rmr_ll_strerror`
+- `rmr_ll_malloc`, `rmr_ll_free`
+- `rmr_ll_strtoull`
+
+Esse caminho permite integrar o BLAKE3 em ambientes sem `malloc` ou
+`strtoull` do sistema, preservando a compatibilidade com fluxos
+existentes e mantendo a semântica de validação de números.
+
+### Prefetch, alinhamento e hot loops
+
+Para cópias grandes e alinhadas, o `rmr_memcpy` expõe *prefetch hints*
+para compiladores que suportam `__builtin_prefetch`. Esses hints são
+aplicados com distância e *stride* definidos como `size_t` para manter
+coerência de tipo e permitir ajustes controlados de cache:
+
+- **Distância de prefetch**: antecipa leituras/escritas para linhas de
+  cache futuras, reduzindo *stall* de memória.
+- **Stride de prefetch**: regula a cadência dos hints para evitar
+  saturar o *front-end* ou poluir caches L1/L2.
+
+Em ambientes sem suporte a prefetch (ou com compiladores não
+compatíveis), os macros degradam para *no-op*, mantendo comportamento
+funcional.
+
+### Recomendações de medição (estilo científico)
+
+Para validar ganhos reais, recomenda-se:
+
+1. **Microbenchmarks isolados**: medir `rmr_memcpy` e `copy_wide` com
+   buffers frios/quentes, variando tamanhos e alinhamento.
+2. **Perf/PMU**: inspecionar *cache misses*, *branch mispredicts* e
+   stalls de memória para confirmar impacto das mudanças.
+3. **A/B em hardware real**: CPUs distintas reagem de forma diferente
+   a prefetch/stride. Validar em alvos representativos do deploy.
+
 ## Análise de performance e comparação
 
 Esta seção resume onde a documentação de desempenho está concentrada e

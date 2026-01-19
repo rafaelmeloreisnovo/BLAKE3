@@ -7,7 +7,8 @@ import subprocess
 
 HERE = path.dirname(__file__)
 TEST_VECTORS_PATH = path.join(HERE, "..", "test_vectors", "test_vectors.json")
-TEST_VECTORS = json.load(open(TEST_VECTORS_PATH))
+with open(TEST_VECTORS_PATH, "r", encoding="utf-8") as test_vectors_file:
+    TEST_VECTORS = json.load(test_vectors_file)
 
 
 def run_blake3(args, input):
@@ -23,11 +24,11 @@ def run_blake3(args, input):
 # to swapping any two adjacent input blocks or chunks will give the same
 # answer.
 def make_test_input(length):
-    i = 0
+    pattern = bytes(range(251))
     buf = bytearray()
     while len(buf) < length:
-        buf.append(i)
-        i = (i + 1) % 251
+        remaining = length - len(buf)
+        buf.extend(pattern[:remaining])
     return buf
 
 
