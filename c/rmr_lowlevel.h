@@ -10,15 +10,27 @@
 
 #if defined(__GNUC__) || defined(__clang__)
 #define RMR_TRAP() __builtin_trap()
+#define RMR_INLINE static inline __attribute__((always_inline))
+#define RMR_LIKELY(x) __builtin_expect(!!(x), 1)
+#define RMR_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#define RMR_RESTRICT __restrict__
 #elif defined(_MSC_VER)
 #include <intrin.h>
 #define RMR_TRAP() __debugbreak()
+#define RMR_INLINE static __forceinline
+#define RMR_LIKELY(x) (x)
+#define RMR_UNLIKELY(x) (x)
+#define RMR_RESTRICT
 #else
 #define RMR_TRAP()                      \
   do {                                  \
     volatile uint8_t *p = (uint8_t *)0; \
     *p = 0;                             \
   } while (0)
+#define RMR_INLINE static inline
+#define RMR_LIKELY(x) (x)
+#define RMR_UNLIKELY(x) (x)
+#define RMR_RESTRICT
 #endif
 
 #if defined(BLAKE3_TESTING)
@@ -32,11 +44,16 @@
 #define RMR_ASSERT(expr) ((void)(expr))
 #endif
 
-static inline void rmr_memcpy(void *dst, const void *src, size_t len) {
-  uint8_t *out = (uint8_t *)dst;
-  const uint8_t *in = (const uint8_t *)src;
+RMR_INLINE void rmr_memcpy(void *RMR_RESTRICT dst,
+                           const void *RMR_RESTRICT src,
+                           size_t len) {
+  if (RMR_UNLIKELY(len == 0)) {
+    return;
+  }
+  uint8_t *RMR_RESTRICT out = (uint8_t *)dst;
+  const uint8_t *RMR_RESTRICT in = (const uint8_t *)src;
   size_t i = 0;
-  if (len <= 16) {
+  if (RMR_LIKELY(len <= 16)) {
     switch (len) {
       case 16: out[15] = in[15];
       case 15: out[14] = in[14];
@@ -56,6 +73,7 @@ static inline void rmr_memcpy(void *dst, const void *src, size_t len) {
       case 1: out[0] = in[0];
       default: return;
     }
+    return;
   }
   if (((uintptr_t)out | (uintptr_t)in) % sizeof(size_t) == 0) {
     size_t *outw = (size_t *)out;
@@ -71,10 +89,13 @@ static inline void rmr_memcpy(void *dst, const void *src, size_t len) {
   }
 }
 
-static inline void rmr_memset(void *dst, uint8_t value, size_t len) {
-  uint8_t *out = (uint8_t *)dst;
+RMR_INLINE void rmr_memset(void *RMR_RESTRICT dst, uint8_t value, size_t len) {
+  if (RMR_UNLIKELY(len == 0)) {
+    return;
+  }
+  uint8_t *RMR_RESTRICT out = (uint8_t *)dst;
   size_t i = 0;
-  if (len <= 16) {
+  if (RMR_LIKELY(len <= 16)) {
     switch (len) {
       case 16: out[15] = value;
       case 15: out[14] = value;
@@ -94,6 +115,7 @@ static inline void rmr_memset(void *dst, uint8_t value, size_t len) {
       case 1: out[0] = value;
       default: return;
     }
+    return;
   }
   if (((uintptr_t)out) % sizeof(size_t) == 0) {
     size_t pattern = value;
@@ -114,25 +136,25 @@ static inline void rmr_memset(void *dst, uint8_t value, size_t len) {
   }
 }
 
-static inline size_t rmr_ll_strlen(const char *value) { return strlen(value); }
+RMR_INLINE size_t rmr_ll_strlen(const char *value) { return strlen(value); }
 
-static inline int rmr_ll_strcmp(const char *left, const char *right) {
+RMR_INLINE int rmr_ll_strcmp(const char *left, const char *right) {
   return strcmp(left, right);
 }
 
-static inline const char *rmr_ll_strerror(int errnum) {
+RMR_INLINE const char *rmr_ll_strerror(int errnum) {
   return strerror(errnum);
 }
 
-static inline void *rmr_ll_malloc(size_t size) { return malloc(size); }
+RMR_INLINE void *rmr_ll_malloc(size_t size) { return malloc(size); }
 
-static inline void rmr_ll_free(void *ptr) { free(ptr); }
+RMR_INLINE void rmr_ll_free(void *ptr) { free(ptr); }
 
-static inline bool rmr_ll_parse_size(const char *text, size_t *out) {
+RMR_INLINE bool rmr_ll_parse_size(const char *text, size_t *out) {
   char *end = NULL;
   errno = 0;
   unsigned long long value = strtoull(text, &end, 10);
-  if (errno != 0 || end == text || *end != '\0' || value > SIZE_MAX) {
+  if (RMR_UNLIKELY(errno != 0 || end == text || *end != '\0' || value > SIZE_MAX)) {
     return false;
   }
   *out = (size_t)value;

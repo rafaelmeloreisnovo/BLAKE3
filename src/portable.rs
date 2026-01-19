@@ -74,6 +74,7 @@ fn compress_pre(
     state
 }
 
+#[inline]
 pub fn compress_in_place(
     cv: &mut CVWords,
     block: &[u8; BLOCK_LEN],
@@ -93,6 +94,7 @@ pub fn compress_in_place(
     cv[7] = state[7] ^ state[15];
 }
 
+#[inline]
 pub fn compress_xof(
     cv: &CVWords,
     block: &[u8; BLOCK_LEN],
@@ -120,6 +122,7 @@ pub fn compress_xof(
     crate::platform::le_bytes_from_words_64(&state)
 }
 
+#[inline]
 pub fn hash1<const N: usize>(
     input: &[u8; N],
     key: &CVWords,
@@ -150,6 +153,7 @@ pub fn hash1<const N: usize>(
     *out = crate::platform::le_bytes_from_words_32(&cv);
 }
 
+#[inline]
 pub fn hash_many<const N: usize>(
     inputs: &[&[u8; N]],
     key: &CVWords,
