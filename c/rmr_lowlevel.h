@@ -1,8 +1,12 @@
 #ifndef RMR_LOWLEVEL_H
 #define RMR_LOWLEVEL_H
 
+#include <errno.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 
 #if defined(__GNUC__) || defined(__clang__)
 #define RMR_TRAP() __builtin_trap()
@@ -108,6 +112,27 @@ static inline void rmr_memset(void *dst, uint8_t value, size_t len) {
   for (; i < len; i++) {
     out[i] = value;
   }
+}
+
+static inline size_t rmr_strlen(const char *value) { return strlen(value); }
+
+static inline int rmr_strcmp(const char *left, const char *right) {
+  return strcmp(left, right);
+}
+
+static inline void *rmr_malloc(size_t size) { return malloc(size); }
+
+static inline void rmr_free(void *ptr) { free(ptr); }
+
+static inline bool rmr_parse_size(const char *text, size_t *out) {
+  char *end = NULL;
+  errno = 0;
+  unsigned long long value = strtoull(text, &end, 10);
+  if (errno != 0 || end == text || *end != '\0' || value > SIZE_MAX) {
+    return false;
+  }
+  *out = (size_t)value;
+  return true;
 }
 
 #endif
