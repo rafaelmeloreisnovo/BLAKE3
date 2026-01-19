@@ -10,14 +10,14 @@ use digest::generic_array::{typenum::U32, typenum::U64, GenericArray};
 impl digest::HashMarker for Hasher {}
 
 impl digest::Update for Hasher {
-    #[inline]
+    #[inline(always)]
     fn update(&mut self, data: &[u8]) {
         self.update(data);
     }
 }
 
 impl digest::Reset for Hasher {
-    #[inline]
+    #[inline(always)]
     fn reset(&mut self) {
         self.reset(); // the inherent method
     }
@@ -28,14 +28,14 @@ impl digest::OutputSizeUser for Hasher {
 }
 
 impl digest::FixedOutput for Hasher {
-    #[inline]
+    #[inline(always)]
     fn finalize_into(self, out: &mut GenericArray<u8, Self::OutputSize>) {
         out.copy_from_slice(self.finalize().as_bytes());
     }
 }
 
 impl digest::FixedOutputReset for Hasher {
-    #[inline]
+    #[inline(always)]
     fn finalize_into_reset(&mut self, out: &mut GenericArray<u8, Self::OutputSize>) {
         out.copy_from_slice(self.finalize().as_bytes());
         self.reset();
@@ -45,14 +45,14 @@ impl digest::FixedOutputReset for Hasher {
 impl digest::ExtendableOutput for Hasher {
     type Reader = OutputReader;
 
-    #[inline]
+    #[inline(always)]
     fn finalize_xof(self) -> Self::Reader {
         Hasher::finalize_xof(&self)
     }
 }
 
 impl digest::ExtendableOutputReset for Hasher {
-    #[inline]
+    #[inline(always)]
     fn finalize_xof_reset(&mut self) -> Self::Reader {
         let reader = Hasher::finalize_xof(self);
         self.reset();
@@ -61,7 +61,7 @@ impl digest::ExtendableOutputReset for Hasher {
 }
 
 impl digest::XofReader for OutputReader {
-    #[inline]
+    #[inline(always)]
     fn read(&mut self, buffer: &mut [u8]) {
         self.fill(buffer);
     }
@@ -78,7 +78,7 @@ impl crypto_common::BlockSizeUser for Hasher {
 impl digest::MacMarker for Hasher {}
 
 impl digest::KeyInit for Hasher {
-    #[inline]
+    #[inline(always)]
     fn new(key: &digest::Key<Self>) -> Self {
         let key_bytes: [u8; 32] = (*key).into();
         Hasher::new_keyed(&key_bytes)
