@@ -31,6 +31,14 @@ enum blake3_flags {
 #define INLINE static inline __attribute__((always_inline))
 #endif
 
+#if defined(__GNUC__) || defined(__clang__)
+#define BLAKE3_LIKELY(x) __builtin_expect(!!(x), 1)
+#define BLAKE3_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#else
+#define BLAKE3_LIKELY(x) (x)
+#define BLAKE3_UNLIKELY(x) (x)
+#endif
+
 #ifdef __cplusplus
 #define NOEXCEPT noexcept
 #else
@@ -111,7 +119,7 @@ static const uint8_t MSG_SCHEDULE[7][16] = {
 
 /* Find index of the highest set bit */
 /* x is assumed to be nonzero.       */
-static unsigned int highest_one(uint64_t x) {
+INLINE unsigned int highest_one(uint64_t x) {
 #if defined(__GNUC__) || defined(__clang__)
   return 63 ^ (unsigned int)__builtin_clzll(x);
 #elif defined(_MSC_VER) && defined(IS_X86_64)

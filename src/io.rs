@@ -1,7 +1,7 @@
 //! Helper functions for efficient IO.
 
 #[cfg(feature = "std")]
-const READ_BUF_LEN: usize = 64 * 1024;
+const READ_BUF_LEN: usize = 128 * 1024;
 
 #[cfg(feature = "std")]
 #[inline]
