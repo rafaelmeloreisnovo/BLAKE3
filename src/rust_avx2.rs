@@ -312,6 +312,7 @@ unsafe fn load_counters(counter: u64, increment_counter: IncrementCounter) -> (_
     }
 }
 
+#[inline]
 #[target_feature(enable = "avx2")]
 pub unsafe fn hash8(
     inputs: &[*const u8; DEGREE],
@@ -400,6 +401,7 @@ pub unsafe fn hash8(
 }
 
 #[target_feature(enable = "avx2")]
+#[inline]
 pub unsafe fn hash_many<const N: usize>(
     mut inputs: &[&[u8; N]],
     key: &CVWords,
