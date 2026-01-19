@@ -455,6 +455,7 @@ fn merge_subtrees_inner(
 /// [`Hasher::finalize_non_root`](HasherExt::finalize_non_root) or other calls to
 /// `merge_subtrees_non_root`. "Chaining value" is the academic term for a non-root or non-final
 /// hash.
+#[inline]
 pub fn merge_subtrees_non_root(
     left_child: &ChainingValue,
     right_child: &ChainingValue,
@@ -473,6 +474,7 @@ pub fn merge_subtrees_non_root(
 /// Note that inputs of [`CHUNK_LEN`] or less don't produce any parent nodes and can't be hashed
 /// using this function. In that case you must get the root hash from [`Hasher::finalize`] (or just
 /// [`blake3::hash`](crate::hash)).
+#[inline]
 pub fn merge_subtrees_root(
     left_child: &ChainingValue,
     right_child: &ChainingValue,

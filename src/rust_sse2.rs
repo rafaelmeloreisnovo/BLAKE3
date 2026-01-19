@@ -673,6 +673,7 @@ pub unsafe fn hash4(
 }
 
 #[target_feature(enable = "sse2")]
+#[inline(always)]
 unsafe fn hash1<const N: usize>(
     input: &[u8; N],
     key: &CVWords,

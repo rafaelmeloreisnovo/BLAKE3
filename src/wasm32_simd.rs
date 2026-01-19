@@ -358,6 +358,7 @@ fn compress_pre(
 }
 
 #[target_feature(enable = "simd128")]
+#[inline]
 pub fn compress_in_place(
     cv: &mut CVWords,
     block: &[u8; BLOCK_LEN],
@@ -375,6 +376,7 @@ pub fn compress_in_place(
 }
 
 #[target_feature(enable = "simd128")]
+#[inline]
 pub fn compress_xof(
     cv: &CVWords,
     block: &[u8; BLOCK_LEN],
@@ -583,6 +585,7 @@ fn load_counters(counter: u64, increment_counter: IncrementCounter) -> (v128, v1
 }
 
 #[target_feature(enable = "simd128")]
+#[inline]
 pub unsafe fn hash4(
     inputs: &[*const u8; DEGREE],
     blocks: usize,
@@ -674,6 +677,7 @@ pub unsafe fn hash4(
 }
 
 #[target_feature(enable = "simd128")]
+#[inline(always)]
 unsafe fn hash1<const N: usize>(
     input: &[u8; N],
     key: &CVWords,
@@ -705,6 +709,7 @@ unsafe fn hash1<const N: usize>(
 }
 
 #[target_feature(enable = "simd128")]
+#[inline]
 pub unsafe fn hash_many<const N: usize>(
     mut inputs: &[&[u8; N]],
     key: &CVWords,
