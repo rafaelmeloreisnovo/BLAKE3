@@ -8,6 +8,9 @@
 /// Identificador de versão do módulo RMR.
 pub const RMR_VERSION: &str = "0.2.0";
 
+/// Tamanho do buffer de leitura para IO amplo.
+pub(crate) const IO_READ_BUF_LEN: usize = 128 * 1024;
+
 /// Estrutura de configuração para evoluções futuras do módulo RMR.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RmrConfig {

@@ -1,7 +1,7 @@
 //! Helper functions for efficient IO.
 
 #[cfg(feature = "std")]
-const READ_BUF_LEN: usize = 128 * 1024;
+const READ_BUF_LEN: usize = crate::rmr::IO_READ_BUF_LEN;
 
 #[cfg(feature = "std")]
 thread_local! {
@@ -17,9 +17,6 @@ pub(crate) fn copy_wide(
 ) -> std::io::Result<u64> {
     READ_BUF.with(|buffer| {
         let mut buffer = buffer.borrow_mut();
-        if buffer.len() != READ_BUF_LEN {
-            buffer.resize(READ_BUF_LEN, 0);
-        }
         let mut total = 0;
         loop {
             match reader.read(&mut buffer) {
