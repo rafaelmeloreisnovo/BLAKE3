@@ -252,3 +252,15 @@ Ao publicar ou comparar resultados, registre pelo menos:
 3. Compare com outra função de hash sob o mesmo I/O.
 4. Ajuste parâmetros (threads, buffer, chunk) e repita.
 5. Documente o ganho e o custo (memória/CPU).
+
+### Escopo de mudanças no repositório
+
+Para evitar alterações desnecessárias, priorize mudanças pontuais nos
+arquivos que realmente influenciam o caminho crítico de hashing:
+
+- **Rust (`src/`)**: otimizações e ajustes de desempenho.
+- **C (`c/`)**: melhorias de SIMD/dispatch e multithreading.
+- **`benches/`**: novos cenários de benchmark.
+
+Evite “codificar em todos os arquivos” sem necessidade. Mudanças
+cirúrgicas tornam o impacto mensurável e reduzem regressões.
