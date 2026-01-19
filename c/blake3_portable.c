@@ -132,6 +132,9 @@ INLINE void hash_one_portable(const uint8_t *input, size_t blocks,
     if (blocks == 1) {
       block_flags |= flags_end;
     }
+    if (blocks > 1) {
+      BLAKE3_PREFETCH(input + BLAKE3_BLOCK_LEN);
+    }
     blake3_compress_in_place_portable(cv, input, BLAKE3_BLOCK_LEN, counter,
                                       block_flags);
     input = &input[BLAKE3_BLOCK_LEN];
