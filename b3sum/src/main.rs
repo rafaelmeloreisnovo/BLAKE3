@@ -18,6 +18,7 @@ const NO_NAMES_ARG: &str = "no_names";
 const RAW_ARG: &str = "raw";
 const TAG_ARG: &str = "tag";
 const CHECK_ARG: &str = "check";
+const CHECKFILE_BUF_SIZE: usize = 64 * 1024;
 
 #[derive(Parser)]
 #[command(version, max_term_width(100))]
@@ -499,10 +500,10 @@ fn check_one_checkfile(path: &Path, args: &Args, files_failed: &mut u64) -> anyh
     if path == Path::new("-") {
         stdin = io::stdin();
         stdin_lock = stdin.lock();
-        bufreader = io::BufReader::new(&mut stdin_lock);
+        bufreader = io::BufReader::with_capacity(CHECKFILE_BUF_SIZE, &mut stdin_lock);
     } else {
         file = File::open(path)?;
-        bufreader = io::BufReader::new(&mut file);
+        bufreader = io::BufReader::with_capacity(CHECKFILE_BUF_SIZE, &mut file);
     }
     let mut line = String::new();
     loop {
