@@ -47,6 +47,9 @@
 RMR_INLINE void rmr_memcpy(void *RMR_RESTRICT dst,
                            const void *RMR_RESTRICT src,
                            size_t len) {
+  if (RMR_UNLIKELY(len == 0)) {
+    return;
+  }
   uint8_t *RMR_RESTRICT out = (uint8_t *)dst;
   const uint8_t *RMR_RESTRICT in = (const uint8_t *)src;
   size_t i = 0;
@@ -86,6 +89,9 @@ RMR_INLINE void rmr_memcpy(void *RMR_RESTRICT dst,
 }
 
 RMR_INLINE void rmr_memset(void *RMR_RESTRICT dst, uint8_t value, size_t len) {
+  if (RMR_UNLIKELY(len == 0)) {
+    return;
+  }
   uint8_t *RMR_RESTRICT out = (uint8_t *)dst;
   size_t i = 0;
   if (RMR_LIKELY(len <= 16)) {
@@ -146,7 +152,7 @@ RMR_INLINE bool rmr_ll_parse_size(const char *text, size_t *out) {
   char *end = NULL;
   errno = 0;
   unsigned long long value = strtoull(text, &end, 10);
-  if (errno != 0 || end == text || *end != '\0' || value > SIZE_MAX) {
+  if (RMR_UNLIKELY(errno != 0 || end == text || *end != '\0' || value > SIZE_MAX)) {
     return false;
   }
   *out = (size_t)value;

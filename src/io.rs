@@ -9,7 +9,7 @@ pub(crate) fn copy_wide(
     mut reader: impl std::io::Read,
     hasher: &mut crate::Hasher,
 ) -> std::io::Result<u64> {
-    let mut buffer = [0; READ_BUF_LEN];
+    let mut buffer = vec![0u8; READ_BUF_LEN];
     let mut total = 0;
     loop {
         match reader.read(&mut buffer) {
