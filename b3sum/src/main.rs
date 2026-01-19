@@ -18,6 +18,7 @@ const NO_NAMES_ARG: &str = "no_names";
 const RAW_ARG: &str = "raw";
 const TAG_ARG: &str = "tag";
 const CHECK_ARG: &str = "check";
+const CHECKFILE_BUF_SIZE: usize = 64 * 1024;
 
 #[derive(Parser)]
 #[command(version, max_term_width(100))]
@@ -217,22 +218,28 @@ fn write_raw_output(output: blake3::OutputReader, args: &Args) -> anyhow::Result
 }
 
 fn read_key_from_stdin() -> anyhow::Result<[u8; blake3::KEY_LEN]> {
-    let mut bytes = Vec::with_capacity(blake3::KEY_LEN + 1);
-    let n = std::io::stdin()
-        .lock()
-        .take(blake3::KEY_LEN as u64 + 1)
-        .read_to_end(&mut bytes)?;
-    if n < blake3::KEY_LEN {
-        bail!(
-            "expected {} key bytes from stdin, found {}",
-            blake3::KEY_LEN,
-            n,
-        )
-    } else if n > blake3::KEY_LEN {
-        bail!("read more than {} key bytes from stdin", blake3::KEY_LEN)
-    } else {
-        Ok(bytes[..blake3::KEY_LEN].try_into().unwrap())
+    let mut key_bytes = [0u8; blake3::KEY_LEN];
+    let stdin = std::io::stdin();
+    let mut handle = stdin.lock();
+    let mut read_total = 0usize;
+    while read_total < key_bytes.len() {
+        let n = handle.read(&mut key_bytes[read_total..])?;
+        if n == 0 {
+            bail!(
+                "expected {} key bytes from stdin, found {}",
+                blake3::KEY_LEN,
+                read_total,
+            )
+        }
+        read_total += n;
     }
+
+    let mut extra = [0u8; 1];
+    if handle.read(&mut extra)? > 0 {
+        bail!("read more than {} key bytes from stdin", blake3::KEY_LEN)
+    }
+
+    Ok(key_bytes)
 }
 
 struct FilepathString {
@@ -493,10 +500,10 @@ fn check_one_checkfile(path: &Path, args: &Args, files_failed: &mut u64) -> anyh
     if path == Path::new("-") {
         stdin = io::stdin();
         stdin_lock = stdin.lock();
-        bufreader = io::BufReader::new(&mut stdin_lock);
+        bufreader = io::BufReader::with_capacity(CHECKFILE_BUF_SIZE, &mut stdin_lock);
     } else {
         file = File::open(path)?;
-        bufreader = io::BufReader::new(&mut file);
+        bufreader = io::BufReader::with_capacity(CHECKFILE_BUF_SIZE, &mut file);
     }
     let mut line = String::new();
     loop {
