@@ -8,6 +8,7 @@ pub struct ChunkState(crate::ChunkState);
 impl ChunkState {
     // Currently this type only supports the regular hash mode. If an
     // incremental user needs keyed_hash or derive_key, we can add that.
+    #[inline]
     pub fn new(chunk_counter: u64) -> Self {
         Self(crate::ChunkState::new(
             crate::IV,
@@ -28,6 +29,7 @@ impl ChunkState {
         self
     }
 
+    #[inline]
     pub fn finalize(&self, is_root: bool) -> crate::Hash {
         let output = self.0.output();
         if is_root {
@@ -40,6 +42,7 @@ impl ChunkState {
 
 // As above, this currently assumes the regular hash mode. If an incremental
 // user needs keyed_hash or derive_key, we can add that.
+#[inline]
 pub fn parent_cv(
     left_child: &crate::Hash,
     right_child: &crate::Hash,

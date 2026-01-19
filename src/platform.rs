@@ -62,6 +62,7 @@ pub enum Platform {
 
 impl Platform {
     #[allow(unreachable_code)]
+    #[inline]
     pub fn detect() -> Self {
         #[cfg(miri)]
         {
@@ -99,6 +100,7 @@ impl Platform {
         Platform::Portable
     }
 
+    #[inline]
     pub fn simd_degree(&self) -> usize {
         let degree = match self {
             Platform::Portable => 1,
@@ -120,6 +122,7 @@ impl Platform {
         degree
     }
 
+    #[inline]
     pub fn compress_in_place(
         &self,
         cv: &mut CVWords,
@@ -156,6 +159,7 @@ impl Platform {
         }
     }
 
+    #[inline]
     pub fn compress_xof(
         &self,
         cv: &CVWords,
@@ -349,11 +353,13 @@ impl Platform {
 
     // Explicit platform constructors, for benchmarks.
 
+    #[inline]
     pub fn portable() -> Self {
         Self::Portable
     }
 
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+    #[inline]
     pub fn sse2() -> Option<Self> {
         if sse2_detected() {
             Some(Self::SSE2)
@@ -363,6 +369,7 @@ impl Platform {
     }
 
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+    #[inline]
     pub fn sse41() -> Option<Self> {
         if sse41_detected() {
             Some(Self::SSE41)
@@ -372,6 +379,7 @@ impl Platform {
     }
 
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+    #[inline]
     pub fn avx2() -> Option<Self> {
         if avx2_detected() {
             Some(Self::AVX2)
@@ -382,6 +390,7 @@ impl Platform {
 
     #[cfg(blake3_avx512_ffi)]
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+    #[inline]
     pub fn avx512() -> Option<Self> {
         if avx512_detected() {
             Some(Self::AVX512)
@@ -391,12 +400,14 @@ impl Platform {
     }
 
     #[cfg(blake3_neon)]
+    #[inline]
     pub fn neon() -> Option<Self> {
         // Assumed to be safe if the "neon" feature is on.
         Some(Self::NEON)
     }
 
     #[cfg(blake3_wasm32_simd)]
+    #[inline]
     pub fn wasm32_simd() -> Option<Self> {
         // Assumed to be safe if the "wasm32_simd" feature is on.
         Some(Self::WASM32_SIMD)
