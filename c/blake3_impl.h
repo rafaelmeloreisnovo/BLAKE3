@@ -34,9 +34,16 @@ enum blake3_flags {
 #if defined(__GNUC__) || defined(__clang__)
 #define BLAKE3_LIKELY(x) __builtin_expect(!!(x), 1)
 #define BLAKE3_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#define BLAKE3_ASSUME(x)   \
+  do {                     \
+    if (!(x)) {            \
+      __builtin_unreachable(); \
+    }                      \
+  } while (0)
 #else
 #define BLAKE3_LIKELY(x) (x)
 #define BLAKE3_UNLIKELY(x) (x)
+#define BLAKE3_ASSUME(x) ((void)(x))
 #endif
 
 #ifdef __cplusplus
