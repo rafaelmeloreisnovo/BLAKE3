@@ -6,7 +6,7 @@
 //! crate.
 
 /// Identificador de versão do módulo RMR.
-pub const RMR_VERSION: &str = "0.1.0";
+pub const RMR_VERSION: &str = "0.2.0";
 
 /// Estrutura de configuração para evoluções futuras do módulo RMR.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -16,6 +16,7 @@ pub struct RmrConfig {
 }
 
 impl Default for RmrConfig {
+    #[inline]
     fn default() -> Self {
         Self {
             experimental: false,
