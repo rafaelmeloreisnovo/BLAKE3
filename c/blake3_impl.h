@@ -40,10 +40,12 @@ enum blake3_flags {
       __builtin_unreachable(); \
     }                      \
   } while (0)
+#define BLAKE3_PREFETCH(addr) __builtin_prefetch((addr))
 #else
 #define BLAKE3_LIKELY(x) (x)
 #define BLAKE3_UNLIKELY(x) (x)
 #define BLAKE3_ASSUME(x) ((void)(x))
+#define BLAKE3_PREFETCH(addr) ((void)(addr))
 #endif
 
 #ifdef __cplusplus
