@@ -4,6 +4,7 @@ use crate::{CVWords, IncrementCounter, BLOCK_LEN, OUT_LEN};
 // compress_xof.
 
 // Unsafe because this may only be called on platforms supporting AVX2.
+#[inline]
 pub unsafe fn hash_many<const N: usize>(
     inputs: &[&[u8; N]],
     key: &CVWords,
