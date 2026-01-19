@@ -230,6 +230,13 @@ time openssl sha256 /tmp/bigfile
 time b3sum /tmp/bigfile
 ```
 
+Para automatizar esse comparativo, use o script
+`tools/benchmark_example.sh` (aceita caminho e tamanho opcional):
+
+```bash
+./tools/benchmark_example.sh /tmp/bigfile 1000000000
+```
+
 Para benchmarks mais detalhados (e repetíveis), utilize os targets em
 `benches/` e registre os parâmetros do hardware (CPU, threads,
 instruções SIMD disponíveis) para comparação honesta.

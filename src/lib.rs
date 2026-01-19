@@ -95,6 +95,7 @@ mod test;
 pub mod guts;
 
 pub mod hazmat;
+pub mod rmr;
 
 /// Undocumented and unstable, for benchmarks only.
 #[doc(hidden)]
