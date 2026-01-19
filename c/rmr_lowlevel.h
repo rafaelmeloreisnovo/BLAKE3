@@ -1,12 +1,14 @@
 #ifndef RMR_LOWLEVEL_H
 #define RMR_LOWLEVEL_H
 
-#include <errno.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
+#if !defined(RMR_NO_LIBC)
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#endif
 
 #if defined(__GNUC__) || defined(__clang__)
 #define RMR_TRAP() __builtin_trap()
@@ -136,6 +138,14 @@ RMR_INLINE void rmr_memset(void *RMR_RESTRICT dst, uint8_t value, size_t len) {
   }
 }
 
+#if defined(RMR_NO_LIBC)
+size_t rmr_ll_strlen(const char *value);
+int rmr_ll_strcmp(const char *left, const char *right);
+const char *rmr_ll_strerror(int errnum);
+void *rmr_ll_malloc(size_t size);
+void rmr_ll_free(void *ptr);
+unsigned long long rmr_ll_strtoull(const char *text, char **end, int base);
+#else
 RMR_INLINE size_t rmr_ll_strlen(const char *value) { return strlen(value); }
 
 RMR_INLINE int rmr_ll_strcmp(const char *left, const char *right) {
@@ -149,14 +159,22 @@ RMR_INLINE const char *rmr_ll_strerror(int errnum) {
 RMR_INLINE void *rmr_ll_malloc(size_t size) { return malloc(size); }
 
 RMR_INLINE void rmr_ll_free(void *ptr) { free(ptr); }
+#endif
 
 RMR_INLINE bool rmr_ll_parse_size(const char *text, size_t *out) {
   char *end = NULL;
+#if defined(RMR_NO_LIBC)
+  unsigned long long value = rmr_ll_strtoull(text, &end, 10);
+  if (RMR_UNLIKELY(end == text || *end != '\0' || value > SIZE_MAX)) {
+    return false;
+  }
+#else
   errno = 0;
   unsigned long long value = strtoull(text, &end, 10);
   if (RMR_UNLIKELY(errno != 0 || end == text || *end != '\0' || value > SIZE_MAX)) {
     return false;
   }
+#endif
   *out = (size_t)value;
   return true;
 }
