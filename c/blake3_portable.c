@@ -1,5 +1,4 @@
 #include "blake3_impl.h"
-#include <string.h>
 
 INLINE uint32_t rotr32(uint32_t w, uint32_t c) {
   return (w >> c) | (w << (32 - c));
@@ -127,7 +126,7 @@ INLINE void hash_one_portable(const uint8_t *input, size_t blocks,
                               uint8_t flags, uint8_t flags_start,
                               uint8_t flags_end, uint8_t out[BLAKE3_OUT_LEN]) {
   uint32_t cv[8];
-  memcpy(cv, key, BLAKE3_KEY_LEN);
+  rmr_memcpy(cv, key, BLAKE3_KEY_LEN);
   uint8_t block_flags = flags | flags_start;
   while (blocks > 0) {
     if (blocks == 1) {
