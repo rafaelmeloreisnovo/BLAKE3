@@ -87,6 +87,19 @@ static const uint32_t IV[8] = {0x6A09E667UL, 0xBB67AE85UL, 0x3C6EF372UL,
                                0xA54FF53AUL, 0x510E527FUL, 0x9B05688CUL,
                                0x1F83D9ABUL, 0x5BE0CD19UL};
 
+static const uint32_t IV_MATRIX[2][4] = {
+    {IV[0], IV[1], IV[2], IV[3]},
+    {IV[4], IV[5], IV[6], IV[7]},
+};
+
+static inline const uint32_t *blake3_iv_matrix_row(size_t row) {
+  return IV_MATRIX[row];
+}
+
+static inline size_t blake3_iv_matrix_rows(void) { return 2; }
+
+static inline size_t blake3_iv_matrix_cols(void) { return 4; }
+
 static const uint8_t MSG_SCHEDULE[7][16] = {
     {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
     {2, 6, 3, 10, 7, 0, 4, 13, 1, 11, 12, 5, 9, 14, 15, 8},
