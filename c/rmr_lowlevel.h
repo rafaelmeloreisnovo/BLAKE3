@@ -31,14 +31,39 @@
 static inline void rmr_memcpy(void *dst, const void *src, size_t len) {
   uint8_t *out = (uint8_t *)dst;
   const uint8_t *in = (const uint8_t *)src;
-  for (size_t i = 0; i < len; i++) {
+  size_t i = 0;
+  if (((uintptr_t)out | (uintptr_t)in) % sizeof(size_t) == 0) {
+    size_t *outw = (size_t *)out;
+    const size_t *inw = (const size_t *)in;
+    size_t words = len / sizeof(size_t);
+    for (i = 0; i < words; i++) {
+      outw[i] = inw[i];
+    }
+    i *= sizeof(size_t);
+  }
+  for (; i < len; i++) {
     out[i] = in[i];
   }
 }
 
 static inline void rmr_memset(void *dst, uint8_t value, size_t len) {
   uint8_t *out = (uint8_t *)dst;
-  for (size_t i = 0; i < len; i++) {
+  size_t i = 0;
+  if (((uintptr_t)out) % sizeof(size_t) == 0) {
+    size_t pattern = value;
+    pattern |= pattern << 8;
+    pattern |= pattern << 16;
+#if SIZE_MAX > 0xffffffffu
+    pattern |= pattern << 32;
+#endif
+    size_t *outw = (size_t *)out;
+    size_t words = len / sizeof(size_t);
+    for (i = 0; i < words; i++) {
+      outw[i] = pattern;
+    }
+    i *= sizeof(size_t);
+  }
+  for (; i < len; i++) {
     out[i] = value;
   }
 }
