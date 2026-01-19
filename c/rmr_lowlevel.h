@@ -87,10 +87,13 @@ RMR_INLINE void rmr_memcpy(void *RMR_RESTRICT dst,
     size_t *outw = (size_t *)out;
     const size_t *inw = (const size_t *)in;
     size_t words = len / sizeof(size_t);
+    const size_t prefetch_distance = 16;
+    const size_t prefetch_stride = 8;
     for (i = 0; i < words; i++) {
-      if (RMR_LIKELY(words >= 16) && (i & 7u) == 0) {
-        RMR_PREFETCH_R(inw + i + 16);
-        RMR_PREFETCH_W(outw + i + 16);
+      if (RMR_LIKELY(words > prefetch_distance) &&
+          (i % prefetch_stride) == 0) {
+        RMR_PREFETCH_R(inw + i + prefetch_distance);
+        RMR_PREFETCH_W(outw + i + prefetch_distance);
       }
       outw[i] = inw[i];
     }
