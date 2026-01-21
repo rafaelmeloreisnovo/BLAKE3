@@ -138,6 +138,14 @@ endif
 ifdef BLAKE3_USE_NEON
 EXTRAFLAGS += -DBLAKE3_USE_NEON=1
 TARGETS += blake3_neon.o
+ifeq ($(RMR_OS_WINDOWS),)
+ifneq ($(RMR_ARCH_AARCH64),)
+  ASM_TARGETS += blake3_neon_aarch64_unix.S
+endif
+ifneq ($(RMR_ARCH_ARM),)
+  ASM_TARGETS += blake3_neon_armv7_unix.S
+endif
+endif
 endif
 
 ifdef BLAKE3_NO_NEON
