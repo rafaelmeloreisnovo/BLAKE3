@@ -36,6 +36,8 @@ separados:
 - `rmr/` (documentação, licença e código experimental isolado).
   - `rmr/include/`: headers auxiliares do módulo externo.
   - `rmr/rust/`: módulos Rust externos (não integrados ao crate `blake3`).
+  - `rmr/benchmark_framework/`: blueprint do framework de benchmark industrial
+    (isolado do core).
 - Scripts ou automações específicos (quando existirem) devem evitar
   tocar no núcleo.
 
@@ -53,6 +55,7 @@ separados:
 - `test_vectors/`: vetores e utilitários oficiais.
 - `benches/`, `tools/`, `media/`: conteúdo upstream.
 - `rmr/`: camada externa isolada (ver `rmr/ARCHITECTURE.md`).
+- `rmr/benchmark_framework/`: blueprint do framework de benchmark (RMR).
 
 ## Build e testes (alinhado ao README oficial)
 
@@ -70,6 +73,26 @@ cargo build -p b3sum
 ### C (implementação oficial)
 
 Siga as instruções em `c/README.md` para compilar e testar.
+
+## Benchmarking (camada RMR, sem tocar no core)
+
+O framework de benchmark **não** altera o núcleo do BLAKE3. Ele fica isolado em
+`rmr/benchmark_framework/` e deve consumir o BLAKE3 somente como biblioteca ou
+CLI externa. O desenho prevê **duas interfaces obrigatórias**:
+
+- **CLI** (`rmr-bench`): execução automática por parâmetros.
+- **BBS/TUI**: interface textual interativa (menus/teclado).
+
+Exemplo de uso esperado (não executado nesta documentação):
+
+```bash
+rmr-bench --profile ram --size 4GiB --runs 5 --seed 123
+rmr-bench --profile io --file ./big.dat --runs 5 --threads 1
+rmr-bench --profile pipeline --runs 5 --save report.json
+```
+
+Saídas previstas: JSON, CSV e Markdown, com registro de seed, tamanho, threads,
+flags, commit e timestamp.
 
 ## Proveniência e autoria
 
