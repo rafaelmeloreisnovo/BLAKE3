@@ -4,6 +4,18 @@ Este documento descreve a arquitetura inicial do módulo **RMR** dentro
 do repositório BLAKE3. O objetivo é oferecer um espaço isolado para
 evoluções focadas em performance, sem impactar o núcleo do hash.
 
+## Proveniência e autoria
+
+O módulo **RMR** (Rafael Melo Reis) é autoral e deve permanecer isolado
+para garantir separação clara em relação ao núcleo **BLAKE3** upstream.
+Essa separação evita confusão de licença e facilita auditoria:
+
+- **Upstream BLAKE3**: todo o conteúdo de `src/` exceto `src/rmr.rs`,
+  além de `c/` (exceto `c/rmr_lowlevel.h`), `reference_impl/`, `b3sum/`
+  e `tools/`.
+- **RMR**: `src/rmr.rs`, `c/rmr_lowlevel.h` e `rmr/` (documentação e
+  licença do módulo).
+
 ## Objetivos
 
 - **Isolamento**: manter mudanças experimentais contidas em `src/rmr.rs`.
