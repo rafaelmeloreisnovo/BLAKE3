@@ -1,0 +1,5008 @@
+diff --git a/rmr/ARCHITECTURE.md b/rmr/ARCHITECTURE.md
+new file mode 100644
+index 0000000..5933325
+--- /dev/null
++++ b/rmr/ARCHITECTURE.md
+@@ -0,0 +1,39 @@
++# Arquitetura do módulo RMR (camada externa)
++
++Este documento descreve a arquitetura do módulo **RMR** dentro deste
++repositório. O RMR é **externo** ao núcleo BLAKE3 upstream e permanece
++isolado para evitar mistura de autoria/licença e para não interferir no
++código criptográfico oficial.
++
++## Escopo e isolamento
++
++- **Upstream BLAKE3**: permanece intacto em `src/`, `c/`,
++  `reference_impl/`, `b3sum/`, `test_vectors/`, `tools/`, `benches/`,
++  `media/` e documentos oficiais.
++- **RMR (externo)**: concentrado em `rmr/`, sem integração obrigatória
++  com o núcleo BLAKE3.
++
++## Componentes do RMR
++
++- `rmr/include/`: headers auxiliares do módulo externo
++  (ex.: detecção de arquitetura/OS, helpers low-level).
++- `rmr/rust/`: módulos Rust externos **não** integrados ao crate
++  `blake3`.
++- `rmr/ARCHITECTURE.md`: este documento.
++- `rmr/PROVENIENCE.md`: mapa de proveniência e licenças.
++- `rmr/LICENSE_RMR`: licença do módulo RMR.
++
++## Diretrizes
++
++1. **Não tocar no núcleo**: o RMR não deve alterar arquivos do upstream.
++2. **Integração opcional**: qualquer uso do RMR deve ocorrer fora do
++   núcleo (ex.: em ferramentas ou wrappers externos).
++3. **Documente mudanças**: arquivos autorais devem ter cabeçalho de
++   licença e registro em `rmr/PROVENIENCE.md`.
++4. **Sem telemetria**: o módulo não coleta nem transmite dados.
++
++## Observações de uso
++
++O RMR pode conter experimentos de performance ou infraestrutura
++auxiliar, mas **não** substitui nem modifica o núcleo BLAKE3. Qualquer
++consumidor deve tratá-lo como **camada externa**.
+diff --git a/rmr/LICENSE_RMR b/rmr/LICENSE_RMR
+new file mode 100644
+index 0000000..7bebc73
+--- /dev/null
++++ b/rmr/LICENSE_RMR
+@@ -0,0 +1,21 @@
++RMR Module License
++
++Copyright (c) 2025 Rafael
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.
+diff --git a/rmr/PRIVACY.md b/rmr/PRIVACY.md
+new file mode 100644
+index 0000000..40ea859
+--- /dev/null
++++ b/rmr/PRIVACY.md
+@@ -0,0 +1,30 @@
++# Privacidade, logs e compliance (RMR + upstream)
++
++Este documento consolida as políticas de privacidade/logs do repositório
++BLAKE3, com ênfase no módulo **RMR**, e referencia as licenças aplicáveis.
++Ele **não** é uma certificação formal (ISO/NIST/RFC/IEEE/W3C/lei), mas
++registra as fronteiras técnicas e de auditoria para apoiar revisões.
++
++## Escopo e coleta de dados
++
++- **Sem telemetria**: o núcleo de hash não coleta nem transmite dados.
++  Não há coleta automática no caminho crítico de `src/` e `c/`.
++- **Sem logging de dados sensíveis**: entradas, chaves e saídas do hash
++  **não devem** ser registradas em stdout/stderr, arquivos ou métricas.
++
++## Limites de logs no repositório
++
++O repositório contém mensagens de diagnóstico **apenas** em exemplos ou
++ferramentas auxiliares (ex.: `c/main.c`, `c/example.c`, `c/example_tbb.c`)
++para fins de demonstração e teste. O caminho crítico do hash permanece
++livre de logs e telemetria.
++
++## Referências de licença (compliance)
++
++- **Upstream BLAKE3**: licenças no topo do repositório
++  (`LICENSE_A2`, `LICENSE_A2LLVM`, `LICENSE_CC0`) aplicam-se ao código
++  upstream.
++- **RMR**: a licença específica do módulo está em `rmr/LICENSE_RMR`.
++
++Para auditorias, mantenha a separação: arquivos sob `rmr/` seguem a
++licença RMR; o restante do projeto segue as licenças upstream listadas.
+diff --git a/rmr/PROVENIENCE.md b/rmr/PROVENIENCE.md
+new file mode 100644
+index 0000000..ed27142
+--- /dev/null
++++ b/rmr/PROVENIENCE.md
+@@ -0,0 +1,39 @@
++<!--
++Copyright (c) 2025 Rafael
++License: RMR Module License (see LICENSE_RMR)
++-->
++
++# Proveniência do repositório (BLAKE3 vs RMR)
++
++Este documento cataloga a origem por arquivo/pasta para evitar mistura de
++autoria entre o upstream **BLAKE3** e a camada externa **RMR**.
++
++## Regras de isolamento
++
++- **Upstream BLAKE3** permanece com autoria e licenças originais.
++- **RMR autoral** permanece isolado em `rmr/`.
++- Integrações entre blocos devem ser **mínimas, documentadas e explícitas**.
++
++## Mapa de proveniência (por arquivo/pasta)
++
++| Caminho | Proveniência | Licença aplicável |
++| --- | --- | --- |
++| `src/` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
++| `c/` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
++| `b3sum/` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
++| `reference_impl/` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
++| `test_vectors/` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
++| `benches/` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
++| `tools/` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
++| `media/` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
++| `README.md`, `CONTRIBUTING.md`, `LICENSE_*`, `Cargo.toml`, `Cargo.lock`, `build.rs` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
++| `rmr/` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
++| `DOCUMENTACAO.md`, `MANIFESTO*.md` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
++
++## Observações sobre integração
++
++- O RMR é **externo** e não integra o núcleo BLAKE3 por padrão.
++- Qualquer novo arquivo autoral do RMR **deve**:
++  1. Ficar dentro de `rmr/`.
++  2. Incluir cabeçalho de copyright/licença no próprio arquivo.
++  3. Ser registrado neste documento.
+diff --git a/rmr/REVIEW.md b/rmr/REVIEW.md
+new file mode 100644
+index 0000000..279cfff
+--- /dev/null
++++ b/rmr/REVIEW.md
+@@ -0,0 +1,38 @@
++# Revisão de determinismo (rmr/ e c/)
++
++Este documento define uma **lista de verificação** para auditorias no
++código-fonte em `rmr/` e `c/`, com foco em determinismo e previsibilidade
++em todos os caminhos críticos do hash. Ele não é uma certificação formal,
++mas orienta revisões para garantir que os resultados sejam esperados e
++reprodutíveis.
++
++## Objetivo
++
++Garantir que qualquer caminho de execução do hash seja determinístico:
++mesma entrada + mesmo contexto de build ⇒ mesma saída.
++
++## Lista de verificação (auditoria)
++
++1. **Sem fontes de aleatoriedade**
++   - Nenhuma chamada a `rand()`, geradores de entropia, relógio, ou
++     dependências temporais em `rmr/` e `c/`.
++2. **Sem IO no caminho crítico**
++   - Não há leitura/escrita de arquivos, rede ou stdout/stderr na lógica
++     do hash (mensagens ficam restritas a exemplos/testes).
++3. **Sem estado global mutável compartilhado**
++   - Evitar estado global que altere o resultado entre execuções.
++4. **Determinismo por arquitetura**
++   - As rotas SIMD/ASM e o dispatcher devem produzir o mesmo resultado
++     que a implementação portátil, para os mesmos vetores de teste.
++5. **Paralelismo controlado**
++   - O agendamento de threads não deve alterar a saída do hash.
++6. **Tratamento de erros previsível**
++   - Erros devem falhar de forma consistente, sem comportamento
++     dependente de timing ou condições externas.
++
++## Evidências recomendadas
++
++- Rodar vetores de teste oficiais e comparar com a implementação de
++  referência.
++- Revisar diffs em `rmr/` e `c/` buscando efeitos colaterais ou logs.
++
+diff --git a/rmr/base.c b/rmr/base.c
+new file mode 100644
+index 0000000..3148700
+--- /dev/null
++++ b/rmr/base.c
+@@ -0,0 +1,199 @@
++#include "pai_base.h"
++#include "pai.h"
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <math.h>
++
++static int is_prime_i64(int64_t x) {
++    if (x < 2) return 0;
++    if (x % 2 == 0) return x == 2;
++    for (int64_t d = 3; d*d <= x; d += 2) {
++        if (x % d == 0) return 0;
++    }
++    return 1;
++}
++
++int64_t pai_prev_prime(int64_t n) {
++    if (n <= 2) return -1;
++    for (int64_t x = n - 1; x >= 2; --x) {
++        if (is_prime_i64(x)) return x;
++    }
++    return -1;
++}
++
++int64_t pai_next_prime(int64_t n) {
++    if (n < 2) n = 2;
++    for (int64_t x = n + 1; ; ++x) {
++        if (is_prime_i64(x)) return x;
++    }
++}
++
++static void trim(char *s) {
++    size_t n = strlen(s);
++    while (n && (s[n-1]=='\n' || s[n-1]=='\r' || s[n-1]==' ' || s[n-1]=='\t')) s[--n]=0;
++    while (*s==' ' || *s=='\t') memmove(s, s+1, strlen(s));
++}
++
++static int split_csv_i64(const char *csv, int64_t *out, int cap) {
++    if (!csv || !*csv) return 0;
++    char *tmp = strdup(csv);
++    if (!tmp) return 0;
++
++    int k = 0;
++    char *save = NULL;
++    for (char *tok = strtok_r(tmp, ",", &save); tok; tok = strtok_r(NULL, ",", &save)) {
++        if (k >= cap) break;
++        trim(tok);
++        out[k++] = atoll(tok);
++    }
++    free(tmp);
++    return k;
++}
++
++static int split_csv_i32(const char *csv, int *out, int cap) {
++    if (!csv || !*csv) return 0;
++    char *tmp = strdup(csv);
++    if (!tmp) return 0;
++
++    int k = 0;
++    char *save = NULL;
++    for (char *tok = strtok_r(tmp, ",", &save); tok; tok = strtok_r(NULL, ",", &save)) {
++        if (k >= cap) break;
++        trim(tok);
++        out[k++] = atoi(tok);
++    }
++    free(tmp);
++    return k;
++}
++
++static void to_base_vec_u64(uint64_t v, uint32_t base, uint32_t *digits, int *nd) {
++    // digits em ordem reversa
++    int k = 0;
++    if (base < 2) { *nd = 0; return; }
++    if (v == 0) { digits[0] = 0; *nd = 1; return; }
++    while (v && k < 256) {
++        digits[k++] = (uint32_t)(v % base);
++        v /= base;
++    }
++    *nd = k;
++}
++
++static void fmt_base(FILE *f, int64_t value, uint32_t base) {
++    if (base < 2) {
++        fprintf(f, "base %u: [invalida]\n", base);
++        return;
++    }
++
++    int neg = (value < 0);
++    uint64_t v = (uint64_t)(neg ? -(value + 1) + 1 : value); // safe abs
++
++    uint32_t digits[256];
++    int nd = 0;
++    to_base_vec_u64(v, base, digits, &nd);
++
++    // base "bonita" <= 62 (0-9A-Za-z)
++    static const char *ALPHA62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
++
++    if (base <= 62) {
++        char buf[512];
++        int p = 0;
++        if (neg) buf[p++] = '-';
++        for (int i = nd - 1; i >= 0; --i) {
++            uint32_t d = digits[i];
++            buf[p++] = ALPHA62[d];
++        }
++        buf[p] = 0;
++        fprintf(f, "base %u: %s\n", base, buf);
++    } else {
++        // bases grandes: vetor de dígitos (sem inventar alfabeto)
++        fprintf(f, "base %u: %s[", base, neg ? "-" : "");
++        for (int i = nd - 1; i >= 0; --i) {
++            fprintf(f, "%u", digits[i]);
++            if (i) fputc(',', f);
++        }
++        fprintf(f, "]\n");
++    }
++}
++
++static void write_report(
++    const char *out_dir,
++    const int64_t *vals, int nvals,
++    const int *bases, int nbases
++) {
++    if (pai_mkdir_p(out_dir) != 0) {
++        perror("mkdir");
++        return;
++    }
++
++    char path[PAI_MAX_PATH];
++    snprintf(path, sizeof(path), "%s/bases.txt", out_dir);
++
++    FILE *f = fopen(path, "wb");
++    if (!f) pai_die("bases.txt");
++
++    fprintf(f, "PAI :: bases report\n");
++    fprintf(f, "values=%d bases=%d\n\n", nvals, nbases);
++
++    for (int i = 0; i < nvals; ++i) {
++        int64_t v = vals[i];
++        int64_t pprev = pai_prev_prime(v);
++        int64_t pnext = pai_next_prime(v);
++
++        fprintf(f, "== value: %lld ==\n", (long long)v);
++        fprintf(f, "prev_prime=%lld next_prime=%lld\n", (long long)pprev, (long long)pnext);
++
++        // extras: “pontos bonitos”
++        // 12^2=144, 42-30=12 etc (só calcula, não dogmatiza)
++        if (v == 12) fprintf(f, "note: 12^2=144\n");
++        if (v == 42) fprintf(f, "note: 42-30=12 (ciclo 4 setores)\n");
++        if (v == 30) fprintf(f, "note: sin(30°)=0.5 (triangulo)\n");
++
++        for (int b = 0; b < nbases; ++b) {
++            uint32_t base = (uint32_t)bases[b];
++            fmt_base(f, v, base);
++        }
++        fprintf(f, "\n");
++    }
++
++    fclose(f);
++    printf("[OK] bases report: %s\n", path);
++}
++
++int pai_cmd_bases(int argc, char **argv) {
++    const char *values_csv = NULL;
++    const char *bases_csv  = NULL;
++    const char *out_dir    = "out_bases";
++
++    for (int i = 2; i < argc; ++i) {
++        if (!strcmp(argv[i], "--values") && i + 1 < argc) values_csv = argv[++i];
++        else if (!strcmp(argv[i], "--bases") && i + 1 < argc) bases_csv = argv[++i];
++        else if (!strcmp(argv[i], "--out") && i + 1 < argc) out_dir = argv[++i];
++    }
++
++    if (!values_csv || !bases_csv) {
++        fprintf(stderr, "uso: pai bases --values 7,12,30,... --bases 10,7,14,60,... [--out DIR]\n");
++        return 1;
++    }
++
++    int64_t vals[256];
++    int bases[256];
++    int nvals  = split_csv_i64(values_csv, vals, 256);
++    int nbases = split_csv_i32(bases_csv, bases, 256);
++
++    if (nvals <= 0 || nbases <= 0) {
++        fprintf(stderr, "[erro] values/bases vazios\n");
++        return 1;
++    }
++
++    // valida base >=2
++    for (int i = 0; i < nbases; ++i) {
++        if (bases[i] < 2) {
++            fprintf(stderr, "[erro] base invalida: %d (min=2)\n", bases[i]);
++            return 1;
++        }
++    }
++
++    write_report(out_dir, vals, nvals, bases, nbases);
++    return 0;
++}
+diff --git a/rmr/base.o b/rmr/base.o
+new file mode 100644
+index 0000000..a3df4a2
+Binary files /dev/null and b/rmr/base.o differ
+diff --git a/rmr/bench.c b/rmr/bench.c
+new file mode 100644
+index 0000000..ab69aa9
+--- /dev/null
++++ b/rmr/bench.c
+@@ -0,0 +1,184 @@
++#include "pai.h"
++#include <errno.h>
++#include <fcntl.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <time.h>
++#include <unistd.h>
++#include <sys/stat.h>
++#include <sys/wait.h>
++
++static double now_ms(void){
++    struct timespec ts;
++    clock_gettime(CLOCK_MONOTONIC, &ts);
++    return (double)ts.tv_sec*1000.0 + (double)ts.tv_nsec/1000000.0;
++}
++
++static int deterministic_enabled(void){
++    const char *env = getenv("RMR_DETERMINISTIC");
++    return env && strcmp(env, "1") == 0;
++}
++
++static void report_timestamp(struct tm *out_tm){
++    if(deterministic_enabled()){
++        memset(out_tm, 0, sizeof(*out_tm));
++        out_tm->tm_year = 70;
++        out_tm->tm_mon = 0;
++        out_tm->tm_mday = 1;
++        return;
++    }
++
++    time_t tt = time(NULL);
++    struct tm *tm = gmtime(&tt);
++    if(tm){
++        *out_tm = *tm;
++        return;
++    }
++    memset(out_tm, 0, sizeof(*out_tm));
++    out_tm->tm_year = 70;
++    out_tm->tm_mon = 0;
++    out_tm->tm_mday = 1;
++}
++
++static int mkdir_p(const char *path){
++    if(mkdir(path,0700)==0) return 0;
++    if(errno==EEXIST) return 0;
++    return -1;
++}
++
++static void usage(void){
++    puts("pai bench --repeat N --out OUTDIR [--quiet] [--bytes N] -- <comando> [args...]");
++    puts("  --quiet  : suprime stdout/stderr do comando benchmarkado");
++    puts("  --bytes N: calcula throughput no report (use p/ hash de arquivo grande)");
++}
++
++static int run_self_cmd(int quiet, char *const argv_exec[]){
++    pid_t pid = fork();
++    if(pid < 0) return -1;
++
++    if(pid == 0){
++        if(quiet){
++            int fd = open("/dev/null", O_WRONLY);
++            if(fd >= 0){
++                dup2(fd, STDOUT_FILENO);
++                dup2(fd, STDERR_FILENO);
++                close(fd);
++            }
++        }
++        execv(argv_exec[0], argv_exec);
++        _exit(127);
++    }
++
++    int status = 0;
++    if(waitpid(pid, &status, 0) < 0) return -1;
++    if(WIFEXITED(status)) return WEXITSTATUS(status);
++    return 128;
++}
++
++int pai_cmd_bench(int argc, char **argv){
++    int repeat = 0;
++    const char *out = NULL;
++    int quiet = 0;
++    long long bytes = -1;
++
++    int sep = -1;
++    for(int i=2;i<argc;i++){
++        if(!strcmp(argv[i],"--repeat") && i+1<argc){ repeat = atoi(argv[++i]); continue; }
++        if(!strcmp(argv[i],"--out") && i+1<argc){ out = argv[++i]; continue; }
++        if(!strcmp(argv[i],"--quiet")){ quiet = 1; continue; }
++        if(!strcmp(argv[i],"--bytes") && i+1<argc){ bytes = atoll(argv[++i]); continue; }
++        if(!strcmp(argv[i],"--")){ sep = i; break; }
++        if(!strcmp(argv[i],"--help") || !strcmp(argv[i],"-h")){ usage(); return 0; }
++    }
++
++    if(repeat <= 0 || !out || sep < 0 || sep+1 >= argc){
++        usage();
++        return 2;
++    }
++
++    if(mkdir_p(out)!=0){ perror("mkdir"); return 3; }
++
++    char tsvpath[512], rptpath[512];
++    snprintf(tsvpath,sizeof(tsvpath),"%s/bench.tsv",out);
++    snprintf(rptpath,sizeof(rptpath),"%s/bench_report.txt",out);
++
++    FILE *tsv = fopen(tsvpath,"w");
++    if(!tsv){ perror("fopen"); return 4; }
++    fprintf(tsv,"cmd\tok\tms\n");
++
++    // monta argv para executar: ./pai <cmd> <args...>
++    // o <cmd> é argv[sep+1], args seguintes idem
++    // argv_exec[0] = "./pai" (default); se nao existir, usa argv[0] do processo
++    const char *self = "./pai";
++    if(access(self, X_OK)!=0) self = argv[0];
++
++    int sub_argc = argc - (sep+1);
++    // +2: self + NULL
++    char **argv_exec = (char**)calloc((size_t)sub_argc + 2, sizeof(char*));
++    if(!argv_exec){ fclose(tsv); return 5; }
++
++    argv_exec[0] = (char*)self;
++    for(int i=0;i<sub_argc;i++){
++        argv_exec[i+1] = argv[sep+1+i];
++    }
++    argv_exec[sub_argc+1] = NULL;
++
++    const char *cmd = argv[sep+1];
++
++    double sum=0.0, mn=1e300, mx=0.0;
++    int okcount=0;
++
++    for(int i=0;i<repeat;i++){
++        double t0 = now_ms();
++        int rc = run_self_cmd(quiet, argv_exec);
++        double t1 = now_ms();
++        double dt = t1 - t0;
++
++        int ok = (rc==0);
++        if(ok) okcount++;
++
++        fprintf(tsv,"%s\t%d\t%.3f\n", cmd, ok?1:0, dt);
++
++        sum += dt;
++        if(dt < mn) mn = dt;
++        if(dt > mx) mx = dt;
++    }
++
++    free(argv_exec);
++    fclose(tsv);
++
++    double avg = sum / (double)repeat;
++
++    struct tm tm;
++    report_timestamp(&tm);
++
++    FILE *rpt = fopen(rptpath,"w");
++    if(!rpt){ perror("fopen"); return 6; }
++
++    fprintf(rpt,"PAI BENCH v1\n");
++    fprintf(rpt,"timestamp=%04d-%02d-%02dT%02d:%02d:%02dZ\n",
++        tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday,
++        tm.tm_hour, tm.tm_min, tm.tm_sec);
++    fprintf(rpt,"cmd=%s\n", cmd);
++    fprintf(rpt,"repeat=%d\n", repeat);
++    fprintf(rpt,"ok=%d/%d\n", okcount, repeat);
++    fprintf(rpt,"ms_avg=%.3f\n", avg);
++    fprintf(rpt,"ms_min=%.3f\n", mn);
++    fprintf(rpt,"ms_max=%.3f\n", mx);
++    fprintf(rpt,"tsv=%s\n", tsvpath);
++
++    if(bytes > 0){
++        double sec = avg/1000.0;
++        double bps = (sec>0.0) ? ((double)bytes / sec) : 0.0;
++        fprintf(rpt,"bytes=%lld\n", bytes);
++        fprintf(rpt,"MBps=%.3f\n", bps/1000000.0);
++        fprintf(rpt,"MiBps=%.3f\n", bps/1048576.0);
++    }
++
++    fclose(rpt);
++
++    printf("[OK] bench.tsv: %s\n", tsvpath);
++    printf("[OK] bench_report.txt: %s\n", rptpath);
++    return 0;
++}
+diff --git a/rmr/bench.o b/rmr/bench.o
+new file mode 100644
+index 0000000..b9f040e
+Binary files /dev/null and b/rmr/bench.o differ
+diff --git a/rmr/bench_termux.sh b/rmr/bench_termux.sh
+new file mode 100644
+index 0000000..9a28fff
+--- /dev/null
++++ b/rmr/bench_termux.sh
+@@ -0,0 +1,79 @@
++#!/data/data/com.termux/files/usr/bin/sh
++set -eu
++
++# ===== config =====
++BIN="${1:-./pai}"
++OUTDIR="${2:-out_bench}"
++N="${N:-7}"            # repeticoes
++SIZE="${SIZE:-1024}"
++NU="${NU:-256}"
++NV="${NV:-128}"
++
++mkdir -p "$OUTDIR"
++OUT="$OUTDIR/bench.tsv"
++
++echo "op\trep\tms\tok" > "$OUT"
++
++ms_now() {
++  # Termux: date +%s%3N funciona na maioria; fallback para seconds*1000
++  if date +%s%3N >/dev/null 2>&1; then
++    date +%s%3N
++  else
++    python - <<'PY'
++import time
++print(int(time.time()*1000))
++PY
++  fi
++}
++
++run_op() {
++  op="$1"
++  shift
++  rep="$1"
++  shift
++
++  t0=$(ms_now)
++  ok=1
++  if "$BIN" "$op" "$@" >/dev/null 2>&1; then
++    ok=1
++  else
++    ok=0
++  fi
++  t1=$(ms_now)
++  dt=$((t1 - t0))
++  echo "${op}\t${rep}\t${dt}\t${ok}" >> "$OUT"
++}
++
++# ===== prepara dados =====
++rm -rf "$OUTDIR/tmp"
++mkdir -p "$OUTDIR/tmp"
++
++# arquivo teste
++printf "abc" > "$OUTDIR/tmp/test.txt"
++
++# ===== bench =====
++i=1
++while [ "$i" -le "$N" ]; do
++  run_op "hash"   "$i" --file "$OUTDIR/tmp/test.txt"
++
++  rm -rf "$OUTDIR/tmp/scan_in" "$OUTDIR/tmp/scan_out"
++  mkdir -p "$OUTDIR/tmp/scan_in"
++  cp "$OUTDIR/tmp/test.txt" "$OUTDIR/tmp/scan_in/a.txt"
++  run_op "scan"   "$i" --base "$OUTDIR/tmp/scan_in" --out "$OUTDIR/tmp/scan_out"
++
++  rm -rf "$OUTDIR/tmp/geom"
++  run_op "geom"   "$i" --out "$OUTDIR/tmp/geom" --size "$SIZE" --cycle42 --sin30 --sqrt2 --sqrt3 --fibo --shapes --mandel
++
++  rm -rf "$OUTDIR/tmp/toroid"
++  run_op "toroid" "$i" --tex "$OUTDIR/tmp/geom/geom.pgm" --out "$OUTDIR/tmp/toroid" --nu "$NU" --nv "$NV"
++
++  rm -rf "$OUTDIR/tmp/toroid_scan" "$OUTDIR/tmp/toroid_signed"
++  run_op "scan"   "$i" --base "$OUTDIR/tmp/toroid" --out "$OUTDIR/tmp/toroid_scan"
++  run_op "sign"   "$i" --base "$OUTDIR/tmp/toroid" --scan "$OUTDIR/tmp/toroid_scan" --out "$OUTDIR/tmp/toroid_signed"
++
++  i=$((i+1))
++done
++
++echo "[OK] bench salvo em: $OUT"
++echo "Dica: ordenar por op e ver medias:"
++echo "  awk 'NR>1{a[\$1]+=\$3; c[\$1]++} END{for(k in a) printf(\"%s\\t%.2f ms\\t(n=%d)\\n\", k, a[k]/c[k], c[k])}' $OUT | sort"
+diff --git a/rmr/benchdiff.c b/rmr/benchdiff.c
+new file mode 100644
+index 0000000..8570303
+--- /dev/null
++++ b/rmr/benchdiff.c
+@@ -0,0 +1,121 @@
++#include "pai.h"
++#include "pai_benchdiff.h"
++
++#include <errno.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/stat.h>
++
++static int ensure_dir(const char *path) {
++    if(!path || !*path) return 0;
++    if(mkdir(path, 0700) == 0) return 0;
++    if(errno == EEXIST) return 0;
++    return -1;
++}
++
++static int read_avg_ms(const char *tsv, double *out_avg, int *out_n) {
++    FILE *f = fopen(tsv, "r");
++    if(!f) return -1;
++
++    char line[256];
++    int n = 0;
++    double sum = 0.0;
++
++    /* header */
++    if(!fgets(line, sizeof(line), f)) {
++        fclose(f);
++        return -2;
++    }
++
++    while(fgets(line, sizeof(line), f)) {
++        /* format: cmd \t ok \t ms */
++        char cmd[64];
++        int ok = 0;
++        double ms = 0.0;
++
++        /* be permissive: spaces or tabs */
++        if(sscanf(line, "%63s %d %lf", cmd, &ok, &ms) != 3) continue;
++        if(ok != 1) continue;
++        sum += ms;
++        n++;
++    }
++
++    fclose(f);
++
++    if(n <= 0) return -3;
++    *out_avg = sum / (double)n;
++    *out_n = n;
++    return 0;
++}
++
++int pai_cmd_benchdiff(int argc, char **argv) {
++    const char *a = NULL;
++    const char *b = NULL;
++    const char *out = NULL;
++    double threshold = 5.0;
++
++    for(int i = 2; i < argc; i++) {
++        if(!strcmp(argv[i], "--a") && i+1 < argc) { a = argv[++i]; continue; }
++        if(!strcmp(argv[i], "--b") && i+1 < argc) { b = argv[++i]; continue; }
++        if(!strcmp(argv[i], "--out") && i+1 < argc) { out = argv[++i]; continue; }
++        if(!strcmp(argv[i], "--threshold") && i+1 < argc) { threshold = atof(argv[++i]); continue; }
++    }
++
++    if(!a || !b) {
++        fprintf(stderr, "uso: pai benchdiff --a A.tsv --b B.tsv [--out OUTDIR] [--threshold 5]\n");
++        return 2;
++    }
++
++    double a_avg = 0.0, b_avg = 0.0;
++    int a_n = 0, b_n = 0;
++
++    if(read_avg_ms(a, &a_avg, &a_n) != 0) {
++        fprintf(stderr, "[erro] nao leu A: %s\n", a);
++        return 3;
++    }
++    if(read_avg_ms(b, &b_avg, &b_n) != 0) {
++        fprintf(stderr, "[erro] nao leu B: %s\n", b);
++        return 4;
++    }
++
++    /* delta percent: positive means B slower than A (bigger ms) */
++    double delta = ((b_avg - a_avg) / a_avg) * 100.0;
++    double adelta = (delta < 0.0) ? -delta : delta;
++    const char *status = (adelta >= threshold) ? "ALERT" : "OK";
++
++    if(out && *out) {
++        if(ensure_dir(out) != 0) {
++            perror("mkdir");
++            return 5;
++        }
++
++        char rpt[512];
++        snprintf(rpt, sizeof(rpt), "%s/benchdiff_report.txt", out);
++
++        FILE *o = fopen(rpt, "w");
++        if(!o) {
++            perror("fopen");
++            return 6;
++        }
++
++        fprintf(o, "BENCHDIFF\n");
++        fprintf(o, "A=%s\n", a);
++        fprintf(o, "B=%s\n", b);
++        fprintf(o, "A.avg_ms=%.3f (n=%d)\n", a_avg, a_n);
++        fprintf(o, "B.avg_ms=%.3f (n=%d)\n", b_avg, b_n);
++        fprintf(o, "delta=%.2f%% (threshold=%.2f%%)\n", delta, threshold);
++        fprintf(o, "status=%s\n", status);
++        fclose(o);
++
++        printf("[OK] benchdiff_report.txt: %s\n", rpt);
++    } else {
++        printf("BENCHDIFF\n");
++        printf("A.avg_ms=%.3f (n=%d)\n", a_avg, a_n);
++        printf("B.avg_ms=%.3f (n=%d)\n", b_avg, b_n);
++        printf("delta=%.2f%% (threshold=%.2f%%)\n", delta, threshold);
++        printf("status=%s\n", status);
++    }
++
++    return (strcmp(status, "ALERT") == 0) ? 1 : 0;
++}
+diff --git a/rmr/benchdiff.o b/rmr/benchdiff.o
+new file mode 100644
+index 0000000..431d3c2
+Binary files /dev/null and b/rmr/benchdiff.o differ
+diff --git a/rmr/build_termux.sh b/rmr/build_termux.sh
+new file mode 100644
+index 0000000..97a6676
+--- /dev/null
++++ b/rmr/build_termux.sh
+@@ -0,0 +1,6 @@
++#!/data/data/com.termux/files/usr/bin/sh
++set -eu
++cd "$(dirname "$0")/.."
++make clean
++make CC=clang
++echo "[OK] build: ./pai"
+diff --git a/rmr/cli.c b/rmr/cli.c
+new file mode 100644
+index 0000000..b8d164c
+--- /dev/null
++++ b/rmr/cli.c
+@@ -0,0 +1,78 @@
++#include "pai_benchdiff.h"
++#include "pai_bench.h"
++#include "pai_sign.h"
++#include "pai_sign.h"
++#include "pai_toroid.h"
++#include "pai.h"
++#include "pai_hash.h"
++#include "pai_scan.h"
++#include "pai_base.h"
++#include "pai_geom.h"
++#include <stdio.h>
++#include <string.h>
++
++static void usage(void) {
++    puts("pai (Pipeline de Arquitetura Integradora) — C bare metal");
++    puts("");
++    puts("Comandos:");
++    puts("  pai hash  --file arquivo");
++    puts("  pai scan  --base DIR --out OUTDIR [--exclude PATH]... [--hidden] [--follow] [--max-depth N] [--max-size BYTES]");
++    puts("  pai bases --values 7,12,30,42,56,70,144 --bases 10,7,14,60,20,18,13 --out out_bases");
++    puts("  pai geom  --out out_geom --size 1024 --cycle42 --sin30 --sqrt2 --sqrt3 --fibo --shapes --mandel");
++    puts("  pai toroid --tex out_geom/geom.pgm --out out_toroid [--nu 256] [--nv 128] [--R 1.0] [--r 0.35]");
++    puts("  pai bench --repeat N --out OUTDIR -- <comando> [args...]");
++    puts("  pai benchdiff --a A.tsv --b B.tsv [--out OUTDIR] [--threshold 5]");
++    puts("  pai sign   --base DIR --scan SCANDIR --out DIR");
++    puts("");
++    puts("Notas:");
++    puts("  - scan exclui automaticamente o OUTDIR para evitar auto-referencia.");
++    puts("  - scan falha (exit!=0) se a base nao existir.");
++    puts("  - geom escreve PGM (P5) para compatibilidade bare metal.");
++    puts("");
++}
++
++static int cmd_hash(int argc, char **argv) {
++    const char *file = NULL;
++    for(int i=2;i<argc;i++) {
++        if(!strcmp(argv[i],"--file") && i+1<argc) file = argv[++i];
++    }
++    if(!file) {
++        fprintf(stderr,"uso: pai hash --file arquivo\n");
++        return 1;
++    }
++
++    uint8_t hash[32];
++    char hex[65];
++
++    if(pai_sha256_file(file, hash)!=0) {
++        perror("hash");
++        return 1;
++    }
++
++    pai_sha256_hex(hash, hex);
++    printf("%s  %s\n", hex, file);
++    return 0;
++}
++
++int pai_main(int argc, char **argv) {
++    if(argc < 2) { usage(); return 0; }
++
++    if(!strcmp(argv[1], "--help") || !strcmp(argv[1], "-h")) {
++        usage();
++        return 0;
++    }
++
++    if(!strcmp(argv[1], "hash"))  return cmd_hash(argc, argv);
++    if(!strcmp(argv[1], "scan"))  return pai_cmd_scan(argc, argv);
++    if(!strcmp(argv[1], "bases")) return pai_cmd_bases(argc, argv);
++    if(!strcmp(argv[1], "geom"))  return pai_cmd_geom(argc, argv);
++    if(!strcmp(argv[1], "toroid")) return pai_cmd_toroid(argc, argv);
++    if(!strcmp(argv[1], "sign"))   return pai_cmd_sign(argc, argv);
++    if(!strcmp(argv[1], "bench"))  return pai_cmd_bench(argc, argv);
++    if(!strcmp(argv[1], "benchdiff")) return pai_cmd_benchdiff(argc, argv);
++    if(!strcmp(argv[1], "benchdiff")) return pai_cmd_benchdiff(argc, argv);
++
++    fprintf(stderr,"[erro] comando desconhecido: %s\n", argv[1]);
++    usage();
++    return 1;
++}
+diff --git a/rmr/cli.o b/rmr/cli.o
+new file mode 100644
+index 0000000..3fc22f9
+Binary files /dev/null and b/rmr/cli.o differ
+diff --git a/rmr/fix_geom_N_all_scopes.py b/rmr/fix_geom_N_all_scopes.py
+new file mode 100644
+index 0000000..5e1274a
+--- /dev/null
++++ b/rmr/fix_geom_N_all_scopes.py
+@@ -0,0 +1,100 @@
++#!/usr/bin/env python3
++from pathlib import Path
++import time, re
++
++p = Path("src/geom.c")
++s = p.read_text(encoding="utf-8", errors="ignore")
++
++bak = p.with_suffix(f".pre_fix.{int(time.time())}.bak")
++bak.write_text(s, encoding="utf-8")
++print(f"[A] backup: {bak}")
++
++# 0) helper macros
++if "PAI_CAST_HELPERS" not in s:
++    macro = (
++        "\n#ifndef PAI_CAST_HELPERS\n"
++        "#define PAI_CAST_HELPERS\n"
++        "#include <stddef.h>\n"
++        "#define F32(x) ((float)(x))\n"
++        "#define SZ(x)  ((size_t)(x))\n"
++        "#endif\n"
++    )
++    incs = list(re.finditer(r"^#include[^\n]*$", s, flags=re.M))
++    if incs:
++        pos = incs[-1].end()
++        s = s[:pos] + macro + s[pos:]
++    else:
++        s = macro + s
++
++# 1) remover lixo antigo fn / const const
++s = re.sub(r"^[ \t]*const[ \t]+float[ \t]+fn[ \t]*=[ \t]*\(\s*float\s*\)\s*n\s*;[ \t]*\r?\n", "", s, flags=re.M)
++s = re.sub(r"\bfn\b", "F32(n)", s)
++s = re.sub(r"\bconst\s+const\b", "const", s)
++
++# 2) corrigir N*N*sizeof(float) -> N*sizeof(float)
++s = re.sub(r"\bN\s*\*\s*N\s*\*\s*sizeof\s*\(\s*float\s*\)", "N * sizeof(float)", s)
++
++lines = s.splitlines(True)
++
++# 3) Para cada função: se houver " i < N " e não houver definição de N dentro do corpo,
++#    injeta "size_t N = SZ(n) * SZ(n);" logo após a primeira chave '{' da função.
++#
++# Heurística segura:
++# - detecta início de função por linha que termina com "{"
++# - coleta bloco até o matching "}"
++# - verifica uso de N no bloco e presença de definição de N
++def find_blocks(lines):
++    blocks = []
++    i = 0
++    while i < len(lines):
++        # linha com '{' possivelmente início de função (evita struct/if/for)
++        if re.search(r"\)\s*\{\s*$", lines[i]):  # assinatura de função típica
++            start = i
++            depth = 0
++            j = i
++            while j < len(lines):
++                depth += lines[j].count("{")
++                depth -= lines[j].count("}")
++                if depth == 0 and j > start:
++                    end = j
++                    blocks.append((start, end))
++                    i = end + 1
++                    break
++                j += 1
++            else:
++                i += 1
++        else:
++            i += 1
++    return blocks
++
++blocks = find_blocks(lines)
++
++def block_text(a,b):
++    return "".join(lines[a:b+1])
++
++for (a,b) in blocks:
++    txt = block_text(a,b)
++
++    uses_N = re.search(r"\bN\b", txt) is not None
++    loop_uses_N = re.search(r"\bfor\s*\([^;]*;[^;]*<\s*N\s*;[^)]*\)", txt) is not None
++    has_N_def = re.search(r"^\s*(int|size_t)\s+N\s*=", txt, flags=re.M) is not None
++
++    if loop_uses_N and not has_N_def:
++        # injeta após a linha do "{"
++        indent = re.match(r"^(\s*)", lines[a+1] if a+1 <= b else lines[a]).group(1)
++        inject = indent + "size_t N = SZ(n) * SZ(n);\n"
++        lines.insert(a+1, inject)
++        print(f"[B] injected N in function starting line {a+1}")
++
++# 4) Trocar loops int->size_t quando comparando com N
++for i, ln in enumerate(lines):
++    lines[i] = re.sub(
++        r"\bfor\s*\(\s*int\s+i\s*=\s*0\s*;\s*i\s*<\s*N\s*;\s*i\+\+\s*\)",
++        "for(size_t i=0; i < N; i++)",
++        lines[i]
++    )
++
++# 5) salvar
++out = "".join(lines)
++p.write_text(out, encoding="utf-8")
++print("[OK] geom.c patched: N definido em todos os escopos que usam N")
+diff --git a/rmr/fix_geom_N_scope.py b/rmr/fix_geom_N_scope.py
+new file mode 100644
+index 0000000..a86a031
+--- /dev/null
++++ b/rmr/fix_geom_N_scope.py
+@@ -0,0 +1,89 @@
++#!/usr/bin/env python3
++from pathlib import Path
++import time
++import re
++
++p = Path("src/geom.c")
++s = p.read_text(encoding="utf-8", errors="ignore")
++
++# 0) backup
++bak = p.with_suffix(f".pre_fix.{int(time.time())}.bak")
++bak.write_text(s, encoding="utf-8")
++print(f"[A] backup: {bak}")
++
++# 1) garantir helpers F32/SZ (uma vez)
++if "PAI_CAST_HELPERS" not in s:
++    macro = (
++        "\n#ifndef PAI_CAST_HELPERS\n"
++        "#define PAI_CAST_HELPERS\n"
++        "#include <stddef.h>\n"
++        "#define F32(x) ((float)(x))\n"
++        "#define SZ(x)  ((size_t)(x))\n"
++        "#endif\n"
++    )
++    incs = list(re.finditer(r"^#include[^\n]*$", s, flags=re.M))
++    if incs:
++        pos = incs[-1].end()
++        s = s[:pos] + macro + s[pos:]
++    else:
++        s = macro + s
++
++# 2) remover qualquer declaração "const float fn = (float)n;" (se sobrou lixo)
++s = re.sub(r"^[ \t]*const[ \t]+float[ \t]+fn[ \t]*=[ \t]*\(\s*float\s*\)\s*n\s*;[ \t]*\r?\n", "", s, flags=re.M)
++
++# 3) substituir token isolado fn -> F32(n) (se ainda existir em algum lugar)
++s = re.sub(r"\bfn\b", "F32(n)", s)
++
++# 4) limpar "const const"
++s = re.sub(r"\bconst\s+const\b", "const", s)
++
++# 5) Corrigir o bug: N*N*sizeof(float) -> N*sizeof(float) (se existir)
++s = re.sub(r"\bN\s*\*\s*N\s*\*\s*sizeof\s*\(\s*float\s*\)", "N * sizeof(float)", s)
++
++# 6) Garantir que EXISTE um "size_t N = SZ(n)*SZ(n);" NO ESCOPO CERTO
++# Estratégia: localizar a primeira alocação do bloco ov/mb/gf e injetar N logo antes.
++lines = s.splitlines(True)
++
++# achar linha do primeiro "float *ov = (float*)xmalloc(" (ou "xmalloc(" perto de ov)
++idx_ov = None
++for i, ln in enumerate(lines):
++    if "float *ov" in ln and "xmalloc" in ln:
++        idx_ov = i
++        break
++
++if idx_ov is None:
++    raise SystemExit("[ERRO] nao achei a linha de alocacao do ov (float *ov = ... xmalloc).")
++
++# remover quaisquer definicoes antigas de N muito acima/abaixo que possam estar fora do lugar
++# (somente se forem exatamente "int N = n*n;" ou "size_t N = ...;" soltas)
++new_lines = []
++for ln in lines:
++    if re.search(r"^\s*(int|size_t)\s+N\s*=\s*.*;\s*$", ln):
++        # vamos remover e reinserir no lugar certo
++        continue
++    new_lines.append(ln)
++lines = new_lines
++
++# recalcular idx_ov porque a lista pode ter mudado
++idx_ov = None
++for i, ln in enumerate(lines):
++    if "float *ov" in ln and "xmalloc" in ln:
++        idx_ov = i
++        break
++if idx_ov is None:
++    raise SystemExit("[ERRO] apos limpeza, nao achei ov/xmalloc.")
++
++# injetar definicao de N imediatamente antes do ov
++indent = re.match(r"^(\s*)", lines[idx_ov]).group(1)
++inject = indent + "size_t N = SZ(n) * SZ(n);\n"
++lines.insert(idx_ov, inject)
++
++# 7) Ajustar qualquer loop "for(int i=0;i<N;i++)" -> size_t
++for i, ln in enumerate(lines):
++    lines[i] = re.sub(r"\bfor\s*\(\s*int\s+i\s*=\s*0\s*;\s*i\s*<\s*N\s*;\s*i\+\+\s*\)",
++                      "for(size_t i=0; i < N; i++)", lines[i])
++
++# 8) garantir includes de <stddef.h> já via macro, e salvar
++out = "".join(lines)
++p.write_text(out, encoding="utf-8")
++print("[B] patched: N reinserido no escopo certo + loop size_t + limpeza fn/constconst")
+diff --git a/rmr/fix_pai_warnings.py b/rmr/fix_pai_warnings.py
+new file mode 100644
+index 0000000..ac2a97d
+--- /dev/null
++++ b/rmr/fix_pai_warnings.py
+@@ -0,0 +1,167 @@
++#!/usr/bin/env python3
++import re
++from pathlib import Path
++
++def load(p: Path) -> str:
++    return p.read_text(encoding="utf-8", errors="ignore")
++
++def save(p: Path, s: str):
++    p.write_text(s, encoding="utf-8")
++
++def ensure_once(s: str, needle: str, insert_after_re: str, insert_text: str) -> str:
++    if needle in s:
++        return s
++    m = re.search(insert_after_re, s, flags=re.M)
++    if not m:
++        # if can't find anchor, prepend
++        return insert_text + "\n" + s
++    idx = m.end()
++    return s[:idx] + "\n" + insert_text + s[idx:]
++
++def sub_idem(s: str, pattern: str, repl: str, flags=0) -> str:
++    # only replace if pattern exists and repl not already present nearby
++    if re.search(pattern, s, flags):
++        s = re.sub(pattern, repl, s, flags=flags)
++    return s
++
++def fix_hash_sha256(path: Path):
++    s = load(path)
++
++    # Ensure <stdint.h> (should exist, but safe)
++    s = ensure_once(s, "#include <stdint.h>", r"^#include\s+<stdio\.h>.*$", "#include <stdint.h>")
++
++    # w[i] message schedule cast fix
++    # Try to match a typical line constructing uint32_t from 4 bytes
++    s = sub_idem(
++        s,
++        r"w\[(?:i|t)\]\s*=\s*\(block\[[^\]]+\]\s*<<\s*24\)\s*\|\s*\(block\[[^\]]+\]\s*<<\s*16\)\s*\|\s*\(block\[[^\]]+\]\s*<<\s*8\)\s*\|\s*\(block\[[^\]]+\]\)\s*;",
++        "w[i] = ((uint32_t)block[i*4] << 24) | ((uint32_t)block[i*4+1] << 16) | ((uint32_t)block[i*4+2] << 8) | ((uint32_t)block[i*4+3]);",
++        flags=re.M,
++    )
++    # Another common form: w[i] = (block[i*4]<<24)|...
++    s = sub_idem(
++        s,
++        r"w\[i\]\s*=\s*\(block\[i\*4\]\s*<<\s*24\)\s*\|\s*\(block\[i\*4\+1\]\s*<<\s*16\)\s*\|\s*\(block\[i\*4\+2\]\s*<<\s*8\)\s*\|\s*\(block\[i\*4\+3\]\)\s*;",
++        "w[i] = ((uint32_t)block[i*4] << 24) | ((uint32_t)block[i*4+1] << 16) | ((uint32_t)block[i*4+2] << 8) | ((uint32_t)block[i*4+3]);",
++        flags=re.M,
++    )
++
++    # Output bytes explicit truncation to uint8_t
++    # Replace 4 lines pattern if present
++    s = sub_idem(
++        s,
++        r"out\[(?:i)\*4\+0\]\s*=\s*ctx->h\[(?:i)\]\s*>>\s*24\s*;\s*"
++        r"out\[(?:i)\*4\+1\]\s*=\s*ctx->h\[(?:i)\]\s*>>\s*16\s*;\s*"
++        r"out\[(?:i)\*4\+2\]\s*=\s*ctx->h\[(?:i)\]\s*>>\s*8\s*;\s*"
++        r"out\[(?:i)\*4\+3\]\s*=\s*ctx->h\[(?:i)\]\s*;\s*",
++        "out[i*4+0] = (uint8_t)(ctx->h[i] >> 24);\n        out[i*4+1] = (uint8_t)(ctx->h[i] >> 16);\n        out[i*4+2] = (uint8_t)(ctx->h[i] >>  8);\n        out[i*4+3] = (uint8_t)(ctx->h[i] >>  0);\n",
++        flags=re.S,
++    )
++
++    save(path, s)
++
++def fix_toroid(path: Path):
++    s = load(path)
++
++    # Ensure includes
++    s = ensure_once(s, "#include <math.h>", r"^#include\s+\".*?\"\s*$", "#include <math.h>")
++
++    # atof -> float casts
++    s = sub_idem(s, r"o\.R\s*=\s*atof\(", "o.R = (float)atof(")
++    s = sub_idem(s, r"o\.r\s*=\s*atof\(", "o.r = (float)atof(")
++
++    # Safer size_t for read buffer if pattern exists
++    # Transform:
++    # unsigned char *buf = xmalloc((*w)*(*h));
++    # fread(buf,1,(*w)*(*h),f);
++    if "unsigned char *buf = xmalloc((*w)*(*h));" in s and "const size_t tw =" not in s:
++        s = s.replace(
++            "unsigned char *buf = xmalloc((*w)*(*h));\n    fread(buf,1,(*w)*(*h),f);",
++            "const size_t tw = (size_t)(*w);\n    const size_t th = (size_t)(*h);\n    unsigned char *buf = xmalloc(tw * th);\n    (void)fread(buf, 1, tw * th, f);",
++        )
++
++    # fwrite(tex,1,tw*th,ft) -> size_t
++    s = sub_idem(s, r"fwrite\(\s*tex\s*,\s*1\s*,\s*tw\*th\s*,\s*ft\s*\)\s*;", "fwrite(tex, 1, (size_t)tw * (size_t)th, ft);")
++
++    # 2*M_PI float: introduce two_pi and cast divisions
++    if re.search(r"\* 2\*M_PI", s) and "two_pi" not in s:
++        s = re.sub(
++            r"(float\s+v\s*=\s*\(float\)j/o\.nv\s*\*\s*2\*M_PI\s*;)",
++            "const float two_pi = (float)(2.0 * M_PI);\n        float v = ((float)j/(float)o.nv) * two_pi;",
++            s,
++        )
++        s = re.sub(
++            r"float\s+u\s*=\s*\(float\)i/o\.nu\s*\*\s*2\*M_PI\s*;",
++            "float u = ((float)i/(float)o.nu) * two_pi;",
++            s,
++        )
++
++    save(path, s)
++
++def fix_geom(path: Path):
++    s = load(path)
++
++    # Add helper macros once (keeps patch simple + avoids messing with code structure)
++    macro_block = (
++        "#ifndef PAI_CAST_HELPERS\n"
++        "#define PAI_CAST_HELPERS\n"
++        "#define F32(x) ((float)(x))\n"
++        "#define SZ(x)  ((size_t)(x))\n"
++        "#endif\n"
++    )
++    # Insert after last include
++    if "PAI_CAST_HELPERS" not in s:
++        # find last include line
++        incs = list(re.finditer(r"^#include[^\n]*$", s, flags=re.M))
++        if incs:
++            last = incs[-1].end()
++            s = s[:last] + "\n" + macro_block + s[last:]
++        else:
++            s = macro_block + s
++
++    # Replace common int->float risky patterns
++    s = s.replace("(n-1)/2.0f", "(F32(n)-1.0f)*0.5f")
++    s = s.replace("(n/2.0f)", "(F32(n)*0.5f)")
++    s = s.replace("0.93f*(n/2.0f)", "0.93f*(F32(n)*0.5f)")
++    s = s.replace("0.85f*(n/2.0f)", "0.85f*(F32(n)*0.5f)")
++    s = s.replace("(n/2.0f)", "(F32(n)*0.5f)")
++
++    # (x - cx)/s etc
++    s = re.sub(r"\(\s*x\s*-\s*cx\s*\)\s*/\s*s", "(F32(x) - cx) / s", s)
++    s = re.sub(r"\(\s*y\s*-\s*cy\s*\)\s*/\s*s", "(F32(y) - cy) / s", s)
++
++    # ((float)y/(n-1) - 0.5f) already casts y, but ensure denom float
++    s = s.replace("((float)y/(n-1)", "((float)y/(F32(n)-1.0f)")
++    s = s.replace("((float)x/(n-1)", "((float)x/(F32(n)-1.0f)")
++
++    # size_t for allocations/memset: (size_t)n*n -> SZ(n)*SZ(n)
++    s = re.sub(r"\(size_t\)\s*n\s*\*\s*n", "SZ(n) * SZ(n)", s)
++    s = re.sub(r"\(size_t\)\s*n\s*\*\s*n\s*\*\s*sizeof\(float\)", "SZ(n) * SZ(n) * sizeof(float)", s)
++    s = re.sub(r"\(size_t\)\s*n\s*\*\s*n\s*\*\s*sizeof\(\s*float\s*\)", "SZ(n) * SZ(n) * sizeof(float)", s)
++
++    # also n*n when already inside size_t: (size_t)n*n*sizeof(float) variants
++    s = re.sub(r"\(\s*SZ\(n\)\s*\)\s*\*\s*\(\s*SZ\(n\)\s*\)", "SZ(n) * SZ(n)", s)
++
++    save(path, s)
++
++def main():
++    base = Path(".")
++    targets = [
++        ("src/hash_sha256.c", fix_hash_sha256),
++        ("src/toroid.c", fix_toroid),
++        ("src/geom.c", fix_geom),
++    ]
++    for rel, fn in targets:
++        p = base / rel
++        if p.exists():
++            # backup once
++            bak = p.with_suffix(p.suffix + ".bak")
++            if not bak.exists():
++                bak.write_text(load(p), encoding="utf-8", errors="ignore")
++            fn(p)
++            print(f"[OK] patched {rel}")
++        else:
++            print(f"[SKIP] missing {rel}")
++
++if __name__ == "__main__":
++    main()
+diff --git a/rmr/geom.c b/rmr/geom.c
+new file mode 100644
+index 0000000..15664fe
+--- /dev/null
++++ b/rmr/geom.c
+@@ -0,0 +1,312 @@
++#include "pai_geom.h"
++#include "pai_scan.h"
++#include <math.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#ifndef PAI_CAST_HELPERS
++#define PAI_CAST_HELPERS
++#define F32(x) ((float)(x))
++#define SZ(x)  ((size_t)(x))
++#endif
++
++
++#ifndef M_PI
++#define M_PI 3.14159265358979323846
++#endif
++
++typedef struct {
++    int size;
++    const char *out;
++    int do_cycle42;
++    int do_sin30;
++    int do_sqrt2;
++    int do_sqrt3;
++    int do_fibo;
++    int do_shapes;
++    int do_mandel;
++    float w_shapes;
++    float w_mandel;
++    int max_iter;
++} geom_opt;
++
++static void *xmalloc(size_t n) {
++    void *p = malloc(n);
++    if(!p) { perror("malloc"); exit(2); }
++    memset(p, 0, n);
++    return p;
++}
++
++static unsigned char u8_clamp(float x) {
++    if(x < 0.0f) x = 0.0f;
++    if(x > 1.0f) x = 1.0f;
++    int v = (int)lrintf(x * 255.0f);
++    if(v < 0) v = 0;
++    if(v > 255) v = 255;
++    return (unsigned char)v;
++}
++
++static int write_pgm(const char *path, const float *img01, int n) {
++    FILE *f = fopen(path, "wb");
++    if(!f) return -1;
++    fprintf(f, "P5\n%d %d\n255\n", n, n);
++    for(int i=0;i<n*n;i++) {
++        unsigned char v = u8_clamp(img01[i]);
++        fwrite(&v, 1, 1, f);
++    }
++    fclose(f);
++    return 0;
++}
++
++static inline float f01(float x) {
++    if(x < 0.0f) return 0.0f;
++    if(x > 1.0f) return 1.0f;
++    return x;
++}
++
++static void overlay_shapes(float *out01, int n) {
++    // Normalizado: coord em [-1,1]
++    const float cx = (F32(n) - 1.0f) * 0.5f;
++    const float cy = (F32(n) - 1.0f) * 0.5f;
++    const float s = (F32(n) * 0.5f);
++
++    for(int y=0;y<n;y++) {
++        for(int x=0;x<n;x++) {
++            const float fx = (float)x;
++            const float X = (fx - cx)/s;
++            const float fy = (float)y;
++            const float Y = (fy - cy)/s;
++            float r2 = X*X + Y*Y;
++
++            // circle (r <= 0.95)
++            float circle = (r2 <= (0.95f*0.95f)) ? 1.0f : 0.0f;
++
++            // square (|x|<=0.70, |y|<=0.70) rotacionado 45° -> losango
++            float ax = fabsf(X), ay = fabsf(Y);
++            float diamond = ((ax + ay) <= 0.95f) ? 1.0f : 0.0f;
++
++            // triangle (equilátero) aproximado por half-planes
++            // vtx: (0,0.88), (-0.76,-0.44), (0.76,-0.44)
++            float tri = 1.0f;
++            {
++                float x1=0.0f,  y1=0.88f;
++                float x2=-0.76f,y2=-0.44f;
++                float x3=0.76f, y3=-0.44f;
++                // barycentric sign
++                float d1 = (X-x2)*(y1-y2) - (Y-y2)*(x1-x2);
++                float d2 = (X-x3)*(y2-y3) - (Y-y3)*(x2-x3);
++                float d3 = (X-x1)*(y3-y1) - (Y-y1)*(x3-x1);
++                int has_neg = (d1<0) || (d2<0) || (d3<0);
++                int has_pos = (d1>0) || (d2>0) || (d3>0);
++                tri = !(has_neg && has_pos) ? 1.0f : 0.0f;
++            }
++
++            // hexagon: |x| + |y|/sqrt(3) <= a  (aprox)
++            float hex = ((ax + ay/1.7320508f) <= 0.95f) ? 1.0f : 0.0f;
++
++            float ov = fmaxf(tri, fmaxf(diamond, fmaxf(hex, circle)));
++            ov *= circle; // recorte circular
++
++            out01[y*n + x] = ov;
++        }
++    }
++}
++
++static void mandelbrot_field(float *out01, int n, int max_iter) {
++    // janela padrão
++    float cx = -0.5f, cy = 0.0f;
++    float scale = 2.8f;
++
++    for(int y=0;y<n;y++) {
++        float im = cy + scale * ((float)y/(F32(n)-1.0f) - 0.5f);
++        for(int x=0;x<n;x++) {
++            float re = cx + scale * ((float)x/(F32(n)-1.0f) - 0.5f);
++
++            float zr = 0.0f, zi = 0.0f;
++            int it = 0;
++            for(; it<max_iter; ++it) {
++                float zr2 = zr*zr - zi*zi + re;
++                float zi2 = 2.0f*zr*zi + im;
++                zr = zr2; zi = zi2;
++                if(zr*zr + zi*zi > 4.0f) break;
++            }
++
++            float t = (float)it / (float)max_iter;
++            float v = 1.0f - sqrtf(t);
++            out01[y*n + x] = f01(v);
++        }
++    }
++}
++
++static float fibo_phase(int k) {
++    // Fibonacci discreta como fase (não “régua”, só sequência)
++    // Usa razão áurea para modularizar em [0,1)
++    const float phi = 1.61803398875f;
++    float x = fmodf((float)k * phi, 1.0f);
++    if(x < 0.0f) x += 1.0f;
++    return x;
++}
++
++static void add_cycle42(float *img01, int n) {
++    // amostra circular 42 passos e injeta como “anel”
++    const float cx = (F32(n) - 1.0f) * 0.5f;
++    const float cy = (F32(n) - 1.0f) * 0.5f;
++    float R  = 0.93f*(F32(n) * 0.5f);
++
++    for(int k=0;k<42;k++) {
++        float th = 2.0f*(float)M_PI*(float)k/42.0f;
++        float x = cx + R*cosf(th);
++        float y = cy + R*sinf(th);
++        int xi = (int)lrintf(x);
++        int yi = (int)lrintf(y);
++        if(xi<0||xi>=n||yi<0||yi>=n) continue;
++        img01[yi*n + xi] = 1.0f;
++    }
++}
++
++static void add_sin30_sqrt(float *img01, int n, int do_sin30, int do_sqrt2, int do_sqrt3, int do_fibo) {
++    // Desenha “traços” e relações (não dogma, só marcadores)
++    float cx = (F32(n) - 1.0f) * 0.5f, cy = (F32(n) - 1.0f) * 0.5f;
++    float R  = 0.85f*(F32(n) * 0.5f);
++
++    // sin(30)=0.5 -> y = 0.5R no círculo
++    if(do_sin30) {
++        int y = (int)lrintf(cy - 0.5f*R);
++        for(int x=0;x<n;x++) {
++            img01[y*n + x] = fmaxf(img01[y*n + x], 0.85f);
++        }
++    }
++
++    // sqrt2 diagonal (quadrado): linha y=x
++    if(do_sqrt2) {
++        for(int i=0;i<n;i++) {
++            img01[i*n + i] = 1.0f;
++        }
++    }
++
++    // sqrt3/2: “altura” do triângulo equilátero: h = (sqrt3/2)*lado
++    if(do_sqrt3) {
++        float h = 0.8660254f * R;
++        int y = (int)lrintf(cy - h);
++        if(y>=0 && y<n) {
++            for(int x=0;x<n;x++) img01[y*n + x] = fmaxf(img01[y*n + x], 0.65f);
++        }
++    }
++
++    // Fibonacci: variação angular discreta
++    if(do_fibo) {
++        for(int k=0;k<144;k++) {
++            float ph = fibo_phase(k);
++            float th = 2.0f*(float)M_PI*ph;
++            float rr = (0.15f + 0.80f*ph) * (F32(n) * 0.5f);
++            int xi = (int)lrintf(cx + rr*cosf(th));
++            int yi = (int)lrintf(cy + rr*sinf(th));
++            if(xi<0||xi>=n||yi<0||yi>=n) continue;
++            img01[yi*n + xi] = fmaxf(img01[yi*n + xi], 0.75f);
++        }
++    }
++}
++
++static void blend(float *dst, const float *a, const float *b, int n, float wa, float wb) {
++    size_t N = SZ(n) * SZ(n);
++    for(size_t i=0; i < N; i++) {
++        float v = wa*a[i] + wb*b[i];
++        dst[i] = f01(v);
++    }
++}
++
++static void write_report(const char *out_dir, const geom_opt *o) {
++    char path[PAI_MAX_PATH];
++    snprintf(path, sizeof(path), "%s/report.txt", out_dir);
++    FILE *f = fopen(path, "wb");
++    if(!f) return;
++
++    fprintf(f, "PAI :: geom report\n");
++    fprintf(f, "size=%d\n", o->size);
++    fprintf(f, "flags: cycle42=%d sin30=%d sqrt2=%d sqrt3=%d fibo=%d shapes=%d mandel=%d\n",
++        o->do_cycle42, o->do_sin30, o->do_sqrt2, o->do_sqrt3, o->do_fibo, o->do_shapes, o->do_mandel);
++    fprintf(f, "weights: w_shapes=%.3f w_mandel=%.3f max_iter=%d\n", o->w_shapes, o->w_mandel, o->max_iter);
++
++    // notas numéricas (sem régua fixa)
++    fprintf(f, "\nnotes:\n");
++    fprintf(f, " - sin(30)=0.5 marker line if enabled\n");
++    fprintf(f, " - sqrt2 diagonal marker if enabled\n");
++    fprintf(f, " - sqrt3/2 height marker if enabled\n");
++    fprintf(f, " - cycle42 draws 42 samples on the ring\n");
++    fprintf(f, " - fibo draws 144 phase points using phi modular phase\n");
++
++    fclose(f);
++    printf("[OK] report: %s\n", path);
++}
++
++int pai_cmd_geom(int argc, char **argv) {
++    geom_opt o;
++    memset(&o, 0, sizeof(o));
++    o.size = 768;
++    o.out = "out_geom";
++    o.w_shapes = 0.55f;
++    o.w_mandel = 0.45f;
++    o.max_iter = 360;
++
++    for(int i=2;i<argc;i++) {
++        if(!strcmp(argv[i],"--out") && i+1<argc) o.out = argv[++i];
++        else if(!strcmp(argv[i],"--size") && i+1<argc) o.size = atoi(argv[++i]);
++        else if(!strcmp(argv[i],"--cycle42")) o.do_cycle42 = 1;
++        else if(!strcmp(argv[i],"--sin30")) o.do_sin30 = 1;
++        else if(!strcmp(argv[i],"--sqrt2")) o.do_sqrt2 = 1;
++        else if(!strcmp(argv[i],"--sqrt3")) o.do_sqrt3 = 1;
++        else if(!strcmp(argv[i],"--fibo"))  o.do_fibo = 1;
++        else if(!strcmp(argv[i],"--shapes")) o.do_shapes = 1;
++        else if(!strcmp(argv[i],"--mandel")) o.do_mandel = 1;
++        else if(!strcmp(argv[i],"--w-shapes") && i+1<argc) o.w_shapes = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--w-mandel") && i+1<argc) o.w_mandel = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--max-iter") && i+1<argc) o.max_iter = atoi(argv[++i]);
++    }
++
++    if(o.size < 64) o.size = 64;
++    if(o.size > 4096) o.size = 4096;
++
++    if (pai_mkdir_p(o.out) != 0) {
++        perror("mkdir");
++        return 1;
++    }
++
++    int n = o.size;
++    size_t N = SZ(n) * SZ(n);
++    float *ov = (float*)xmalloc(N * sizeof(float));
++    float *mb = (float*)xmalloc(N * sizeof(float));
++    float *gf = (float*)xmalloc(N * sizeof(float));
++
++    // shapes
++    if(o.do_shapes) overlay_shapes(ov, n);
++    else memset(ov, 0, N * sizeof(float));
++
++    // mandel
++    if(o.do_mandel) mandelbrot_field(mb, n, o.max_iter);
++    else memset(mb, 0, N * sizeof(float));
++
++    // blend
++    blend(gf, ov, mb, n, o.w_shapes, o.w_mandel);
++
++    // add markers
++    if(o.do_cycle42) add_cycle42(gf, n);
++    add_sin30_sqrt(gf, n, o.do_sin30, o.do_sqrt2, o.do_sqrt3, o.do_fibo);
++
++    char p1[PAI_MAX_PATH], p2[PAI_MAX_PATH], p3[PAI_MAX_PATH];
++    snprintf(p1, sizeof(p1), "%s/overlay.pgm", o.out);
++    snprintf(p2, sizeof(p2), "%s/mandel.pgm", o.out);
++    snprintf(p3, sizeof(p3), "%s/geom.pgm",   o.out);
++
++    if(write_pgm(p1, ov, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p1);
++    if(write_pgm(p2, mb, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p2);
++    if(write_pgm(p3, gf, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p3);
++
++    printf("[OK] overlay: %s\n", p1);
++    printf("[OK] mandel:  %s\n", p2);
++    printf("[OK] geom:    %s\n", p3);
++
++    write_report(o.out, &o);
++
++    free(ov); free(mb); free(gf);
++    return 0;
++}
+diff --git a/rmr/geom.c.bak b/rmr/geom.c.bak
+new file mode 100644
+index 0000000..1559af8
+--- /dev/null
++++ b/rmr/geom.c.bak
+@@ -0,0 +1,304 @@
++#include "pai_geom.h"
++#include "pai_scan.h"
++#include <math.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++
++#ifndef M_PI
++#define M_PI 3.14159265358979323846
++#endif
++
++typedef struct {
++    int size;
++    const char *out;
++    int do_cycle42;
++    int do_sin30;
++    int do_sqrt2;
++    int do_sqrt3;
++    int do_fibo;
++    int do_shapes;
++    int do_mandel;
++    float w_shapes;
++    float w_mandel;
++    int max_iter;
++} geom_opt;
++
++static void *xmalloc(size_t n) {
++    void *p = malloc(n);
++    if(!p) { perror("malloc"); exit(2); }
++    memset(p, 0, n);
++    return p;
++}
++
++static unsigned char u8_clamp(float x) {
++    if(x < 0.0f) x = 0.0f;
++    if(x > 1.0f) x = 1.0f;
++    int v = (int)lrintf(x * 255.0f);
++    if(v < 0) v = 0;
++    if(v > 255) v = 255;
++    return (unsigned char)v;
++}
++
++static int write_pgm(const char *path, const float *img01, int n) {
++    FILE *f = fopen(path, "wb");
++    if(!f) return -1;
++    fprintf(f, "P5\n%d %d\n255\n", n, n);
++    for(int i=0;i<n*n;i++) {
++        unsigned char v = u8_clamp(img01[i]);
++        fwrite(&v, 1, 1, f);
++    }
++    fclose(f);
++    return 0;
++}
++
++static inline float f01(float x) {
++    if(x < 0.0f) return 0.0f;
++    if(x > 1.0f) return 1.0f;
++    return x;
++}
++
++static void overlay_shapes(float *out01, int n) {
++    // Normalizado: coord em [-1,1]
++    const const float cx = (fn - 1.0f) * 0.5f;
++    const const float cy = (fn - 1.0f) * 0.5f;
++    const const float s = (fn * 0.5f);
++
++    for(int y=0;y<n;y++) {
++        for(int x=0;x<n;x++) {
++            const float fx = (float)x;
++            const float X = (fx - cx)/s;
++            const float fy = (float)y;
++            const float Y = (fy - cy)/s;
++            float r2 = X*X + Y*Y;
++
++            // circle (r <= 0.95)
++            float circle = (r2 <= (0.95f*0.95f)) ? 1.0f : 0.0f;
++
++            // square (|x|<=0.70, |y|<=0.70) rotacionado 45° -> losango
++            float ax = fabsf(X), ay = fabsf(Y);
++            float diamond = ((ax + ay) <= 0.95f) ? 1.0f : 0.0f;
++
++            // triangle (equilátero) aproximado por half-planes
++            // vtx: (0,0.88), (-0.76,-0.44), (0.76,-0.44)
++            float tri = 1.0f;
++            {
++                float x1=0.0f,  y1=0.88f;
++                float x2=-0.76f,y2=-0.44f;
++                float x3=0.76f, y3=-0.44f;
++                // barycentric sign
++                float d1 = (X-x2)*(y1-y2) - (Y-y2)*(x1-x2);
++                float d2 = (X-x3)*(y2-y3) - (Y-y3)*(x2-x3);
++                float d3 = (X-x1)*(y3-y1) - (Y-y1)*(x3-x1);
++                int has_neg = (d1<0) || (d2<0) || (d3<0);
++                int has_pos = (d1>0) || (d2>0) || (d3>0);
++                tri = !(has_neg && has_pos) ? 1.0f : 0.0f;
++            }
++
++            // hexagon: |x| + |y|/sqrt(3) <= a  (aprox)
++            float hex = ((ax + ay/1.7320508f) <= 0.95f) ? 1.0f : 0.0f;
++
++            float ov = fmaxf(tri, fmaxf(diamond, fmaxf(hex, circle)));
++            ov *= circle; // recorte circular
++
++            out01[y*n + x] = ov;
++        }
++    }
++}
++
++static void mandelbrot_field(float *out01, int n, int max_iter) {
++    // janela padrão
++    float cx = -0.5f, cy = 0.0f;
++    float scale = 2.8f;
++
++    for(int y=0;y<n;y++) {
++        float im = cy + scale * ((float)y/(n-1) - 0.5f);
++        for(int x=0;x<n;x++) {
++            float re = cx + scale * ((float)x/(n-1) - 0.5f);
++
++            float zr = 0.0f, zi = 0.0f;
++            int it = 0;
++            for(; it<max_iter; ++it) {
++                float zr2 = zr*zr - zi*zi + re;
++                float zi2 = 2.0f*zr*zi + im;
++                zr = zr2; zi = zi2;
++                if(zr*zr + zi*zi > 4.0f) break;
++            }
++
++            float t = (float)it / (float)max_iter;
++            float v = 1.0f - sqrtf(t);
++            out01[y*n + x] = f01(v);
++        }
++    }
++}
++
++static float fibo_phase(int k) {
++    // Fibonacci discreta como fase (não “régua”, só sequência)
++    // Usa razão áurea para modularizar em [0,1)
++    const float phi = 1.61803398875f;
++    float x = fmodf((float)k * phi, 1.0f);
++    if(x < 0.0f) x += 1.0f;
++    return x;
++}
++
++static void add_cycle42(float *img01, int n) {
++    // amostra circular 42 passos e injeta como “anel”
++    const const float cx = (fn - 1.0f) * 0.5f;
++    const const float cy = (fn - 1.0f) * 0.5f;
++    float R  = 0.93f*(fn * 0.5f);
++
++    for(int k=0;k<42;k++) {
++        float th = 2.0f*(float)M_PI*(float)k/42.0f;
++        float x = cx + R*cosf(th);
++        float y = cy + R*sinf(th);
++        int xi = (int)lrintf(x);
++        int yi = (int)lrintf(y);
++        if(xi<0||xi>=n||yi<0||yi>=n) continue;
++        img01[yi*n + xi] = 1.0f;
++    }
++}
++
++static void add_sin30_sqrt(float *img01, int n, int do_sin30, int do_sqrt2, int do_sqrt3, int do_fibo) {
++    // Desenha “traços” e relações (não dogma, só marcadores)
++    float cx = (fn - 1.0f) * 0.5f, cy = (fn - 1.0f) * 0.5f;
++    float R  = 0.85f*(fn * 0.5f);
++
++    // sin(30)=0.5 -> y = 0.5R no círculo
++    if(do_sin30) {
++        int y = (int)lrintf(cy - 0.5f*R);
++        for(int x=0;x<n;x++) {
++            img01[y*n + x] = fmaxf(img01[y*n + x], 0.85f);
++        }
++    }
++
++    // sqrt2 diagonal (quadrado): linha y=x
++    if(do_sqrt2) {
++        for(int i=0;i<n;i++) {
++            img01[i*n + i] = 1.0f;
++        }
++    }
++
++    // sqrt3/2: “altura” do triângulo equilátero: h = (sqrt3/2)*lado
++    if(do_sqrt3) {
++        float h = 0.8660254f * R;
++        int y = (int)lrintf(cy - h);
++        if(y>=0 && y<n) {
++            for(int x=0;x<n;x++) img01[y*n + x] = fmaxf(img01[y*n + x], 0.65f);
++        }
++    }
++
++    // Fibonacci: variação angular discreta
++    if(do_fibo) {
++        for(int k=0;k<144;k++) {
++            float ph = fibo_phase(k);
++            float th = 2.0f*(float)M_PI*ph;
++            float rr = (0.15f + 0.80f*ph) * (fn * 0.5f);
++            int xi = (int)lrintf(cx + rr*cosf(th));
++            int yi = (int)lrintf(cy + rr*sinf(th));
++            if(xi<0||xi>=n||yi<0||yi>=n) continue;
++            img01[yi*n + xi] = fmaxf(img01[yi*n + xi], 0.75f);
++        }
++    }
++}
++
++static void blend(float *dst, const float *a, const float *b, int n, float wa, float wb) {
++    int N = n*n;
++    for(int i=0;i<N;i++) {
++        float v = wa*a[i] + wb*b[i];
++        dst[i] = f01(v);
++    }
++}
++
++static void write_report(const char *out_dir, const geom_opt *o) {
++    char path[PAI_MAX_PATH];
++    snprintf(path, sizeof(path), "%s/report.txt", out_dir);
++    FILE *f = fopen(path, "wb");
++    if(!f) return;
++
++    fprintf(f, "PAI :: geom report\n");
++    fprintf(f, "size=%d\n", o->size);
++    fprintf(f, "flags: cycle42=%d sin30=%d sqrt2=%d sqrt3=%d fibo=%d shapes=%d mandel=%d\n",
++        o->do_cycle42, o->do_sin30, o->do_sqrt2, o->do_sqrt3, o->do_fibo, o->do_shapes, o->do_mandel);
++    fprintf(f, "weights: w_shapes=%.3f w_mandel=%.3f max_iter=%d\n", o->w_shapes, o->w_mandel, o->max_iter);
++
++    // notas numéricas (sem régua fixa)
++    fprintf(f, "\nnotes:\n");
++    fprintf(f, " - sin(30)=0.5 marker line if enabled\n");
++    fprintf(f, " - sqrt2 diagonal marker if enabled\n");
++    fprintf(f, " - sqrt3/2 height marker if enabled\n");
++    fprintf(f, " - cycle42 draws 42 samples on the ring\n");
++    fprintf(f, " - fibo draws 144 phase points using phi modular phase\n");
++
++    fclose(f);
++    printf("[OK] report: %s\n", path);
++}
++
++int pai_cmd_geom(int argc, char **argv) {
++    geom_opt o;
++    memset(&o, 0, sizeof(o));
++    o.size = 768;
++    o.out = "out_geom";
++    o.w_shapes = 0.55f;
++    o.w_mandel = 0.45f;
++    o.max_iter = 360;
++
++    for(int i=2;i<argc;i++) {
++        if(!strcmp(argv[i],"--out") && i+1<argc) o.out = argv[++i];
++        else if(!strcmp(argv[i],"--size") && i+1<argc) o.size = atoi(argv[++i]);
++        else if(!strcmp(argv[i],"--cycle42")) o.do_cycle42 = 1;
++        else if(!strcmp(argv[i],"--sin30")) o.do_sin30 = 1;
++        else if(!strcmp(argv[i],"--sqrt2")) o.do_sqrt2 = 1;
++        else if(!strcmp(argv[i],"--sqrt3")) o.do_sqrt3 = 1;
++        else if(!strcmp(argv[i],"--fibo"))  o.do_fibo = 1;
++        else if(!strcmp(argv[i],"--shapes")) o.do_shapes = 1;
++        else if(!strcmp(argv[i],"--mandel")) o.do_mandel = 1;
++        else if(!strcmp(argv[i],"--w-shapes") && i+1<argc) o.w_shapes = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--w-mandel") && i+1<argc) o.w_mandel = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--max-iter") && i+1<argc) o.max_iter = atoi(argv[++i]);
++    }
++
++    if(o.size < 64) o.size = 64;
++    if(o.size > 4096) o.size = 4096;
++
++    pai_mkdir_p(o.out);
++
++    int n = o.size;
++    const float fn = (float)n;
++    const float fn = (float)n;
++    float *ov = (float*)xmalloc(N * N * sizeof(float));
++    float *mb = (float*)xmalloc(N * N * sizeof(float));
++    float *gf = (float*)xmalloc(N * N * sizeof(float));
++
++    // shapes
++    if(o.do_shapes) overlay_shapes(ov, n);
++    else memset(ov, 0, N * N * sizeof(float));
++
++    // mandel
++    if(o.do_mandel) mandelbrot_field(mb, n, o.max_iter);
++    else memset(mb, 0, N * N * sizeof(float));
++
++    // blend
++    blend(gf, ov, mb, n, o.w_shapes, o.w_mandel);
++
++    // add markers
++    if(o.do_cycle42) add_cycle42(gf, n);
++    add_sin30_sqrt(gf, n, o.do_sin30, o.do_sqrt2, o.do_sqrt3, o.do_fibo);
++
++    char p1[PAI_MAX_PATH], p2[PAI_MAX_PATH], p3[PAI_MAX_PATH];
++    snprintf(p1, sizeof(p1), "%s/overlay.pgm", o.out);
++    snprintf(p2, sizeof(p2), "%s/mandel.pgm", o.out);
++    snprintf(p3, sizeof(p3), "%s/geom.pgm",   o.out);
++
++    if(write_pgm(p1, ov, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p1);
++    if(write_pgm(p2, mb, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p2);
++    if(write_pgm(p3, gf, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p3);
++
++    printf("[OK] overlay: %s\n", p1);
++    printf("[OK] mandel:  %s\n", p2);
++    printf("[OK] geom:    %s\n", p3);
++
++    write_report(o.out, &o);
++
++    free(ov); free(mb); free(gf);
++    return 0;
++}
+diff --git a/rmr/geom.c.pre_fix.1768878317.bak b/rmr/geom.c.pre_fix.1768878317.bak
+new file mode 100644
+index 0000000..1df3ab3
+--- /dev/null
++++ b/rmr/geom.c.pre_fix.1768878317.bak
+@@ -0,0 +1,310 @@
++#include "pai_geom.h"
++#include "pai_scan.h"
++#include <math.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#ifndef PAI_CAST_HELPERS
++#define PAI_CAST_HELPERS
++#define F32(x) ((float)(x))
++#define SZ(x)  ((size_t)(x))
++#endif
++
++
++#ifndef M_PI
++#define M_PI 3.14159265358979323846
++#endif
++
++typedef struct {
++    int size;
++    const char *out;
++    int do_cycle42;
++    int do_sin30;
++    int do_sqrt2;
++    int do_sqrt3;
++    int do_fibo;
++    int do_shapes;
++    int do_mandel;
++    float w_shapes;
++    float w_mandel;
++    int max_iter;
++} geom_opt;
++
++static void *xmalloc(size_t n) {
++    void *p = malloc(n);
++    if(!p) { perror("malloc"); exit(2); }
++    memset(p, 0, n);
++    return p;
++}
++
++static unsigned char u8_clamp(float x) {
++    if(x < 0.0f) x = 0.0f;
++    if(x > 1.0f) x = 1.0f;
++    int v = (int)lrintf(x * 255.0f);
++    if(v < 0) v = 0;
++    if(v > 255) v = 255;
++    return (unsigned char)v;
++}
++
++static int write_pgm(const char *path, const float *img01, int n) {
++    FILE *f = fopen(path, "wb");
++    if(!f) return -1;
++    fprintf(f, "P5\n%d %d\n255\n", n, n);
++    for(int i=0;i<n*n;i++) {
++        unsigned char v = u8_clamp(img01[i]);
++        fwrite(&v, 1, 1, f);
++    }
++    fclose(f);
++    return 0;
++}
++
++static inline float f01(float x) {
++    if(x < 0.0f) return 0.0f;
++    if(x > 1.0f) return 1.0f;
++    return x;
++}
++
++static void overlay_shapes(float *out01, int n) {
++    // Normalizado: coord em [-1,1]
++    const float cx = (fn - 1.0f) * 0.5f;
++    const float cy = (fn - 1.0f) * 0.5f;
++    const float s = (fn * 0.5f);
++
++    for(int y=0;y<n;y++) {
++        for(int x=0;x<n;x++) {
++            const float fx = (float)x;
++            const float X = (fx - cx)/s;
++            const float fy = (float)y;
++            const float Y = (fy - cy)/s;
++            float r2 = X*X + Y*Y;
++
++            // circle (r <= 0.95)
++            float circle = (r2 <= (0.95f*0.95f)) ? 1.0f : 0.0f;
++
++            // square (|x|<=0.70, |y|<=0.70) rotacionado 45° -> losango
++            float ax = fabsf(X), ay = fabsf(Y);
++            float diamond = ((ax + ay) <= 0.95f) ? 1.0f : 0.0f;
++
++            // triangle (equilátero) aproximado por half-planes
++            // vtx: (0,0.88), (-0.76,-0.44), (0.76,-0.44)
++            float tri = 1.0f;
++            {
++                float x1=0.0f,  y1=0.88f;
++                float x2=-0.76f,y2=-0.44f;
++                float x3=0.76f, y3=-0.44f;
++                // barycentric sign
++                float d1 = (X-x2)*(y1-y2) - (Y-y2)*(x1-x2);
++                float d2 = (X-x3)*(y2-y3) - (Y-y3)*(x2-x3);
++                float d3 = (X-x1)*(y3-y1) - (Y-y1)*(x3-x1);
++                int has_neg = (d1<0) || (d2<0) || (d3<0);
++                int has_pos = (d1>0) || (d2>0) || (d3>0);
++                tri = !(has_neg && has_pos) ? 1.0f : 0.0f;
++            }
++
++            // hexagon: |x| + |y|/sqrt(3) <= a  (aprox)
++            float hex = ((ax + ay/1.7320508f) <= 0.95f) ? 1.0f : 0.0f;
++
++            float ov = fmaxf(tri, fmaxf(diamond, fmaxf(hex, circle)));
++            ov *= circle; // recorte circular
++
++            out01[y*n + x] = ov;
++        }
++    }
++}
++
++static void mandelbrot_field(float *out01, int n, int max_iter) {
++    // janela padrão
++    float cx = -0.5f, cy = 0.0f;
++    float scale = 2.8f;
++
++    for(int y=0;y<n;y++) {
++        float im = cy + scale * ((float)y/(F32(n)-1.0f) - 0.5f);
++        for(int x=0;x<n;x++) {
++            float re = cx + scale * ((float)x/(F32(n)-1.0f) - 0.5f);
++
++            float zr = 0.0f, zi = 0.0f;
++            int it = 0;
++            for(; it<max_iter; ++it) {
++                float zr2 = zr*zr - zi*zi + re;
++                float zi2 = 2.0f*zr*zi + im;
++                zr = zr2; zi = zi2;
++                if(zr*zr + zi*zi > 4.0f) break;
++            }
++
++            float t = (float)it / (float)max_iter;
++            float v = 1.0f - sqrtf(t);
++            out01[y*n + x] = f01(v);
++        }
++    }
++}
++
++static float fibo_phase(int k) {
++    // Fibonacci discreta como fase (não “régua”, só sequência)
++    // Usa razão áurea para modularizar em [0,1)
++    const float phi = 1.61803398875f;
++    float x = fmodf((float)k * phi, 1.0f);
++    if(x < 0.0f) x += 1.0f;
++    return x;
++}
++
++static void add_cycle42(float *img01, int n) {
++    // amostra circular 42 passos e injeta como “anel”
++    const float cx = (fn - 1.0f) * 0.5f;
++    const float cy = (fn - 1.0f) * 0.5f;
++    float R  = 0.93f*(fn * 0.5f);
++
++    for(int k=0;k<42;k++) {
++        float th = 2.0f*(float)M_PI*(float)k/42.0f;
++        float x = cx + R*cosf(th);
++        float y = cy + R*sinf(th);
++        int xi = (int)lrintf(x);
++        int yi = (int)lrintf(y);
++        if(xi<0||xi>=n||yi<0||yi>=n) continue;
++        img01[yi*n + xi] = 1.0f;
++    }
++}
++
++static void add_sin30_sqrt(float *img01, int n, int do_sin30, int do_sqrt2, int do_sqrt3, int do_fibo) {
++    // Desenha “traços” e relações (não dogma, só marcadores)
++    float cx = (fn - 1.0f) * 0.5f, cy = (fn - 1.0f) * 0.5f;
++    float R  = 0.85f*(fn * 0.5f);
++
++    // sin(30)=0.5 -> y = 0.5R no círculo
++    if(do_sin30) {
++        int y = (int)lrintf(cy - 0.5f*R);
++        for(int x=0;x<n;x++) {
++            img01[y*n + x] = fmaxf(img01[y*n + x], 0.85f);
++        }
++    }
++
++    // sqrt2 diagonal (quadrado): linha y=x
++    if(do_sqrt2) {
++        for(int i=0;i<n;i++) {
++            img01[i*n + i] = 1.0f;
++        }
++    }
++
++    // sqrt3/2: “altura” do triângulo equilátero: h = (sqrt3/2)*lado
++    if(do_sqrt3) {
++        float h = 0.8660254f * R;
++        int y = (int)lrintf(cy - h);
++        if(y>=0 && y<n) {
++            for(int x=0;x<n;x++) img01[y*n + x] = fmaxf(img01[y*n + x], 0.65f);
++        }
++    }
++
++    // Fibonacci: variação angular discreta
++    if(do_fibo) {
++        for(int k=0;k<144;k++) {
++            float ph = fibo_phase(k);
++            float th = 2.0f*(float)M_PI*ph;
++            float rr = (0.15f + 0.80f*ph) * (fn * 0.5f);
++            int xi = (int)lrintf(cx + rr*cosf(th));
++            int yi = (int)lrintf(cy + rr*sinf(th));
++            if(xi<0||xi>=n||yi<0||yi>=n) continue;
++            img01[yi*n + xi] = fmaxf(img01[yi*n + xi], 0.75f);
++        }
++    }
++}
++
++static void blend(float *dst, const float *a, const float *b, int n, float wa, float wb) {
++    int N = n*n;
++    for(int i=0;i<N;i++) {
++        float v = wa*a[i] + wb*b[i];
++        dst[i] = f01(v);
++    }
++}
++
++static void write_report(const char *out_dir, const geom_opt *o) {
++    char path[PAI_MAX_PATH];
++    snprintf(path, sizeof(path), "%s/report.txt", out_dir);
++    FILE *f = fopen(path, "wb");
++    if(!f) return;
++
++    fprintf(f, "PAI :: geom report\n");
++    fprintf(f, "size=%d\n", o->size);
++    fprintf(f, "flags: cycle42=%d sin30=%d sqrt2=%d sqrt3=%d fibo=%d shapes=%d mandel=%d\n",
++        o->do_cycle42, o->do_sin30, o->do_sqrt2, o->do_sqrt3, o->do_fibo, o->do_shapes, o->do_mandel);
++    fprintf(f, "weights: w_shapes=%.3f w_mandel=%.3f max_iter=%d\n", o->w_shapes, o->w_mandel, o->max_iter);
++
++    // notas numéricas (sem régua fixa)
++    fprintf(f, "\nnotes:\n");
++    fprintf(f, " - sin(30)=0.5 marker line if enabled\n");
++    fprintf(f, " - sqrt2 diagonal marker if enabled\n");
++    fprintf(f, " - sqrt3/2 height marker if enabled\n");
++    fprintf(f, " - cycle42 draws 42 samples on the ring\n");
++    fprintf(f, " - fibo draws 144 phase points using phi modular phase\n");
++
++    fclose(f);
++    printf("[OK] report: %s\n", path);
++}
++
++int pai_cmd_geom(int argc, char **argv) {
++    geom_opt o;
++    memset(&o, 0, sizeof(o));
++    o.size = 768;
++    o.out = "out_geom";
++    o.w_shapes = 0.55f;
++    o.w_mandel = 0.45f;
++    o.max_iter = 360;
++
++    for(int i=2;i<argc;i++) {
++        if(!strcmp(argv[i],"--out") && i+1<argc) o.out = argv[++i];
++        else if(!strcmp(argv[i],"--size") && i+1<argc) o.size = atoi(argv[++i]);
++        else if(!strcmp(argv[i],"--cycle42")) o.do_cycle42 = 1;
++        else if(!strcmp(argv[i],"--sin30")) o.do_sin30 = 1;
++        else if(!strcmp(argv[i],"--sqrt2")) o.do_sqrt2 = 1;
++        else if(!strcmp(argv[i],"--sqrt3")) o.do_sqrt3 = 1;
++        else if(!strcmp(argv[i],"--fibo"))  o.do_fibo = 1;
++        else if(!strcmp(argv[i],"--shapes")) o.do_shapes = 1;
++        else if(!strcmp(argv[i],"--mandel")) o.do_mandel = 1;
++        else if(!strcmp(argv[i],"--w-shapes") && i+1<argc) o.w_shapes = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--w-mandel") && i+1<argc) o.w_mandel = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--max-iter") && i+1<argc) o.max_iter = atoi(argv[++i]);
++    }
++
++    if(o.size < 64) o.size = 64;
++    if(o.size > 4096) o.size = 4096;
++
++    pai_mkdir_p(o.out);
++
++    int n = o.size;
++    const float fn = (float)n;
++    const float fn = (float)n;
++    float *ov = (float*)xmalloc(N * N * sizeof(float));
++    float *mb = (float*)xmalloc(N * N * sizeof(float));
++    float *gf = (float*)xmalloc(N * N * sizeof(float));
++
++    // shapes
++    if(o.do_shapes) overlay_shapes(ov, n);
++    else memset(ov, 0, N * N * sizeof(float));
++
++    // mandel
++    if(o.do_mandel) mandelbrot_field(mb, n, o.max_iter);
++    else memset(mb, 0, N * N * sizeof(float));
++
++    // blend
++    blend(gf, ov, mb, n, o.w_shapes, o.w_mandel);
++
++    // add markers
++    if(o.do_cycle42) add_cycle42(gf, n);
++    add_sin30_sqrt(gf, n, o.do_sin30, o.do_sqrt2, o.do_sqrt3, o.do_fibo);
++
++    char p1[PAI_MAX_PATH], p2[PAI_MAX_PATH], p3[PAI_MAX_PATH];
++    snprintf(p1, sizeof(p1), "%s/overlay.pgm", o.out);
++    snprintf(p2, sizeof(p2), "%s/mandel.pgm", o.out);
++    snprintf(p3, sizeof(p3), "%s/geom.pgm",   o.out);
++
++    if(write_pgm(p1, ov, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p1);
++    if(write_pgm(p2, mb, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p2);
++    if(write_pgm(p3, gf, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p3);
++
++    printf("[OK] overlay: %s\n", p1);
++    printf("[OK] mandel:  %s\n", p2);
++    printf("[OK] geom:    %s\n", p3);
++
++    write_report(o.out, &o);
++
++    free(ov); free(mb); free(gf);
++    return 0;
++}
+diff --git a/rmr/geom.c.pre_fix.1768917982.bak b/rmr/geom.c.pre_fix.1768917982.bak
+new file mode 100644
+index 0000000..8b6f769
+--- /dev/null
++++ b/rmr/geom.c.pre_fix.1768917982.bak
+@@ -0,0 +1,308 @@
++#include "pai_geom.h"
++#include "pai_scan.h"
++#include <math.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#ifndef PAI_CAST_HELPERS
++#define PAI_CAST_HELPERS
++#define F32(x) ((float)(x))
++#define SZ(x)  ((size_t)(x))
++#endif
++
++
++#ifndef M_PI
++#define M_PI 3.14159265358979323846
++#endif
++
++typedef struct {
++    int size;
++    const char *out;
++    int do_cycle42;
++    int do_sin30;
++    int do_sqrt2;
++    int do_sqrt3;
++    int do_fibo;
++    int do_shapes;
++    int do_mandel;
++    float w_shapes;
++    float w_mandel;
++    int max_iter;
++} geom_opt;
++
++static void *xmalloc(size_t n) {
++    void *p = malloc(n);
++    if(!p) { perror("malloc"); exit(2); }
++    memset(p, 0, n);
++    return p;
++}
++
++static unsigned char u8_clamp(float x) {
++    if(x < 0.0f) x = 0.0f;
++    if(x > 1.0f) x = 1.0f;
++    int v = (int)lrintf(x * 255.0f);
++    if(v < 0) v = 0;
++    if(v > 255) v = 255;
++    return (unsigned char)v;
++}
++
++static int write_pgm(const char *path, const float *img01, int n) {
++    FILE *f = fopen(path, "wb");
++    if(!f) return -1;
++    fprintf(f, "P5\n%d %d\n255\n", n, n);
++    for(int i=0;i<n*n;i++) {
++        unsigned char v = u8_clamp(img01[i]);
++        fwrite(&v, 1, 1, f);
++    }
++    fclose(f);
++    return 0;
++}
++
++static inline float f01(float x) {
++    if(x < 0.0f) return 0.0f;
++    if(x > 1.0f) return 1.0f;
++    return x;
++}
++
++static void overlay_shapes(float *out01, int n) {
++    // Normalizado: coord em [-1,1]
++    const float cx = (F32(n) - 1.0f) * 0.5f;
++    const float cy = (F32(n) - 1.0f) * 0.5f;
++    const float s = (F32(n) * 0.5f);
++
++    for(int y=0;y<n;y++) {
++        for(int x=0;x<n;x++) {
++            const float fx = (float)x;
++            const float X = (fx - cx)/s;
++            const float fy = (float)y;
++            const float Y = (fy - cy)/s;
++            float r2 = X*X + Y*Y;
++
++            // circle (r <= 0.95)
++            float circle = (r2 <= (0.95f*0.95f)) ? 1.0f : 0.0f;
++
++            // square (|x|<=0.70, |y|<=0.70) rotacionado 45° -> losango
++            float ax = fabsf(X), ay = fabsf(Y);
++            float diamond = ((ax + ay) <= 0.95f) ? 1.0f : 0.0f;
++
++            // triangle (equilátero) aproximado por half-planes
++            // vtx: (0,0.88), (-0.76,-0.44), (0.76,-0.44)
++            float tri = 1.0f;
++            {
++                float x1=0.0f,  y1=0.88f;
++                float x2=-0.76f,y2=-0.44f;
++                float x3=0.76f, y3=-0.44f;
++                // barycentric sign
++                float d1 = (X-x2)*(y1-y2) - (Y-y2)*(x1-x2);
++                float d2 = (X-x3)*(y2-y3) - (Y-y3)*(x2-x3);
++                float d3 = (X-x1)*(y3-y1) - (Y-y1)*(x3-x1);
++                int has_neg = (d1<0) || (d2<0) || (d3<0);
++                int has_pos = (d1>0) || (d2>0) || (d3>0);
++                tri = !(has_neg && has_pos) ? 1.0f : 0.0f;
++            }
++
++            // hexagon: |x| + |y|/sqrt(3) <= a  (aprox)
++            float hex = ((ax + ay/1.7320508f) <= 0.95f) ? 1.0f : 0.0f;
++
++            float ov = fmaxf(tri, fmaxf(diamond, fmaxf(hex, circle)));
++            ov *= circle; // recorte circular
++
++            out01[y*n + x] = ov;
++        }
++    }
++}
++
++static void mandelbrot_field(float *out01, int n, int max_iter) {
++    // janela padrão
++    float cx = -0.5f, cy = 0.0f;
++    float scale = 2.8f;
++
++    for(int y=0;y<n;y++) {
++        float im = cy + scale * ((float)y/(F32(n)-1.0f) - 0.5f);
++        for(int x=0;x<n;x++) {
++            float re = cx + scale * ((float)x/(F32(n)-1.0f) - 0.5f);
++
++            float zr = 0.0f, zi = 0.0f;
++            int it = 0;
++            for(; it<max_iter; ++it) {
++                float zr2 = zr*zr - zi*zi + re;
++                float zi2 = 2.0f*zr*zi + im;
++                zr = zr2; zi = zi2;
++                if(zr*zr + zi*zi > 4.0f) break;
++            }
++
++            float t = (float)it / (float)max_iter;
++            float v = 1.0f - sqrtf(t);
++            out01[y*n + x] = f01(v);
++        }
++    }
++}
++
++static float fibo_phase(int k) {
++    // Fibonacci discreta como fase (não “régua”, só sequência)
++    // Usa razão áurea para modularizar em [0,1)
++    const float phi = 1.61803398875f;
++    float x = fmodf((float)k * phi, 1.0f);
++    if(x < 0.0f) x += 1.0f;
++    return x;
++}
++
++static void add_cycle42(float *img01, int n) {
++    // amostra circular 42 passos e injeta como “anel”
++    const float cx = (F32(n) - 1.0f) * 0.5f;
++    const float cy = (F32(n) - 1.0f) * 0.5f;
++    float R  = 0.93f*(F32(n) * 0.5f);
++
++    for(int k=0;k<42;k++) {
++        float th = 2.0f*(float)M_PI*(float)k/42.0f;
++        float x = cx + R*cosf(th);
++        float y = cy + R*sinf(th);
++        int xi = (int)lrintf(x);
++        int yi = (int)lrintf(y);
++        if(xi<0||xi>=n||yi<0||yi>=n) continue;
++        img01[yi*n + xi] = 1.0f;
++    }
++}
++
++static void add_sin30_sqrt(float *img01, int n, int do_sin30, int do_sqrt2, int do_sqrt3, int do_fibo) {
++    // Desenha “traços” e relações (não dogma, só marcadores)
++    float cx = (F32(n) - 1.0f) * 0.5f, cy = (F32(n) - 1.0f) * 0.5f;
++    float R  = 0.85f*(F32(n) * 0.5f);
++
++    // sin(30)=0.5 -> y = 0.5R no círculo
++    if(do_sin30) {
++        int y = (int)lrintf(cy - 0.5f*R);
++        for(int x=0;x<n;x++) {
++            img01[y*n + x] = fmaxf(img01[y*n + x], 0.85f);
++        }
++    }
++
++    // sqrt2 diagonal (quadrado): linha y=x
++    if(do_sqrt2) {
++        for(int i=0;i<n;i++) {
++            img01[i*n + i] = 1.0f;
++        }
++    }
++
++    // sqrt3/2: “altura” do triângulo equilátero: h = (sqrt3/2)*lado
++    if(do_sqrt3) {
++        float h = 0.8660254f * R;
++        int y = (int)lrintf(cy - h);
++        if(y>=0 && y<n) {
++            for(int x=0;x<n;x++) img01[y*n + x] = fmaxf(img01[y*n + x], 0.65f);
++        }
++    }
++
++    // Fibonacci: variação angular discreta
++    if(do_fibo) {
++        for(int k=0;k<144;k++) {
++            float ph = fibo_phase(k);
++            float th = 2.0f*(float)M_PI*ph;
++            float rr = (0.15f + 0.80f*ph) * (F32(n) * 0.5f);
++            int xi = (int)lrintf(cx + rr*cosf(th));
++            int yi = (int)lrintf(cy + rr*sinf(th));
++            if(xi<0||xi>=n||yi<0||yi>=n) continue;
++            img01[yi*n + xi] = fmaxf(img01[yi*n + xi], 0.75f);
++        }
++    }
++}
++
++static void blend(float *dst, const float *a, const float *b, int n, float wa, float wb) {
++    size_t N = SZ(n)*SZ(n);
++    for(int i=0;i<N;i++) {
++        float v = wa*a[i] + wb*b[i];
++        dst[i] = f01(v);
++    }
++}
++
++static void write_report(const char *out_dir, const geom_opt *o) {
++    char path[PAI_MAX_PATH];
++    snprintf(path, sizeof(path), "%s/report.txt", out_dir);
++    FILE *f = fopen(path, "wb");
++    if(!f) return;
++
++    fprintf(f, "PAI :: geom report\n");
++    fprintf(f, "size=%d\n", o->size);
++    fprintf(f, "flags: cycle42=%d sin30=%d sqrt2=%d sqrt3=%d fibo=%d shapes=%d mandel=%d\n",
++        o->do_cycle42, o->do_sin30, o->do_sqrt2, o->do_sqrt3, o->do_fibo, o->do_shapes, o->do_mandel);
++    fprintf(f, "weights: w_shapes=%.3f w_mandel=%.3f max_iter=%d\n", o->w_shapes, o->w_mandel, o->max_iter);
++
++    // notas numéricas (sem régua fixa)
++    fprintf(f, "\nnotes:\n");
++    fprintf(f, " - sin(30)=0.5 marker line if enabled\n");
++    fprintf(f, " - sqrt2 diagonal marker if enabled\n");
++    fprintf(f, " - sqrt3/2 height marker if enabled\n");
++    fprintf(f, " - cycle42 draws 42 samples on the ring\n");
++    fprintf(f, " - fibo draws 144 phase points using phi modular phase\n");
++
++    fclose(f);
++    printf("[OK] report: %s\n", path);
++}
++
++int pai_cmd_geom(int argc, char **argv) {
++    geom_opt o;
++    memset(&o, 0, sizeof(o));
++    o.size = 768;
++    o.out = "out_geom";
++    o.w_shapes = 0.55f;
++    o.w_mandel = 0.45f;
++    o.max_iter = 360;
++
++    for(int i=2;i<argc;i++) {
++        if(!strcmp(argv[i],"--out") && i+1<argc) o.out = argv[++i];
++        else if(!strcmp(argv[i],"--size") && i+1<argc) o.size = atoi(argv[++i]);
++        else if(!strcmp(argv[i],"--cycle42")) o.do_cycle42 = 1;
++        else if(!strcmp(argv[i],"--sin30")) o.do_sin30 = 1;
++        else if(!strcmp(argv[i],"--sqrt2")) o.do_sqrt2 = 1;
++        else if(!strcmp(argv[i],"--sqrt3")) o.do_sqrt3 = 1;
++        else if(!strcmp(argv[i],"--fibo"))  o.do_fibo = 1;
++        else if(!strcmp(argv[i],"--shapes")) o.do_shapes = 1;
++        else if(!strcmp(argv[i],"--mandel")) o.do_mandel = 1;
++        else if(!strcmp(argv[i],"--w-shapes") && i+1<argc) o.w_shapes = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--w-mandel") && i+1<argc) o.w_mandel = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--max-iter") && i+1<argc) o.max_iter = atoi(argv[++i]);
++    }
++
++    if(o.size < 64) o.size = 64;
++    if(o.size > 4096) o.size = 4096;
++
++    pai_mkdir_p(o.out);
++
++    int n = o.size;
++    float *ov = (float*)xmalloc(N * sizeof(float));
++    float *mb = (float*)xmalloc(N * sizeof(float));
++    float *gf = (float*)xmalloc(N * sizeof(float));
++
++    // shapes
++    if(o.do_shapes) overlay_shapes(ov, n);
++    else memset(ov, 0, N * sizeof(float));
++
++    // mandel
++    if(o.do_mandel) mandelbrot_field(mb, n, o.max_iter);
++    else memset(mb, 0, N * sizeof(float));
++
++    // blend
++    blend(gf, ov, mb, n, o.w_shapes, o.w_mandel);
++
++    // add markers
++    if(o.do_cycle42) add_cycle42(gf, n);
++    add_sin30_sqrt(gf, n, o.do_sin30, o.do_sqrt2, o.do_sqrt3, o.do_fibo);
++
++    char p1[PAI_MAX_PATH], p2[PAI_MAX_PATH], p3[PAI_MAX_PATH];
++    snprintf(p1, sizeof(p1), "%s/overlay.pgm", o.out);
++    snprintf(p2, sizeof(p2), "%s/mandel.pgm", o.out);
++    snprintf(p3, sizeof(p3), "%s/geom.pgm",   o.out);
++
++    if(write_pgm(p1, ov, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p1);
++    if(write_pgm(p2, mb, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p2);
++    if(write_pgm(p3, gf, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p3);
++
++    printf("[OK] overlay: %s\n", p1);
++    printf("[OK] mandel:  %s\n", p2);
++    printf("[OK] geom:    %s\n", p3);
++
++    write_report(o.out, &o);
++
++    free(ov); free(mb); free(gf);
++    return 0;
++}
+diff --git a/rmr/geom.o b/rmr/geom.o
+new file mode 100644
+index 0000000..50e6074
+Binary files /dev/null and b/rmr/geom.o differ
+diff --git a/rmr/geom.pre_fix.1768918156.bak b/rmr/geom.pre_fix.1768918156.bak
+new file mode 100644
+index 0000000..8b6f769
+--- /dev/null
++++ b/rmr/geom.pre_fix.1768918156.bak
+@@ -0,0 +1,308 @@
++#include "pai_geom.h"
++#include "pai_scan.h"
++#include <math.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#ifndef PAI_CAST_HELPERS
++#define PAI_CAST_HELPERS
++#define F32(x) ((float)(x))
++#define SZ(x)  ((size_t)(x))
++#endif
++
++
++#ifndef M_PI
++#define M_PI 3.14159265358979323846
++#endif
++
++typedef struct {
++    int size;
++    const char *out;
++    int do_cycle42;
++    int do_sin30;
++    int do_sqrt2;
++    int do_sqrt3;
++    int do_fibo;
++    int do_shapes;
++    int do_mandel;
++    float w_shapes;
++    float w_mandel;
++    int max_iter;
++} geom_opt;
++
++static void *xmalloc(size_t n) {
++    void *p = malloc(n);
++    if(!p) { perror("malloc"); exit(2); }
++    memset(p, 0, n);
++    return p;
++}
++
++static unsigned char u8_clamp(float x) {
++    if(x < 0.0f) x = 0.0f;
++    if(x > 1.0f) x = 1.0f;
++    int v = (int)lrintf(x * 255.0f);
++    if(v < 0) v = 0;
++    if(v > 255) v = 255;
++    return (unsigned char)v;
++}
++
++static int write_pgm(const char *path, const float *img01, int n) {
++    FILE *f = fopen(path, "wb");
++    if(!f) return -1;
++    fprintf(f, "P5\n%d %d\n255\n", n, n);
++    for(int i=0;i<n*n;i++) {
++        unsigned char v = u8_clamp(img01[i]);
++        fwrite(&v, 1, 1, f);
++    }
++    fclose(f);
++    return 0;
++}
++
++static inline float f01(float x) {
++    if(x < 0.0f) return 0.0f;
++    if(x > 1.0f) return 1.0f;
++    return x;
++}
++
++static void overlay_shapes(float *out01, int n) {
++    // Normalizado: coord em [-1,1]
++    const float cx = (F32(n) - 1.0f) * 0.5f;
++    const float cy = (F32(n) - 1.0f) * 0.5f;
++    const float s = (F32(n) * 0.5f);
++
++    for(int y=0;y<n;y++) {
++        for(int x=0;x<n;x++) {
++            const float fx = (float)x;
++            const float X = (fx - cx)/s;
++            const float fy = (float)y;
++            const float Y = (fy - cy)/s;
++            float r2 = X*X + Y*Y;
++
++            // circle (r <= 0.95)
++            float circle = (r2 <= (0.95f*0.95f)) ? 1.0f : 0.0f;
++
++            // square (|x|<=0.70, |y|<=0.70) rotacionado 45° -> losango
++            float ax = fabsf(X), ay = fabsf(Y);
++            float diamond = ((ax + ay) <= 0.95f) ? 1.0f : 0.0f;
++
++            // triangle (equilátero) aproximado por half-planes
++            // vtx: (0,0.88), (-0.76,-0.44), (0.76,-0.44)
++            float tri = 1.0f;
++            {
++                float x1=0.0f,  y1=0.88f;
++                float x2=-0.76f,y2=-0.44f;
++                float x3=0.76f, y3=-0.44f;
++                // barycentric sign
++                float d1 = (X-x2)*(y1-y2) - (Y-y2)*(x1-x2);
++                float d2 = (X-x3)*(y2-y3) - (Y-y3)*(x2-x3);
++                float d3 = (X-x1)*(y3-y1) - (Y-y1)*(x3-x1);
++                int has_neg = (d1<0) || (d2<0) || (d3<0);
++                int has_pos = (d1>0) || (d2>0) || (d3>0);
++                tri = !(has_neg && has_pos) ? 1.0f : 0.0f;
++            }
++
++            // hexagon: |x| + |y|/sqrt(3) <= a  (aprox)
++            float hex = ((ax + ay/1.7320508f) <= 0.95f) ? 1.0f : 0.0f;
++
++            float ov = fmaxf(tri, fmaxf(diamond, fmaxf(hex, circle)));
++            ov *= circle; // recorte circular
++
++            out01[y*n + x] = ov;
++        }
++    }
++}
++
++static void mandelbrot_field(float *out01, int n, int max_iter) {
++    // janela padrão
++    float cx = -0.5f, cy = 0.0f;
++    float scale = 2.8f;
++
++    for(int y=0;y<n;y++) {
++        float im = cy + scale * ((float)y/(F32(n)-1.0f) - 0.5f);
++        for(int x=0;x<n;x++) {
++            float re = cx + scale * ((float)x/(F32(n)-1.0f) - 0.5f);
++
++            float zr = 0.0f, zi = 0.0f;
++            int it = 0;
++            for(; it<max_iter; ++it) {
++                float zr2 = zr*zr - zi*zi + re;
++                float zi2 = 2.0f*zr*zi + im;
++                zr = zr2; zi = zi2;
++                if(zr*zr + zi*zi > 4.0f) break;
++            }
++
++            float t = (float)it / (float)max_iter;
++            float v = 1.0f - sqrtf(t);
++            out01[y*n + x] = f01(v);
++        }
++    }
++}
++
++static float fibo_phase(int k) {
++    // Fibonacci discreta como fase (não “régua”, só sequência)
++    // Usa razão áurea para modularizar em [0,1)
++    const float phi = 1.61803398875f;
++    float x = fmodf((float)k * phi, 1.0f);
++    if(x < 0.0f) x += 1.0f;
++    return x;
++}
++
++static void add_cycle42(float *img01, int n) {
++    // amostra circular 42 passos e injeta como “anel”
++    const float cx = (F32(n) - 1.0f) * 0.5f;
++    const float cy = (F32(n) - 1.0f) * 0.5f;
++    float R  = 0.93f*(F32(n) * 0.5f);
++
++    for(int k=0;k<42;k++) {
++        float th = 2.0f*(float)M_PI*(float)k/42.0f;
++        float x = cx + R*cosf(th);
++        float y = cy + R*sinf(th);
++        int xi = (int)lrintf(x);
++        int yi = (int)lrintf(y);
++        if(xi<0||xi>=n||yi<0||yi>=n) continue;
++        img01[yi*n + xi] = 1.0f;
++    }
++}
++
++static void add_sin30_sqrt(float *img01, int n, int do_sin30, int do_sqrt2, int do_sqrt3, int do_fibo) {
++    // Desenha “traços” e relações (não dogma, só marcadores)
++    float cx = (F32(n) - 1.0f) * 0.5f, cy = (F32(n) - 1.0f) * 0.5f;
++    float R  = 0.85f*(F32(n) * 0.5f);
++
++    // sin(30)=0.5 -> y = 0.5R no círculo
++    if(do_sin30) {
++        int y = (int)lrintf(cy - 0.5f*R);
++        for(int x=0;x<n;x++) {
++            img01[y*n + x] = fmaxf(img01[y*n + x], 0.85f);
++        }
++    }
++
++    // sqrt2 diagonal (quadrado): linha y=x
++    if(do_sqrt2) {
++        for(int i=0;i<n;i++) {
++            img01[i*n + i] = 1.0f;
++        }
++    }
++
++    // sqrt3/2: “altura” do triângulo equilátero: h = (sqrt3/2)*lado
++    if(do_sqrt3) {
++        float h = 0.8660254f * R;
++        int y = (int)lrintf(cy - h);
++        if(y>=0 && y<n) {
++            for(int x=0;x<n;x++) img01[y*n + x] = fmaxf(img01[y*n + x], 0.65f);
++        }
++    }
++
++    // Fibonacci: variação angular discreta
++    if(do_fibo) {
++        for(int k=0;k<144;k++) {
++            float ph = fibo_phase(k);
++            float th = 2.0f*(float)M_PI*ph;
++            float rr = (0.15f + 0.80f*ph) * (F32(n) * 0.5f);
++            int xi = (int)lrintf(cx + rr*cosf(th));
++            int yi = (int)lrintf(cy + rr*sinf(th));
++            if(xi<0||xi>=n||yi<0||yi>=n) continue;
++            img01[yi*n + xi] = fmaxf(img01[yi*n + xi], 0.75f);
++        }
++    }
++}
++
++static void blend(float *dst, const float *a, const float *b, int n, float wa, float wb) {
++    size_t N = SZ(n)*SZ(n);
++    for(int i=0;i<N;i++) {
++        float v = wa*a[i] + wb*b[i];
++        dst[i] = f01(v);
++    }
++}
++
++static void write_report(const char *out_dir, const geom_opt *o) {
++    char path[PAI_MAX_PATH];
++    snprintf(path, sizeof(path), "%s/report.txt", out_dir);
++    FILE *f = fopen(path, "wb");
++    if(!f) return;
++
++    fprintf(f, "PAI :: geom report\n");
++    fprintf(f, "size=%d\n", o->size);
++    fprintf(f, "flags: cycle42=%d sin30=%d sqrt2=%d sqrt3=%d fibo=%d shapes=%d mandel=%d\n",
++        o->do_cycle42, o->do_sin30, o->do_sqrt2, o->do_sqrt3, o->do_fibo, o->do_shapes, o->do_mandel);
++    fprintf(f, "weights: w_shapes=%.3f w_mandel=%.3f max_iter=%d\n", o->w_shapes, o->w_mandel, o->max_iter);
++
++    // notas numéricas (sem régua fixa)
++    fprintf(f, "\nnotes:\n");
++    fprintf(f, " - sin(30)=0.5 marker line if enabled\n");
++    fprintf(f, " - sqrt2 diagonal marker if enabled\n");
++    fprintf(f, " - sqrt3/2 height marker if enabled\n");
++    fprintf(f, " - cycle42 draws 42 samples on the ring\n");
++    fprintf(f, " - fibo draws 144 phase points using phi modular phase\n");
++
++    fclose(f);
++    printf("[OK] report: %s\n", path);
++}
++
++int pai_cmd_geom(int argc, char **argv) {
++    geom_opt o;
++    memset(&o, 0, sizeof(o));
++    o.size = 768;
++    o.out = "out_geom";
++    o.w_shapes = 0.55f;
++    o.w_mandel = 0.45f;
++    o.max_iter = 360;
++
++    for(int i=2;i<argc;i++) {
++        if(!strcmp(argv[i],"--out") && i+1<argc) o.out = argv[++i];
++        else if(!strcmp(argv[i],"--size") && i+1<argc) o.size = atoi(argv[++i]);
++        else if(!strcmp(argv[i],"--cycle42")) o.do_cycle42 = 1;
++        else if(!strcmp(argv[i],"--sin30")) o.do_sin30 = 1;
++        else if(!strcmp(argv[i],"--sqrt2")) o.do_sqrt2 = 1;
++        else if(!strcmp(argv[i],"--sqrt3")) o.do_sqrt3 = 1;
++        else if(!strcmp(argv[i],"--fibo"))  o.do_fibo = 1;
++        else if(!strcmp(argv[i],"--shapes")) o.do_shapes = 1;
++        else if(!strcmp(argv[i],"--mandel")) o.do_mandel = 1;
++        else if(!strcmp(argv[i],"--w-shapes") && i+1<argc) o.w_shapes = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--w-mandel") && i+1<argc) o.w_mandel = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--max-iter") && i+1<argc) o.max_iter = atoi(argv[++i]);
++    }
++
++    if(o.size < 64) o.size = 64;
++    if(o.size > 4096) o.size = 4096;
++
++    pai_mkdir_p(o.out);
++
++    int n = o.size;
++    float *ov = (float*)xmalloc(N * sizeof(float));
++    float *mb = (float*)xmalloc(N * sizeof(float));
++    float *gf = (float*)xmalloc(N * sizeof(float));
++
++    // shapes
++    if(o.do_shapes) overlay_shapes(ov, n);
++    else memset(ov, 0, N * sizeof(float));
++
++    // mandel
++    if(o.do_mandel) mandelbrot_field(mb, n, o.max_iter);
++    else memset(mb, 0, N * sizeof(float));
++
++    // blend
++    blend(gf, ov, mb, n, o.w_shapes, o.w_mandel);
++
++    // add markers
++    if(o.do_cycle42) add_cycle42(gf, n);
++    add_sin30_sqrt(gf, n, o.do_sin30, o.do_sqrt2, o.do_sqrt3, o.do_fibo);
++
++    char p1[PAI_MAX_PATH], p2[PAI_MAX_PATH], p3[PAI_MAX_PATH];
++    snprintf(p1, sizeof(p1), "%s/overlay.pgm", o.out);
++    snprintf(p2, sizeof(p2), "%s/mandel.pgm", o.out);
++    snprintf(p3, sizeof(p3), "%s/geom.pgm",   o.out);
++
++    if(write_pgm(p1, ov, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p1);
++    if(write_pgm(p2, mb, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p2);
++    if(write_pgm(p3, gf, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p3);
++
++    printf("[OK] overlay: %s\n", p1);
++    printf("[OK] mandel:  %s\n", p2);
++    printf("[OK] geom:    %s\n", p3);
++
++    write_report(o.out, &o);
++
++    free(ov); free(mb); free(gf);
++    return 0;
++}
+diff --git a/rmr/geom.pre_fix.1768918259.bak b/rmr/geom.pre_fix.1768918259.bak
+new file mode 100644
+index 0000000..175d8d2
+--- /dev/null
++++ b/rmr/geom.pre_fix.1768918259.bak
+@@ -0,0 +1,308 @@
++#include "pai_geom.h"
++#include "pai_scan.h"
++#include <math.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#ifndef PAI_CAST_HELPERS
++#define PAI_CAST_HELPERS
++#define F32(x) ((float)(x))
++#define SZ(x)  ((size_t)(x))
++#endif
++
++
++#ifndef M_PI
++#define M_PI 3.14159265358979323846
++#endif
++
++typedef struct {
++    int size;
++    const char *out;
++    int do_cycle42;
++    int do_sin30;
++    int do_sqrt2;
++    int do_sqrt3;
++    int do_fibo;
++    int do_shapes;
++    int do_mandel;
++    float w_shapes;
++    float w_mandel;
++    int max_iter;
++} geom_opt;
++
++static void *xmalloc(size_t n) {
++    void *p = malloc(n);
++    if(!p) { perror("malloc"); exit(2); }
++    memset(p, 0, n);
++    return p;
++}
++
++static unsigned char u8_clamp(float x) {
++    if(x < 0.0f) x = 0.0f;
++    if(x > 1.0f) x = 1.0f;
++    int v = (int)lrintf(x * 255.0f);
++    if(v < 0) v = 0;
++    if(v > 255) v = 255;
++    return (unsigned char)v;
++}
++
++static int write_pgm(const char *path, const float *img01, int n) {
++    FILE *f = fopen(path, "wb");
++    if(!f) return -1;
++    fprintf(f, "P5\n%d %d\n255\n", n, n);
++    for(int i=0;i<n*n;i++) {
++        unsigned char v = u8_clamp(img01[i]);
++        fwrite(&v, 1, 1, f);
++    }
++    fclose(f);
++    return 0;
++}
++
++static inline float f01(float x) {
++    if(x < 0.0f) return 0.0f;
++    if(x > 1.0f) return 1.0f;
++    return x;
++}
++
++static void overlay_shapes(float *out01, int n) {
++    // Normalizado: coord em [-1,1]
++    const float cx = (F32(n) - 1.0f) * 0.5f;
++    const float cy = (F32(n) - 1.0f) * 0.5f;
++    const float s = (F32(n) * 0.5f);
++
++    for(int y=0;y<n;y++) {
++        for(int x=0;x<n;x++) {
++            const float fx = (float)x;
++            const float X = (fx - cx)/s;
++            const float fy = (float)y;
++            const float Y = (fy - cy)/s;
++            float r2 = X*X + Y*Y;
++
++            // circle (r <= 0.95)
++            float circle = (r2 <= (0.95f*0.95f)) ? 1.0f : 0.0f;
++
++            // square (|x|<=0.70, |y|<=0.70) rotacionado 45° -> losango
++            float ax = fabsf(X), ay = fabsf(Y);
++            float diamond = ((ax + ay) <= 0.95f) ? 1.0f : 0.0f;
++
++            // triangle (equilátero) aproximado por half-planes
++            // vtx: (0,0.88), (-0.76,-0.44), (0.76,-0.44)
++            float tri = 1.0f;
++            {
++                float x1=0.0f,  y1=0.88f;
++                float x2=-0.76f,y2=-0.44f;
++                float x3=0.76f, y3=-0.44f;
++                // barycentric sign
++                float d1 = (X-x2)*(y1-y2) - (Y-y2)*(x1-x2);
++                float d2 = (X-x3)*(y2-y3) - (Y-y3)*(x2-x3);
++                float d3 = (X-x1)*(y3-y1) - (Y-y1)*(x3-x1);
++                int has_neg = (d1<0) || (d2<0) || (d3<0);
++                int has_pos = (d1>0) || (d2>0) || (d3>0);
++                tri = !(has_neg && has_pos) ? 1.0f : 0.0f;
++            }
++
++            // hexagon: |x| + |y|/sqrt(3) <= a  (aprox)
++            float hex = ((ax + ay/1.7320508f) <= 0.95f) ? 1.0f : 0.0f;
++
++            float ov = fmaxf(tri, fmaxf(diamond, fmaxf(hex, circle)));
++            ov *= circle; // recorte circular
++
++            out01[y*n + x] = ov;
++        }
++    }
++}
++
++static void mandelbrot_field(float *out01, int n, int max_iter) {
++    // janela padrão
++    float cx = -0.5f, cy = 0.0f;
++    float scale = 2.8f;
++
++    for(int y=0;y<n;y++) {
++        float im = cy + scale * ((float)y/(F32(n)-1.0f) - 0.5f);
++        for(int x=0;x<n;x++) {
++            float re = cx + scale * ((float)x/(F32(n)-1.0f) - 0.5f);
++
++            float zr = 0.0f, zi = 0.0f;
++            int it = 0;
++            for(; it<max_iter; ++it) {
++                float zr2 = zr*zr - zi*zi + re;
++                float zi2 = 2.0f*zr*zi + im;
++                zr = zr2; zi = zi2;
++                if(zr*zr + zi*zi > 4.0f) break;
++            }
++
++            float t = (float)it / (float)max_iter;
++            float v = 1.0f - sqrtf(t);
++            out01[y*n + x] = f01(v);
++        }
++    }
++}
++
++static float fibo_phase(int k) {
++    // Fibonacci discreta como fase (não “régua”, só sequência)
++    // Usa razão áurea para modularizar em [0,1)
++    const float phi = 1.61803398875f;
++    float x = fmodf((float)k * phi, 1.0f);
++    if(x < 0.0f) x += 1.0f;
++    return x;
++}
++
++static void add_cycle42(float *img01, int n) {
++    // amostra circular 42 passos e injeta como “anel”
++    const float cx = (F32(n) - 1.0f) * 0.5f;
++    const float cy = (F32(n) - 1.0f) * 0.5f;
++    float R  = 0.93f*(F32(n) * 0.5f);
++
++    for(int k=0;k<42;k++) {
++        float th = 2.0f*(float)M_PI*(float)k/42.0f;
++        float x = cx + R*cosf(th);
++        float y = cy + R*sinf(th);
++        int xi = (int)lrintf(x);
++        int yi = (int)lrintf(y);
++        if(xi<0||xi>=n||yi<0||yi>=n) continue;
++        img01[yi*n + xi] = 1.0f;
++    }
++}
++
++static void add_sin30_sqrt(float *img01, int n, int do_sin30, int do_sqrt2, int do_sqrt3, int do_fibo) {
++    // Desenha “traços” e relações (não dogma, só marcadores)
++    float cx = (F32(n) - 1.0f) * 0.5f, cy = (F32(n) - 1.0f) * 0.5f;
++    float R  = 0.85f*(F32(n) * 0.5f);
++
++    // sin(30)=0.5 -> y = 0.5R no círculo
++    if(do_sin30) {
++        int y = (int)lrintf(cy - 0.5f*R);
++        for(int x=0;x<n;x++) {
++            img01[y*n + x] = fmaxf(img01[y*n + x], 0.85f);
++        }
++    }
++
++    // sqrt2 diagonal (quadrado): linha y=x
++    if(do_sqrt2) {
++        for(int i=0;i<n;i++) {
++            img01[i*n + i] = 1.0f;
++        }
++    }
++
++    // sqrt3/2: “altura” do triângulo equilátero: h = (sqrt3/2)*lado
++    if(do_sqrt3) {
++        float h = 0.8660254f * R;
++        int y = (int)lrintf(cy - h);
++        if(y>=0 && y<n) {
++            for(int x=0;x<n;x++) img01[y*n + x] = fmaxf(img01[y*n + x], 0.65f);
++        }
++    }
++
++    // Fibonacci: variação angular discreta
++    if(do_fibo) {
++        for(int k=0;k<144;k++) {
++            float ph = fibo_phase(k);
++            float th = 2.0f*(float)M_PI*ph;
++            float rr = (0.15f + 0.80f*ph) * (F32(n) * 0.5f);
++            int xi = (int)lrintf(cx + rr*cosf(th));
++            int yi = (int)lrintf(cy + rr*sinf(th));
++            if(xi<0||xi>=n||yi<0||yi>=n) continue;
++            img01[yi*n + xi] = fmaxf(img01[yi*n + xi], 0.75f);
++        }
++    }
++}
++
++static void blend(float *dst, const float *a, const float *b, int n, float wa, float wb) {
++    for(size_t i=0; i < N; i++) {
++        float v = wa*a[i] + wb*b[i];
++        dst[i] = f01(v);
++    }
++}
++
++static void write_report(const char *out_dir, const geom_opt *o) {
++    char path[PAI_MAX_PATH];
++    snprintf(path, sizeof(path), "%s/report.txt", out_dir);
++    FILE *f = fopen(path, "wb");
++    if(!f) return;
++
++    fprintf(f, "PAI :: geom report\n");
++    fprintf(f, "size=%d\n", o->size);
++    fprintf(f, "flags: cycle42=%d sin30=%d sqrt2=%d sqrt3=%d fibo=%d shapes=%d mandel=%d\n",
++        o->do_cycle42, o->do_sin30, o->do_sqrt2, o->do_sqrt3, o->do_fibo, o->do_shapes, o->do_mandel);
++    fprintf(f, "weights: w_shapes=%.3f w_mandel=%.3f max_iter=%d\n", o->w_shapes, o->w_mandel, o->max_iter);
++
++    // notas numéricas (sem régua fixa)
++    fprintf(f, "\nnotes:\n");
++    fprintf(f, " - sin(30)=0.5 marker line if enabled\n");
++    fprintf(f, " - sqrt2 diagonal marker if enabled\n");
++    fprintf(f, " - sqrt3/2 height marker if enabled\n");
++    fprintf(f, " - cycle42 draws 42 samples on the ring\n");
++    fprintf(f, " - fibo draws 144 phase points using phi modular phase\n");
++
++    fclose(f);
++    printf("[OK] report: %s\n", path);
++}
++
++int pai_cmd_geom(int argc, char **argv) {
++    geom_opt o;
++    memset(&o, 0, sizeof(o));
++    o.size = 768;
++    o.out = "out_geom";
++    o.w_shapes = 0.55f;
++    o.w_mandel = 0.45f;
++    o.max_iter = 360;
++
++    for(int i=2;i<argc;i++) {
++        if(!strcmp(argv[i],"--out") && i+1<argc) o.out = argv[++i];
++        else if(!strcmp(argv[i],"--size") && i+1<argc) o.size = atoi(argv[++i]);
++        else if(!strcmp(argv[i],"--cycle42")) o.do_cycle42 = 1;
++        else if(!strcmp(argv[i],"--sin30")) o.do_sin30 = 1;
++        else if(!strcmp(argv[i],"--sqrt2")) o.do_sqrt2 = 1;
++        else if(!strcmp(argv[i],"--sqrt3")) o.do_sqrt3 = 1;
++        else if(!strcmp(argv[i],"--fibo"))  o.do_fibo = 1;
++        else if(!strcmp(argv[i],"--shapes")) o.do_shapes = 1;
++        else if(!strcmp(argv[i],"--mandel")) o.do_mandel = 1;
++        else if(!strcmp(argv[i],"--w-shapes") && i+1<argc) o.w_shapes = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--w-mandel") && i+1<argc) o.w_mandel = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--max-iter") && i+1<argc) o.max_iter = atoi(argv[++i]);
++    }
++
++    if(o.size < 64) o.size = 64;
++    if(o.size > 4096) o.size = 4096;
++
++    pai_mkdir_p(o.out);
++
++    int n = o.size;
++    size_t N = SZ(n) * SZ(n);
++    float *ov = (float*)xmalloc(N * sizeof(float));
++    float *mb = (float*)xmalloc(N * sizeof(float));
++    float *gf = (float*)xmalloc(N * sizeof(float));
++
++    // shapes
++    if(o.do_shapes) overlay_shapes(ov, n);
++    else memset(ov, 0, N * sizeof(float));
++
++    // mandel
++    if(o.do_mandel) mandelbrot_field(mb, n, o.max_iter);
++    else memset(mb, 0, N * sizeof(float));
++
++    // blend
++    blend(gf, ov, mb, n, o.w_shapes, o.w_mandel);
++
++    // add markers
++    if(o.do_cycle42) add_cycle42(gf, n);
++    add_sin30_sqrt(gf, n, o.do_sin30, o.do_sqrt2, o.do_sqrt3, o.do_fibo);
++
++    char p1[PAI_MAX_PATH], p2[PAI_MAX_PATH], p3[PAI_MAX_PATH];
++    snprintf(p1, sizeof(p1), "%s/overlay.pgm", o.out);
++    snprintf(p2, sizeof(p2), "%s/mandel.pgm", o.out);
++    snprintf(p3, sizeof(p3), "%s/geom.pgm",   o.out);
++
++    if(write_pgm(p1, ov, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p1);
++    if(write_pgm(p2, mb, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p2);
++    if(write_pgm(p3, gf, n)!=0) fprintf(stderr,"[warn] nao escreveu %s\n", p3);
++
++    printf("[OK] overlay: %s\n", p1);
++    printf("[OK] mandel:  %s\n", p2);
++    printf("[OK] geom:    %s\n", p3);
++
++    write_report(o.out, &o);
++
++    free(ov); free(mb); free(gf);
++    return 0;
++}
+diff --git a/rmr/hash_sha256.c b/rmr/hash_sha256.c
+new file mode 100644
+index 0000000..d6fbda5
+--- /dev/null
++++ b/rmr/hash_sha256.c
+@@ -0,0 +1,123 @@
++#include "pai_hash.h"
++#include <string.h>
++#include <stdio.h>
++#include <stdint.h>
++
++#define ROTR(x,n) ((x >> n) | (x << (32-n)))
++#define CH(x,y,z) ((x & y) ^ (~x & z))
++#define MAJ(x,y,z) ((x & y) ^ (x & z) ^ (y & z))
++#define EP0(x) (ROTR(x,2) ^ ROTR(x,13) ^ ROTR(x,22))
++#define EP1(x) (ROTR(x,6) ^ ROTR(x,11) ^ ROTR(x,25))
++#define SIG0(x) (ROTR(x,7) ^ ROTR(x,18) ^ (x >> 3))
++#define SIG1(x) (ROTR(x,17) ^ ROTR(x,19) ^ (x >> 10))
++
++static const uint32_t K[64] = {
++  0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,
++  0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
++  0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,
++  0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
++  0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,
++  0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
++  0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,
++  0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
++  0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,
++  0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
++  0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,
++  0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
++  0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,
++  0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
++  0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,
++  0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
++};
++
++static void process_block(pai_sha256_ctx *ctx, const uint8_t block[64]) {
++    uint32_t w[64];
++    for(int i=0;i<16;i++) {
++        w[i] =
++  ((uint32_t)block[i*4]   << 24) |
++  ((uint32_t)block[i*4+1] << 16) |
++  ((uint32_t)block[i*4+2] <<  8) |
++  ((uint32_t)block[i*4+3]);
++    }
++    for(int i=16;i<64;i++)
++        w[i] = SIG1(w[i-2]) + w[i-7] + SIG0(w[i-15]) + w[i-16];
++
++    uint32_t a=ctx->h[0],b=ctx->h[1],c=ctx->h[2],d=ctx->h[3];
++    uint32_t e=ctx->h[4],f=ctx->h[5],g=ctx->h[6],h=ctx->h[7];
++
++    for(int i=0;i<64;i++) {
++        uint32_t t1 = h + EP1(e) + CH(e,f,g) + K[i] + w[i];
++        uint32_t t2 = EP0(a) + MAJ(a,b,c);
++        h=g; g=f; f=e; e=d+t1;
++        d=c; c=b; b=a; a=t1+t2;
++    }
++
++    ctx->h[0]+=a; ctx->h[1]+=b; ctx->h[2]+=c; ctx->h[3]+=d;
++    ctx->h[4]+=e; ctx->h[5]+=f; ctx->h[6]+=g; ctx->h[7]+=h;
++}
++
++void pai_sha256_init(pai_sha256_ctx *ctx) {
++    ctx->h[0]=0x6a09e667; ctx->h[1]=0xbb67ae85;
++    ctx->h[2]=0x3c6ef372; ctx->h[3]=0xa54ff53a;
++    ctx->h[4]=0x510e527f; ctx->h[5]=0x9b05688c;
++    ctx->h[6]=0x1f83d9ab; ctx->h[7]=0x5be0cd19;
++    ctx->len=0;
++    ctx->buf_len=0;
++}
++
++void pai_sha256_update(pai_sha256_ctx *ctx, const uint8_t *data, size_t len) {
++    ctx->len += len*8;
++    while(len--) {
++        ctx->buf[ctx->buf_len++] = *data++;
++        if(ctx->buf_len == 64) {
++            process_block(ctx, ctx->buf);
++            ctx->buf_len = 0;
++        }
++    }
++}
++
++void pai_sha256_final(pai_sha256_ctx *ctx, uint8_t out[32]) {
++    ctx->buf[ctx->buf_len++] = 0x80;
++    while(ctx->buf_len != 56) {
++        if(ctx->buf_len == 64) {
++            process_block(ctx, ctx->buf);
++            ctx->buf_len = 0;
++        }
++        ctx->buf[ctx->buf_len++] = 0;
++    }
++
++    for(int i=7;i>=0;i--)
++        ctx->buf[ctx->buf_len++] = (ctx->len >> (i*8)) & 0xff;
++
++    process_block(ctx, ctx->buf);
++
++    for(int i=0;i<8;i++) {
++        out[i*4]   = ctx->h[i]>>24;
++        out[i*4+1] = (uint8_t)(ctx->h[i]>>16);
++        out[i*4+2] = (uint8_t)(ctx->h[i]>>8);
++        out[i*4+3] = (uint8_t)(ctx->h[i]);
++    }
++}
++
++void pai_sha256_hex(const uint8_t hash[32], char out[65]) {
++    static const char hex[]="0123456789abcdef";
++    for(int i=0;i<32;i++) {
++        out[i*2]   = hex[hash[i]>>4];
++        out[i*2+1] = hex[hash[i]&0xf];
++    }
++    out[64]=0;
++}
++
++int pai_sha256_file(const char *path, uint8_t out[32]) {
++    FILE *f = fopen(path,"rb");
++    if(!f) return -1;
++    pai_sha256_ctx ctx;
++    pai_sha256_init(&ctx);
++    uint8_t buf[4096];
++    size_t r;
++    while((r=fread(buf,1,sizeof(buf),f))>0)
++        pai_sha256_update(&ctx,buf,r);
++    fclose(f);
++    pai_sha256_final(&ctx,out);
++    return 0;
++}
+diff --git a/rmr/hash_sha256.c.bak b/rmr/hash_sha256.c.bak
+new file mode 100644
+index 0000000..8a91d73
+--- /dev/null
++++ b/rmr/hash_sha256.c.bak
+@@ -0,0 +1,122 @@
++#include "pai_hash.h"
++#include <string.h>
++#include <stdio.h>
++
++#define ROTR(x,n) ((x >> n) | (x << (32-n)))
++#define CH(x,y,z) ((x & y) ^ (~x & z))
++#define MAJ(x,y,z) ((x & y) ^ (x & z) ^ (y & z))
++#define EP0(x) (ROTR(x,2) ^ ROTR(x,13) ^ ROTR(x,22))
++#define EP1(x) (ROTR(x,6) ^ ROTR(x,11) ^ ROTR(x,25))
++#define SIG0(x) (ROTR(x,7) ^ ROTR(x,18) ^ (x >> 3))
++#define SIG1(x) (ROTR(x,17) ^ ROTR(x,19) ^ (x >> 10))
++
++static const uint32_t K[64] = {
++  0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,
++  0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
++  0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,
++  0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
++  0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,
++  0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
++  0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,
++  0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
++  0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,
++  0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
++  0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,
++  0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
++  0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,
++  0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
++  0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,
++  0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
++};
++
++static void process_block(pai_sha256_ctx *ctx, const uint8_t block[64]) {
++    uint32_t w[64];
++    for(int i=0;i<16;i++) {
++        w[i] =
++  ((uint32_t)block[i*4]   << 24) |
++  ((uint32_t)block[i*4+1] << 16) |
++  ((uint32_t)block[i*4+2] <<  8) |
++  ((uint32_t)block[i*4+3]);
++    }
++    for(int i=16;i<64;i++)
++        w[i] = SIG1(w[i-2]) + w[i-7] + SIG0(w[i-15]) + w[i-16];
++
++    uint32_t a=ctx->h[0],b=ctx->h[1],c=ctx->h[2],d=ctx->h[3];
++    uint32_t e=ctx->h[4],f=ctx->h[5],g=ctx->h[6],h=ctx->h[7];
++
++    for(int i=0;i<64;i++) {
++        uint32_t t1 = h + EP1(e) + CH(e,f,g) + K[i] + w[i];
++        uint32_t t2 = EP0(a) + MAJ(a,b,c);
++        h=g; g=f; f=e; e=d+t1;
++        d=c; c=b; b=a; a=t1+t2;
++    }
++
++    ctx->h[0]+=a; ctx->h[1]+=b; ctx->h[2]+=c; ctx->h[3]+=d;
++    ctx->h[4]+=e; ctx->h[5]+=f; ctx->h[6]+=g; ctx->h[7]+=h;
++}
++
++void pai_sha256_init(pai_sha256_ctx *ctx) {
++    ctx->h[0]=0x6a09e667; ctx->h[1]=0xbb67ae85;
++    ctx->h[2]=0x3c6ef372; ctx->h[3]=0xa54ff53a;
++    ctx->h[4]=0x510e527f; ctx->h[5]=0x9b05688c;
++    ctx->h[6]=0x1f83d9ab; ctx->h[7]=0x5be0cd19;
++    ctx->len=0;
++    ctx->buf_len=0;
++}
++
++void pai_sha256_update(pai_sha256_ctx *ctx, const uint8_t *data, size_t len) {
++    ctx->len += len*8;
++    while(len--) {
++        ctx->buf[ctx->buf_len++] = *data++;
++        if(ctx->buf_len == 64) {
++            process_block(ctx, ctx->buf);
++            ctx->buf_len = 0;
++        }
++    }
++}
++
++void pai_sha256_final(pai_sha256_ctx *ctx, uint8_t out[32]) {
++    ctx->buf[ctx->buf_len++] = 0x80;
++    while(ctx->buf_len != 56) {
++        if(ctx->buf_len == 64) {
++            process_block(ctx, ctx->buf);
++            ctx->buf_len = 0;
++        }
++        ctx->buf[ctx->buf_len++] = 0;
++    }
++
++    for(int i=7;i>=0;i--)
++        ctx->buf[ctx->buf_len++] = (ctx->len >> (i*8)) & 0xff;
++
++    process_block(ctx, ctx->buf);
++
++    for(int i=0;i<8;i++) {
++        out[i*4]   = ctx->h[i]>>24;
++        out[i*4+1] = ctx->h[i]>>16;
++        out[i*4+2] = ctx->h[i]>>8;
++        out[i*4+3] = ctx->h[i];
++    }
++}
++
++void pai_sha256_hex(const uint8_t hash[32], char out[65]) {
++    static const char hex[]="0123456789abcdef";
++    for(int i=0;i<32;i++) {
++        out[i*2]   = hex[hash[i]>>4];
++        out[i*2+1] = hex[hash[i]&0xf];
++    }
++    out[64]=0;
++}
++
++int pai_sha256_file(const char *path, uint8_t out[32]) {
++    FILE *f = fopen(path,"rb");
++    if(!f) return -1;
++    pai_sha256_ctx ctx;
++    pai_sha256_init(&ctx);
++    uint8_t buf[4096];
++    size_t r;
++    while((r=fread(buf,1,sizeof(buf),f))>0)
++        pai_sha256_update(&ctx,buf,r);
++    fclose(f);
++    pai_sha256_final(&ctx,out);
++    return 0;
++}
+diff --git a/rmr/hash_sha256.c.pre_warnfix.bak b/rmr/hash_sha256.c.pre_warnfix.bak
+new file mode 100644
+index 0000000..f3251ba
+--- /dev/null
++++ b/rmr/hash_sha256.c.pre_warnfix.bak
+@@ -0,0 +1,123 @@
++#include "pai_hash.h"
++#include <string.h>
++#include <stdio.h>
++#include <stdint.h>
++
++#define ROTR(x,n) ((x >> n) | (x << (32-n)))
++#define CH(x,y,z) ((x & y) ^ (~x & z))
++#define MAJ(x,y,z) ((x & y) ^ (x & z) ^ (y & z))
++#define EP0(x) (ROTR(x,2) ^ ROTR(x,13) ^ ROTR(x,22))
++#define EP1(x) (ROTR(x,6) ^ ROTR(x,11) ^ ROTR(x,25))
++#define SIG0(x) (ROTR(x,7) ^ ROTR(x,18) ^ (x >> 3))
++#define SIG1(x) (ROTR(x,17) ^ ROTR(x,19) ^ (x >> 10))
++
++static const uint32_t K[64] = {
++  0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,
++  0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
++  0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,
++  0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
++  0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,
++  0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
++  0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,
++  0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
++  0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,
++  0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
++  0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,
++  0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
++  0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,
++  0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
++  0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,
++  0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
++};
++
++static void process_block(pai_sha256_ctx *ctx, const uint8_t block[64]) {
++    uint32_t w[64];
++    for(int i=0;i<16;i++) {
++        w[i] =
++  ((uint32_t)block[i*4]   << 24) |
++  ((uint32_t)block[i*4+1] << 16) |
++  ((uint32_t)block[i*4+2] <<  8) |
++  ((uint32_t)block[i*4+3]);
++    }
++    for(int i=16;i<64;i++)
++        w[i] = SIG1(w[i-2]) + w[i-7] + SIG0(w[i-15]) + w[i-16];
++
++    uint32_t a=ctx->h[0],b=ctx->h[1],c=ctx->h[2],d=ctx->h[3];
++    uint32_t e=ctx->h[4],f=ctx->h[5],g=ctx->h[6],h=ctx->h[7];
++
++    for(int i=0;i<64;i++) {
++        uint32_t t1 = h + EP1(e) + CH(e,f,g) + K[i] + w[i];
++        uint32_t t2 = EP0(a) + MAJ(a,b,c);
++        h=g; g=f; f=e; e=d+t1;
++        d=c; c=b; b=a; a=t1+t2;
++    }
++
++    ctx->h[0]+=a; ctx->h[1]+=b; ctx->h[2]+=c; ctx->h[3]+=d;
++    ctx->h[4]+=e; ctx->h[5]+=f; ctx->h[6]+=g; ctx->h[7]+=h;
++}
++
++void pai_sha256_init(pai_sha256_ctx *ctx) {
++    ctx->h[0]=0x6a09e667; ctx->h[1]=0xbb67ae85;
++    ctx->h[2]=0x3c6ef372; ctx->h[3]=0xa54ff53a;
++    ctx->h[4]=0x510e527f; ctx->h[5]=0x9b05688c;
++    ctx->h[6]=0x1f83d9ab; ctx->h[7]=0x5be0cd19;
++    ctx->len=0;
++    ctx->buf_len=0;
++}
++
++void pai_sha256_update(pai_sha256_ctx *ctx, const uint8_t *data, size_t len) {
++    ctx->len += len*8;
++    while(len--) {
++        ctx->buf[ctx->buf_len++] = *data++;
++        if(ctx->buf_len == 64) {
++            process_block(ctx, ctx->buf);
++            ctx->buf_len = 0;
++        }
++    }
++}
++
++void pai_sha256_final(pai_sha256_ctx *ctx, uint8_t out[32]) {
++    ctx->buf[ctx->buf_len++] = 0x80;
++    while(ctx->buf_len != 56) {
++        if(ctx->buf_len == 64) {
++            process_block(ctx, ctx->buf);
++            ctx->buf_len = 0;
++        }
++        ctx->buf[ctx->buf_len++] = 0;
++    }
++
++    for(int i=7;i>=0;i--)
++        ctx->buf[ctx->buf_len++] = (ctx->len >> (i*8)) & 0xff;
++
++    process_block(ctx, ctx->buf);
++
++    for(int i=0;i<8;i++) {
++        out[i*4]   = ctx->h[i]>>24;
++        out[i*4+1] = ctx->h[i]>>16;
++        out[i*4+2] = ctx->h[i]>>8;
++        out[i*4+3] = ctx->h[i];
++    }
++}
++
++void pai_sha256_hex(const uint8_t hash[32], char out[65]) {
++    static const char hex[]="0123456789abcdef";
++    for(int i=0;i<32;i++) {
++        out[i*2]   = hex[hash[i]>>4];
++        out[i*2+1] = hex[hash[i]&0xf];
++    }
++    out[64]=0;
++}
++
++int pai_sha256_file(const char *path, uint8_t out[32]) {
++    FILE *f = fopen(path,"rb");
++    if(!f) return -1;
++    pai_sha256_ctx ctx;
++    pai_sha256_init(&ctx);
++    uint8_t buf[4096];
++    size_t r;
++    while((r=fread(buf,1,sizeof(buf),f))>0)
++        pai_sha256_update(&ctx,buf,r);
++    fclose(f);
++    pai_sha256_final(&ctx,out);
++    return 0;
++}
+diff --git a/rmr/hash_sha256.o b/rmr/hash_sha256.o
+new file mode 100644
+index 0000000..d3f6704
+Binary files /dev/null and b/rmr/hash_sha256.o differ
+diff --git a/rmr/include/rmr_arch.h b/rmr/include/rmr_arch.h
+new file mode 100644
+index 0000000..d324046
+--- /dev/null
++++ b/rmr/include/rmr_arch.h
+@@ -0,0 +1,67 @@
++#ifndef RMR_ARCH_H
++#define RMR_ARCH_H
++
++// Compiler detection.
++#if defined(__clang__)
++#define RMR_COMPILER_CLANG 1
++#elif defined(__GNUC__)
++#define RMR_COMPILER_GCC 1
++#elif defined(_MSC_VER)
++#define RMR_COMPILER_MSVC 1
++#endif
++
++// Operating system detection.
++#if defined(_WIN32) || defined(_WIN64)
++#define RMR_OS_WINDOWS 1
++#elif defined(__APPLE__) && defined(__MACH__)
++#define RMR_OS_DARWIN 1
++#elif defined(__linux__)
++#define RMR_OS_LINUX 1
++#elif defined(__ANDROID__)
++#define RMR_OS_ANDROID 1
++#elif defined(__FreeBSD__)
++#define RMR_OS_FREEBSD 1
++#elif defined(__OpenBSD__)
++#define RMR_OS_OPENBSD 1
++#elif defined(__NetBSD__)
++#define RMR_OS_NETBSD 1
++#endif
++
++// Architecture detection.
++#if defined(__x86_64__) || defined(_M_X64)
++#define RMR_ARCH_X86_64 1
++#elif defined(__i386__) || defined(_M_IX86)
++#define RMR_ARCH_X86_32 1
++#elif defined(__aarch64__) || defined(_M_ARM64)
++#define RMR_ARCH_AARCH64 1
++#elif defined(__arm__) || defined(_M_ARM)
++#define RMR_ARCH_ARM 1
++#elif defined(__powerpc64__) || defined(__ppc64__)
++#define RMR_ARCH_PPC64 1
++#elif defined(__powerpc__) || defined(__ppc__)
++#define RMR_ARCH_PPC32 1
++#elif defined(__riscv) || defined(__riscv__)
++#define RMR_ARCH_RISCV 1
++#endif
++
++// Endianness detection.
++#if defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__)
++#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++#define RMR_LITTLE_ENDIAN 1
++#else
++#define RMR_BIG_ENDIAN 1
++#endif
++#elif defined(_WIN32) || defined(__LITTLE_ENDIAN__)
++#define RMR_LITTLE_ENDIAN 1
++#elif defined(__BIG_ENDIAN__)
++#define RMR_BIG_ENDIAN 1
++#endif
++
++// Assembly family hints.
++#if defined(RMR_ARCH_X86_64) || defined(RMR_ARCH_X86_32)
++#define RMR_ASM_INTEL 1
++#elif defined(RMR_ARCH_AARCH64) || defined(RMR_ARCH_ARM)
++#define RMR_ASM_ARM 1
++#endif
++
++#endif
+diff --git a/rmr/include/rmr_dispatch.h b/rmr/include/rmr_dispatch.h
+new file mode 100644
+index 0000000..ce9ea14
+--- /dev/null
++++ b/rmr/include/rmr_dispatch.h
+@@ -0,0 +1,57 @@
++#ifndef RMR_DISPATCH_H
++#define RMR_DISPATCH_H
++
++#include "rmr_arch.h"
++
++// Compile-time feature flags derived from rmr_arch.h + compiler defines.
++
++#if defined(RMR_ARCH_X86_64) || defined(RMR_ARCH_X86_32)
++#define RMR_HAS_X86 1
++#else
++#define RMR_HAS_X86 0
++#endif
++
++#if defined(RMR_ARCH_AARCH64) || defined(RMR_ARCH_ARM)
++#define RMR_HAS_ARM 1
++#else
++#define RMR_HAS_ARM 0
++#endif
++
++#if RMR_HAS_X86 && defined(__SSE2__)
++#define RMR_HAS_SSE2 1
++#else
++#define RMR_HAS_SSE2 0
++#endif
++
++#if RMR_HAS_X86 && defined(__SSE4_1__)
++#define RMR_HAS_SSE41 1
++#else
++#define RMR_HAS_SSE41 0
++#endif
++
++#if RMR_HAS_X86 && defined(__AVX2__)
++#define RMR_HAS_AVX2 1
++#else
++#define RMR_HAS_AVX2 0
++#endif
++
++#if RMR_HAS_X86 && defined(__AVX512F__)
++#define RMR_HAS_AVX512 1
++#else
++#define RMR_HAS_AVX512 0
++#endif
++
++#if RMR_HAS_ARM && (defined(__ARM_NEON) || defined(__ARM_NEON__))
++#define RMR_HAS_NEON 1
++#else
++#define RMR_HAS_NEON 0
++#endif
++
++#if !defined(RMR_OS_WINDOWS) && !defined(RMR_OS_DARWIN) &&                \
++    !defined(RMR_OS_LINUX) && !defined(RMR_OS_ANDROID) &&                 \
++    !defined(RMR_OS_FREEBSD) && !defined(RMR_OS_OPENBSD) &&               \
++    !defined(RMR_OS_NETBSD)
++#define RMR_OS_UNKNOWN 1
++#endif
++
++#endif
+diff --git a/rmr/include/rmr_lowlevel.h b/rmr/include/rmr_lowlevel.h
+new file mode 100644
+index 0000000..0149395
+--- /dev/null
++++ b/rmr/include/rmr_lowlevel.h
+@@ -0,0 +1,207 @@
++#ifndef RMR_LOWLEVEL_H
++#define RMR_LOWLEVEL_H
++
++#include <stddef.h>
++#include <stdint.h>
++#include <stdbool.h>
++#include "rmr_dispatch.h"
++#if !defined(RMR_NO_LIBC)
++#include <errno.h>
++#include <stdlib.h>
++#include <string.h>
++#endif
++
++#if defined(__GNUC__) || defined(__clang__)
++#define RMR_TRAP() __builtin_trap()
++#define RMR_INLINE static inline __attribute__((always_inline))
++#define RMR_LIKELY(x) __builtin_expect(!!(x), 1)
++#define RMR_UNLIKELY(x) __builtin_expect(!!(x), 0)
++#define RMR_RESTRICT __restrict__
++#define RMR_ASSUME(x)            \
++  do {                           \
++    if (!(x)) {                  \
++      __builtin_unreachable();   \
++    }                            \
++  } while (0)
++#define RMR_PREFETCH_R(p) __builtin_prefetch((p), 0, 3)
++#define RMR_PREFETCH_W(p) __builtin_prefetch((p), 1, 3)
++#elif defined(_MSC_VER)
++#include <intrin.h>
++#define RMR_TRAP() __debugbreak()
++#define RMR_INLINE static __forceinline
++#define RMR_LIKELY(x) (x)
++#define RMR_UNLIKELY(x) (x)
++#define RMR_RESTRICT
++#define RMR_ASSUME(x) __assume(x)
++#define RMR_PREFETCH_R(p) (void)(p)
++#define RMR_PREFETCH_W(p) (void)(p)
++#else
++#define RMR_TRAP()                      \
++  do {                                  \
++    volatile uint8_t *p = (uint8_t *)0; \
++    *p = 0;                             \
++  } while (0)
++#define RMR_INLINE static inline
++#define RMR_LIKELY(x) (x)
++#define RMR_UNLIKELY(x) (x)
++#define RMR_RESTRICT
++#define RMR_ASSUME(x) (void)(x)
++#define RMR_PREFETCH_R(p) (void)(p)
++#define RMR_PREFETCH_W(p) (void)(p)
++#endif
++
++#if defined(BLAKE3_TESTING)
++#define RMR_ASSERT(expr)      \
++  do {                        \
++    if (!(expr)) {            \
++      RMR_TRAP();             \
++    }                         \
++  } while (0)
++#else
++#define RMR_ASSERT(expr) ((void)(expr))
++#endif
++
++RMR_INLINE void rmr_memcpy(void *RMR_RESTRICT dst,
++                           const void *RMR_RESTRICT src,
++                           size_t len) {
++  if (RMR_UNLIKELY(len == 0)) {
++    return;
++  }
++  uint8_t *RMR_RESTRICT out = (uint8_t *)dst;
++  const uint8_t *RMR_RESTRICT in = (const uint8_t *)src;
++  size_t i = 0;
++  if (RMR_LIKELY(len <= 16)) {
++    switch (len) {
++      case 16: out[15] = in[15];
++      case 15: out[14] = in[14];
++      case 14: out[13] = in[13];
++      case 13: out[12] = in[12];
++      case 12: out[11] = in[11];
++      case 11: out[10] = in[10];
++      case 10: out[9] = in[9];
++      case 9: out[8] = in[8];
++      case 8: out[7] = in[7];
++      case 7: out[6] = in[6];
++      case 6: out[5] = in[5];
++      case 5: out[4] = in[4];
++      case 4: out[3] = in[3];
++      case 3: out[2] = in[2];
++      case 2: out[1] = in[1];
++      case 1: out[0] = in[0];
++      default: return;
++    }
++    return;
++  }
++  if (((uintptr_t)out | (uintptr_t)in) % sizeof(size_t) == 0) {
++    size_t *outw = (size_t *)out;
++    const size_t *inw = (const size_t *)in;
++    size_t words = len / sizeof(size_t);
++    const size_t prefetch_distance = 16;
++    const size_t prefetch_stride = 8;
++    RMR_ASSUME(prefetch_stride != 0);
++    RMR_ASSUME((prefetch_stride & (prefetch_stride - 1)) == 0);
++    const size_t prefetch_mask = prefetch_stride - 1;
++    for (i = 0; i < words; i++) {
++      if (RMR_LIKELY(words > prefetch_distance) &&
++          (i & prefetch_mask) == 0) {
++        RMR_PREFETCH_R(inw + i + prefetch_distance);
++        RMR_PREFETCH_W(outw + i + prefetch_distance);
++      }
++      outw[i] = inw[i];
++    }
++    i *= sizeof(size_t);
++  }
++  for (; i < len; i++) {
++    out[i] = in[i];
++  }
++}
++
++RMR_INLINE void rmr_memset(void *RMR_RESTRICT dst, uint8_t value, size_t len) {
++  if (RMR_UNLIKELY(len == 0)) {
++    return;
++  }
++  uint8_t *RMR_RESTRICT out = (uint8_t *)dst;
++  size_t i = 0;
++  if (RMR_LIKELY(len <= 16)) {
++    switch (len) {
++      case 16: out[15] = value;
++      case 15: out[14] = value;
++      case 14: out[13] = value;
++      case 13: out[12] = value;
++      case 12: out[11] = value;
++      case 11: out[10] = value;
++      case 10: out[9] = value;
++      case 9: out[8] = value;
++      case 8: out[7] = value;
++      case 7: out[6] = value;
++      case 6: out[5] = value;
++      case 5: out[4] = value;
++      case 4: out[3] = value;
++      case 3: out[2] = value;
++      case 2: out[1] = value;
++      case 1: out[0] = value;
++      default: return;
++    }
++    return;
++  }
++  if (((uintptr_t)out) % sizeof(size_t) == 0) {
++    size_t pattern = value;
++    pattern |= pattern << 8;
++    pattern |= pattern << 16;
++#if SIZE_MAX > 0xffffffffu
++    pattern |= pattern << 32;
++#endif
++    size_t *outw = (size_t *)out;
++    size_t words = len / sizeof(size_t);
++    for (i = 0; i < words; i++) {
++      outw[i] = pattern;
++    }
++    i *= sizeof(size_t);
++  }
++  for (; i < len; i++) {
++    out[i] = value;
++  }
++}
++
++#if defined(RMR_NO_LIBC)
++size_t rmr_ll_strlen(const char *value);
++int rmr_ll_strcmp(const char *left, const char *right);
++const char *rmr_ll_strerror(int errnum);
++void *rmr_ll_malloc(size_t size);
++void rmr_ll_free(void *ptr);
++unsigned long long rmr_ll_strtoull(const char *text, char **end, int base);
++#else
++RMR_INLINE size_t rmr_ll_strlen(const char *value) { return strlen(value); }
++
++RMR_INLINE int rmr_ll_strcmp(const char *left, const char *right) {
++  return strcmp(left, right);
++}
++
++RMR_INLINE const char *rmr_ll_strerror(int errnum) {
++  return strerror(errnum);
++}
++
++RMR_INLINE void *rmr_ll_malloc(size_t size) { return malloc(size); }
++
++RMR_INLINE void rmr_ll_free(void *ptr) { free(ptr); }
++#endif
++
++RMR_INLINE bool rmr_ll_parse_size(const char *text, size_t *out) {
++  char *end = NULL;
++#if defined(RMR_NO_LIBC)
++  unsigned long long value = rmr_ll_strtoull(text, &end, 10);
++  if (RMR_UNLIKELY(end == text || *end != '\0' || value > SIZE_MAX)) {
++    return false;
++  }
++#else
++  errno = 0;
++  unsigned long long value = strtoull(text, &end, 10);
++  if (RMR_UNLIKELY(errno != 0 || end == text || *end != '\0' || value > SIZE_MAX)) {
++    return false;
++  }
++#endif
++  *out = (size_t)value;
++  return true;
++}
++
++#endif
+diff --git a/rmr/main.c b/rmr/main.c
+new file mode 100644
+index 0000000..c61fab0
+--- /dev/null
++++ b/rmr/main.c
+@@ -0,0 +1,5 @@
++#include "pai.h"
++
++int main(int argc, char **argv) {
++    return pai_main(argc, argv);
++}
+diff --git a/rmr/main.o b/rmr/main.o
+new file mode 100644
+index 0000000..33114ae
+Binary files /dev/null and b/rmr/main.o differ
+diff --git a/rmr/pai.h b/rmr/pai.h
+new file mode 100644
+index 0000000..b94da89
+--- /dev/null
++++ b/rmr/pai.h
+@@ -0,0 +1,26 @@
++#pragma once
++#include <stddef.h>
++#include <stdint.h>
++
++#ifndef PAI_MAX_PATH
++#define PAI_MAX_PATH 4096
++#endif
++
++// --- core config ---
++typedef struct {
++    const char *base_path;
++    const char *out_dir;
++
++    // scan/filter
++    int include_hidden;
++    int follow_symlinks;
++    int max_depth;      // -1 unlimited
++    int64_t max_size;   // -1 unlimited
++} pai_cfg_t;
++
++// --- tiny helpers ---
++void pai_die(const char *msg);
++int pai_mkdir_p(const char *path);
++
++// --- cli ---
++int pai_main(int argc, char **argv);
+diff --git a/rmr/pai_base.h b/rmr/pai_base.h
+new file mode 100644
+index 0000000..9418835
+--- /dev/null
++++ b/rmr/pai_base.h
+@@ -0,0 +1,8 @@
++#pragma once
++#include <stdint.h>
++
++int pai_cmd_bases(int argc, char **argv);
++
++// util: primos opostos
++int64_t pai_prev_prime(int64_t n);
++int64_t pai_next_prime(int64_t n);
+diff --git a/rmr/pai_bench.h b/rmr/pai_bench.h
+new file mode 100644
+index 0000000..c551f76
+--- /dev/null
++++ b/rmr/pai_bench.h
+@@ -0,0 +1,6 @@
++#ifndef PAI_BENCH_H
++#define PAI_BENCH_H
++
++int pai_cmd_bench(int argc, char **argv);
++
++#endif
+diff --git a/rmr/pai_benchdiff.h b/rmr/pai_benchdiff.h
+new file mode 100644
+index 0000000..354cf1a
+--- /dev/null
++++ b/rmr/pai_benchdiff.h
+@@ -0,0 +1,6 @@
++#ifndef PAI_BENCHDIFF_H
++#define PAI_BENCHDIFF_H
++
++int pai_cmd_benchdiff(int argc, char **argv);
++
++#endif
+diff --git a/rmr/pai_geom.h b/rmr/pai_geom.h
+new file mode 100644
+index 0000000..421bff3
+--- /dev/null
++++ b/rmr/pai_geom.h
+@@ -0,0 +1,4 @@
++#pragma once
++#include "pai.h"
++
++int pai_cmd_geom(int argc, char **argv);
+diff --git a/rmr/pai_hash.h b/rmr/pai_hash.h
+new file mode 100644
+index 0000000..6ea02c8
+--- /dev/null
++++ b/rmr/pai_hash.h
+@@ -0,0 +1,18 @@
++#pragma once
++#include <stdint.h>
++#include <stddef.h>
++
++typedef struct {
++    uint32_t h[8];
++    uint64_t len;
++    uint8_t  buf[64];
++    size_t   buf_len;
++} pai_sha256_ctx;
++
++void pai_sha256_init(pai_sha256_ctx *ctx);
++void pai_sha256_update(pai_sha256_ctx *ctx, const uint8_t *data, size_t len);
++void pai_sha256_final(pai_sha256_ctx *ctx, uint8_t out[32]);
++
++// helpers
++void pai_sha256_hex(const uint8_t hash[32], char out[65]);
++int  pai_sha256_file(const char *path, uint8_t out[32]);
+diff --git a/rmr/pai_scan.h b/rmr/pai_scan.h
+new file mode 100644
+index 0000000..fadc7dd
+--- /dev/null
++++ b/rmr/pai_scan.h
+@@ -0,0 +1,19 @@
++#pragma once
++#include "pai.h"
++
++typedef struct {
++    const char *base_dir;
++    const char *out_dir;
++
++    int include_hidden;
++    int follow_symlinks;
++    int max_depth;      // -1 unlimited
++    long long max_size; // -1 unlimited
++
++    // excludes (paths relativos ou absolutos)
++    const char **excludes;
++    int nexcludes;
++} pai_scan_opts;
++
++int pai_cmd_scan(int argc, char **argv);
++int pai_scan_run(const pai_scan_opts *opt);
+diff --git a/rmr/pai_sign.h b/rmr/pai_sign.h
+new file mode 100644
+index 0000000..f76c4c9
+--- /dev/null
++++ b/rmr/pai_sign.h
+@@ -0,0 +1,6 @@
++#ifndef PAI_SIGN_H
++#define PAI_SIGN_H
++
++int pai_cmd_sign(int argc, char **argv);
++
++#endif
+diff --git a/rmr/pai_toroid.h b/rmr/pai_toroid.h
+new file mode 100644
+index 0000000..13872ba
+--- /dev/null
++++ b/rmr/pai_toroid.h
+@@ -0,0 +1,4 @@
++#pragma once
++#include "pai.h"
++
++int pai_cmd_toroid(int argc, char **argv);
+diff --git a/rmr/rust/rmr.rs b/rmr/rust/rmr.rs
+new file mode 100644
+index 0000000..a0d4d9a
+--- /dev/null
++++ b/rmr/rust/rmr.rs
+@@ -0,0 +1,28 @@
++//! RMR module (experimental).
++//!
++//! Este módulo define uma base mínima para futuras otimizações e
++//! extensões de arquitetura relacionadas a desempenho. Ele é um ponto
++//! de integração isolado para evitar mudanças amplas no restante do
++//! crate.
++
++/// Identificador de versão do módulo RMR.
++pub const RMR_VERSION: &str = "0.2.0";
++
++/// Tamanho do buffer de leitura para IO amplo.
++pub(crate) const IO_READ_BUF_LEN: usize = 128 * 1024;
++
++/// Estrutura de configuração para evoluções futuras do módulo RMR.
++#[derive(Debug, Clone, Copy, PartialEq, Eq)]
++pub struct RmrConfig {
++    /// Habilita ajustes experimentais de performance.
++    pub experimental: bool,
++}
++
++impl Default for RmrConfig {
++    #[inline]
++    fn default() -> Self {
++        Self {
++            experimental: false,
++        }
++    }
++}
+diff --git a/rmr/scan.c b/rmr/scan.c
+new file mode 100644
+index 0000000..2bf1b41
+--- /dev/null
++++ b/rmr/scan.c
+@@ -0,0 +1,278 @@
++#define _XOPEN_SOURCE 700
++#include "pai_scan.h"
++#include "pai_hash.h"
++
++#include <dirent.h>
++#include <errno.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/stat.h>
++
++#ifndef PAI_MAX_ENTRIES
++#define PAI_MAX_ENTRIES 200000
++#endif
++
++typedef struct {
++    char *name;
++    int is_dir;
++} entry_t;
++
++static int cmp_entry(const void *a, const void *b) {
++    const entry_t *ea = (const entry_t*)a;
++    const entry_t *eb = (const entry_t*)b;
++    return strcmp(ea->name, eb->name);
++}
++
++static int is_hidden_name(const char *n) {
++    return (n[0]=='.' && strcmp(n,".")!=0 && strcmp(n,"..")!=0);
++}
++
++static void join_path(char *dst, size_t cap, const char *a, const char *b) {
++    if(!a || !b) { snprintf(dst, cap, ""); return; }
++    size_t la = strlen(a);
++    if(la==0) { snprintf(dst, cap, "%s", b); return; }
++    if(a[la-1]=='/') snprintf(dst, cap, "%s%s", a, b);
++    else snprintf(dst, cap, "%s/%s", a, b);
++}
++
++static const char* rel_path(const char *base, const char *full) {
++    size_t lb = strlen(base);
++    if(lb==0) return full;
++    if(strncmp(base, full, lb)==0) {
++        if(full[lb]=='/') return full + lb + 1;
++        if(full[lb]==0)  return ".";
++    }
++    return full;
++}
++
++static int path_eq_or_prefix(const char *p, const char *q) {
++    // true se q == p OU q começa com p + "/"
++    size_t lp = strlen(p);
++    if(strcmp(p, q)==0) return 1;
++    if(strncmp(p, q, lp)==0 && q[lp]=='/') return 1;
++    return 0;
++}
++
++static int is_excluded(const pai_scan_opts *opt, const char *base, const char *full) {
++    const char *rp = rel_path(base, full);
++
++    for(int i=0;i<opt->nexcludes;i++) {
++        const char *ex = opt->excludes[i];
++        if(!ex || !*ex) continue;
++
++        // ex pode ser relativo (ao base) ou absoluto
++        if(ex[0]=='/') {
++            if(path_eq_or_prefix(ex, full)) return 1;
++        } else {
++            if(path_eq_or_prefix(ex, rp)) return 1;
++        }
++    }
++    return 0;
++}
++
++static void sha256_line_update(pai_sha256_ctx *mctx, const char *rel, long long size, const char hex[65]) {
++    char buf[PAI_MAX_PATH + 128];
++    int n = snprintf(buf, sizeof(buf), "%s\t%lld\t%s\n", rel, size, hex);
++    if(n > 0) pai_sha256_update(mctx, (const uint8_t*)buf, (size_t)n);
++}
++
++static int scan_dir_rec(
++    const pai_scan_opts *opt,
++    const char *base,
++    const char *dirpath,
++    int depth,
++    FILE *mf,
++    pai_sha256_ctx *mctx
++) {
++    if(opt->max_depth >= 0 && depth > opt->max_depth) return 0;
++
++    if(is_excluded(opt, base, dirpath)) return 0;
++
++    DIR *d = opendir(dirpath);
++    if(!d) {
++        fprintf(stderr, "[scan] nao abriu dir: %s (%s)\n", dirpath, strerror(errno));
++        return -1;
++    }
++
++    entry_t *entries = NULL;
++    size_t n=0, cap=0;
++
++    for(;;) {
++        errno = 0;
++        struct dirent *de = readdir(d);
++        if(!de) break;
++
++        const char *name = de->d_name;
++        if(!strcmp(name,".") || !strcmp(name,"..")) continue;
++        if(!opt->include_hidden && is_hidden_name(name)) continue;
++
++        if(n >= PAI_MAX_ENTRIES) {
++            closedir(d);
++            fprintf(stderr,"[scan] limite de entradas atingido\n");
++            return -1;
++        }
++
++        if(n==cap) {
++            cap = cap? cap*2 : 128;
++            entries = (entry_t*)realloc(entries, cap*sizeof(entry_t));
++            if(!entries) { closedir(d); perror("realloc"); return -1; }
++        }
++
++        entries[n].name = strdup(name);
++        if(!entries[n].name) { closedir(d); perror("strdup"); return -1; }
++
++        char full[PAI_MAX_PATH];
++        join_path(full, sizeof(full), dirpath, name);
++
++        // excluir já na leitura
++        if(is_excluded(opt, base, full)) {
++            free(entries[n].name);
++            continue;
++        }
++
++        struct stat st;
++        int rc = opt->follow_symlinks ? stat(full, &st) : lstat(full, &st);
++        if(rc != 0) entries[n].is_dir = 0;
++        else entries[n].is_dir = S_ISDIR(st.st_mode) ? 1 : 0;
++        n++;
++    }
++
++    closedir(d);
++
++    if(errno != 0) {
++        fprintf(stderr, "[scan] erro readdir em %s: %s\n", dirpath, strerror(errno));
++    }
++
++    qsort(entries, n, sizeof(entry_t), cmp_entry);
++
++    for(size_t i=0;i<n;i++) {
++        char full[PAI_MAX_PATH];
++        join_path(full, sizeof(full), dirpath, entries[i].name);
++
++        if(is_excluded(opt, base, full)) {
++            free(entries[i].name);
++            continue;
++        }
++
++        struct stat st;
++        int rc = opt->follow_symlinks ? stat(full, &st) : lstat(full, &st);
++        if(rc != 0) {
++            free(entries[i].name);
++            continue;
++        }
++
++        if(S_ISDIR(st.st_mode)) {
++            int r = scan_dir_rec(opt, base, full, depth+1, mf, mctx);
++            (void)r;
++        } else if(S_ISREG(st.st_mode)) {
++            long long sz = (long long)st.st_size;
++            if(opt->max_size >= 0 && sz > opt->max_size) {
++                free(entries[i].name);
++                continue;
++            }
++
++            uint8_t h[32];
++            char hex[65];
++            if(pai_sha256_file(full, h) != 0) {
++                free(entries[i].name);
++                continue;
++            }
++            pai_sha256_hex(h, hex);
++
++            const char *rp = rel_path(base, full);
++            fprintf(mf, "%s\t%lld\t%s\n", rp, sz, hex);
++            sha256_line_update(mctx, rp, sz, hex);
++        }
++
++        free(entries[i].name);
++    }
++
++    free(entries);
++    return 0;
++}
++
++int pai_scan_run(const pai_scan_opts *opt) {
++    if(!opt || !opt->base_dir || !opt->out_dir) return 1;
++
++    // fail-fast: base precisa existir e abrir
++    DIR *test = opendir(opt->base_dir);
++    if(!test) {
++        fprintf(stderr, "[scan] base invalida: %s (%s)\n", opt->base_dir, strerror(errno));
++        return 3;
++    }
++    closedir(test);
++
++    if (pai_mkdir_p(opt->out_dir) != 0) {
++        perror("mkdir");
++        return 4;
++    }
++
++    char manifest_path[PAI_MAX_PATH];
++    char merkle_path[PAI_MAX_PATH];
++    join_path(manifest_path, sizeof(manifest_path), opt->out_dir, "manifest.tsv");
++    join_path(merkle_path, sizeof(merkle_path), opt->out_dir, "merkle_root.txt");
++
++    FILE *mf = fopen(manifest_path, "wb");
++    if(!mf) { perror("manifest"); return 1; }
++
++    pai_sha256_ctx mctx;
++    pai_sha256_init(&mctx);
++
++    int rc = scan_dir_rec(opt, opt->base_dir, opt->base_dir, 0, mf, &mctx);
++    fclose(mf);
++
++    uint8_t root[32];
++    char hex[65];
++    pai_sha256_final(&mctx, root);
++    pai_sha256_hex(root, hex);
++
++    FILE *rf = fopen(merkle_path, "wb");
++    if(!rf) { perror("merkle_root"); return 1; }
++    fprintf(rf, "%s\n", hex);
++    fclose(rf);
++
++    printf("[OK] manifest: %s\n", manifest_path);
++    printf("[OK] merkle_root: %s\n", merkle_path);
++    printf("[OK] root=%s\n", hex);
++
++    return (rc==0)? 0 : 2;
++}
++
++int pai_cmd_scan(int argc, char **argv) {
++    pai_scan_opts opt;
++    memset(&opt, 0, sizeof(opt));
++    opt.include_hidden = 0;
++    opt.follow_symlinks = 0;
++    opt.max_depth = -1;
++    opt.max_size = -1;
++
++    const char *ex_list[64];
++    int ex_n = 0;
++
++    for(int i=2;i<argc;i++) {
++        if(!strcmp(argv[i],"--base") && i+1<argc) opt.base_dir = argv[++i];
++        else if(!strcmp(argv[i],"--out") && i+1<argc) opt.out_dir = argv[++i];
++        else if(!strcmp(argv[i],"--hidden")) opt.include_hidden = 1;
++        else if(!strcmp(argv[i],"--follow")) opt.follow_symlinks = 1;
++        else if(!strcmp(argv[i],"--max-depth") && i+1<argc) opt.max_depth = atoi(argv[++i]);
++        else if(!strcmp(argv[i],"--max-size") && i+1<argc) opt.max_size = atoll(argv[++i]);
++        else if(!strcmp(argv[i],"--exclude") && i+1<argc) {
++            if(ex_n < 64) ex_list[ex_n++] = argv[++i];
++            else i++;
++        }
++    }
++
++    if(!opt.base_dir || !opt.out_dir) {
++        fprintf(stderr, "uso: pai scan --base DIR --out OUTDIR [--exclude PATH]... [--hidden] [--follow] [--max-depth N] [--max-size BYTES]\n");
++        return 1;
++    }
++
++    // por padrão: exclui o próprio out_dir (se estiver dentro do base)
++    ex_list[ex_n++] = opt.out_dir;
++
++    opt.excludes = ex_list;
++    opt.nexcludes = ex_n;
++
++    return pai_scan_run(&opt);
++}
+diff --git a/rmr/scan.o b/rmr/scan.o
+new file mode 100644
+index 0000000..265f552
+Binary files /dev/null and b/rmr/scan.o differ
+diff --git a/rmr/sign.c b/rmr/sign.c
+new file mode 100644
+index 0000000..0014597
+--- /dev/null
++++ b/rmr/sign.c
+@@ -0,0 +1,121 @@
++#include "pai_sign.h"
++#include "pai_hash.h"
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <time.h>
++#include <stdint.h>
++
++static int deterministic_enabled(void) {
++    const char *env = getenv("RMR_DETERMINISTIC");
++    return env && strcmp(env, "1") == 0;
++}
++
++static void signature_timestamp(struct tm *out_tm) {
++    if(deterministic_enabled()) {
++        memset(out_tm, 0, sizeof(*out_tm));
++        out_tm->tm_year = 70;
++        out_tm->tm_mon = 0;
++        out_tm->tm_mday = 1;
++        return;
++    }
++
++    time_t t = time(NULL);
++    struct tm *tm = gmtime(&t);
++    if(tm) {
++        *out_tm = *tm;
++        return;
++    }
++    memset(out_tm, 0, sizeof(*out_tm));
++    out_tm->tm_year = 70;
++    out_tm->tm_mon = 0;
++    out_tm->tm_mday = 1;
++}
++
++static void usage(void) {
++    puts("uso:");
++    puts("  pai sign --base DIR --scan SCANDIR --out DIR");
++}
++
++/* le arquivo texto pequeno (ex: merkle_root.txt) */
++static int read_text(const char *path, char *buf, size_t max) {
++    FILE *f = fopen(path, "r");
++    if(!f) return -1;
++    size_t n = fread(buf, 1, max-1, f);
++    buf[n] = 0;
++    fclose(f);
++    return 0;
++}
++
++static void hex32(const uint8_t in[32], char out_hex[65]) {
++    static const char *hx = "0123456789abcdef";
++    for(int i=0;i<32;i++) {
++        out_hex[i*2+0] = hx[(in[i] >> 4) & 0xF];
++        out_hex[i*2+1] = hx[(in[i] >> 0) & 0xF];
++    }
++    out_hex[64] = 0;
++}
++
++int pai_cmd_sign(int argc, char **argv) {
++    const char *base = NULL;
++    const char *scan = NULL;
++    const char *out  = NULL;
++
++    for(int i=2;i<argc;i++) {
++        if(!strcmp(argv[i], "--base") && i+1<argc) base = argv[++i];
++        else if(!strcmp(argv[i], "--scan") && i+1<argc) scan = argv[++i];
++        else if(!strcmp(argv[i], "--out") && i+1<argc) out = argv[++i];
++    }
++
++    if(!base || !scan || !out) {
++        usage();
++        return 1;
++    }
++
++    (void)base; /* reservado p/ v2: incluir hash do base/manifest no signature */
++
++    /* ler merkle_root do scan */
++    char merkle[256];
++    char path_merkle[512];
++    snprintf(path_merkle, sizeof(path_merkle), "%s/merkle_root.txt", scan);
++
++    if(read_text(path_merkle, merkle, sizeof(merkle)) != 0) {
++        fprintf(stderr, "[sign] falhou lendo: %s\n", path_merkle);
++        return 2;
++    }
++
++    /* hash do binario ./pai usando API existente */
++    uint8_t hbin[32];
++    if(pai_sha256_file("./pai", hbin) != 0) {
++        fprintf(stderr, "[sign] falhou hash binario: ./pai\n");
++        return 3;
++    }
++
++    char self_hex[65];
++    hex32(hbin, self_hex);
++
++    struct tm tm;
++    signature_timestamp(&tm);
++
++    char sigpath[512];
++    snprintf(sigpath, sizeof(sigpath), "%s/SIGNATURE.txt", out);
++
++    FILE *f = fopen(sigpath, "w");
++    if(!f) {
++        perror("fopen");
++        return 4;
++    }
++
++    fprintf(f, "PAI SIGNATURE v1\n");
++    fprintf(f, "timestamp=%04d-%02d-%02dT%02d:%02d:%02dZ\n",
++        tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
++        tm.tm_hour, tm.tm_min, tm.tm_sec);
++
++    fprintf(f, "binary_sha256=%s\n", self_hex);
++    fprintf(f, "merkle_root=%s", merkle);
++
++    fclose(f);
++
++    printf("[OK] assinatura gerada: %s\n", sigpath);
++    return 0;
++}
+diff --git a/rmr/sign.o b/rmr/sign.o
+new file mode 100644
+index 0000000..b25a32c
+Binary files /dev/null and b/rmr/sign.o differ
+diff --git a/rmr/toroid.c b/rmr/toroid.c
+new file mode 100644
+index 0000000..cb9202d
+--- /dev/null
++++ b/rmr/toroid.c
+@@ -0,0 +1,148 @@
++#include "pai_toroid.h"
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <math.h>
++
++#ifndef M_PI
++#define M_PI 3.14159265358979323846
++#endif
++
++typedef struct {
++    int nu, nv;
++    float R, r;
++    const char *tex;
++    const char *out;
++} tor_opt;
++
++static void *xmalloc(size_t n){
++    void *p = malloc(n);
++    if(!p){ perror("malloc"); exit(2); }
++    memset(p,0,n);
++    return p;
++}
++
++static unsigned char* load_pgm(const char *path, int *w, int *h){
++    FILE *f = fopen(path,"rb");
++    if(!f){ perror(path); return NULL; }
++
++    char magic[3];
++    fscanf(f,"%2s",magic);
++    if(strcmp(magic,"P5")!=0){ fclose(f); return NULL; }
++
++    int maxv;
++    fscanf(f,"%d %d %d",w,h,&maxv);
++    (void)fgetc(f); // newline
++
++    const size_t tw = (size_t)(*w);
++    const size_t th = (size_t)(*h);
++    unsigned char *buf = xmalloc(tw * th);
++    (void)fread(buf, 1, tw * th, f);
++    fclose(f);
++    return buf;
++}
++
++int pai_cmd_toroid(int argc, char **argv){
++    tor_opt o;
++    o.nu = 256;
++    o.nv = 128;
++    o.R  = 1.0f;
++    o.r  = 0.35f;
++    o.tex = NULL;
++    o.out = "out_toroid";
++
++    for(int i=2;i<argc;i++){
++        if(!strcmp(argv[i],"--nu") && i+1<argc) o.nu = atoi(argv[++i]);
++        else if(!strcmp(argv[i],"--nv") && i+1<argc) o.nv = atoi(argv[++i]);
++        else if(!strcmp(argv[i],"--R") && i+1<argc) o.R = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--r") && i+1<argc) o.r = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--tex") && i+1<argc) o.tex = argv[++i];
++        else if(!strcmp(argv[i],"--out") && i+1<argc) o.out = argv[++i];
++    }
++
++    if(!o.tex){
++        fprintf(stderr,"uso: pai toroid --tex out_geom/geom.pgm [--out out_toroid]\n");
++        return 1;
++    }
++
++    int tw,th;
++    unsigned char *tex = load_pgm(o.tex,&tw,&th);
++    if(!tex){ fprintf(stderr,"erro lendo textura\n"); return 2; }
++
++    if (pai_mkdir_p(o.out) != 0) {
++        perror("mkdir");
++        free(tex);
++        return 3;
++    }
++
++    char objpath[1024], mtlpath[1024], texpath[1024];
++    snprintf(objpath,sizeof(objpath),"%s/toroid.obj",o.out);
++    snprintf(mtlpath,sizeof(mtlpath),"%s/toroid.mtl",o.out);
++    snprintf(texpath,sizeof(texpath),"%s/toroid_texture.pgm",o.out);
++
++    // copia textura
++    FILE *ft = fopen(texpath,"wb");
++    if (!ft) {
++        perror("toroid_texture");
++        free(tex);
++        return 4;
++    }
++    fprintf(ft,"P5\n%d %d\n255\n",tw,th);
++    fwrite(tex, 1, (size_t)tw * (size_t)th, ft);
++    fclose(ft);
++
++    FILE *obj = fopen(objpath,"wb");
++    if (!obj) {
++        perror("toroid_obj");
++        free(tex);
++        return 5;
++    }
++    FILE *mtl = fopen(mtlpath,"wb");
++    if (!mtl) {
++        perror("toroid_mtl");
++        fclose(obj);
++        free(tex);
++        return 6;
++    }
++
++    fprintf(mtl,"newmtl torus\nmap_Kd toroid_texture.pgm\n");
++    fprintf(obj,"mtllib toroid.mtl\nusemtl torus\n");
++
++    // vértices
++    for(int j=0;j<=o.nv;j++){
++        const float two_pi = (float)(2.0 * M_PI);
++        float v = ((float)j/(float)o.nv) * two_pi;
++        for(int i=0;i<=o.nu;i++){
++            float u = ((float)i/(float)o.nu) * two_pi;
++
++            float x = (o.R + o.r*cosf(v)) * cosf(u);
++            float y = (o.R + o.r*cosf(v)) * sinf(u);
++            float z = o.r * sinf(v);
++
++            fprintf(obj,"v %f %f %f\n",x,y,z);
++            fprintf(obj,"vt %f %f\n",(float)i/(float)o.nu,1.0f-(float)j/(float)o.nv);
++        }
++    }
++
++    int cols = o.nu + 1;
++
++    for(int j=0;j<o.nv;j++){
++        for(int i=0;i<o.nu;i++){
++            int a = j*cols + i + 1;
++            int b = a + 1;
++            int c = a + cols;
++            int d = c + 1;
++            fprintf(obj,"f %d/%d %d/%d %d/%d\n",a,a,c,c,b,b);
++            fprintf(obj,"f %d/%d %d/%d %d/%d\n",b,b,c,c,d,d);
++        }
++    }
++
++    fclose(obj);
++    fclose(mtl);
++    free(tex);
++
++    printf("[OK] obj: %s\n",objpath);
++    printf("[OK] mtl: %s\n",mtlpath);
++    printf("[OK] texture: %s\n",texpath);
++    return 0;
++}
+diff --git a/rmr/toroid.c.bak b/rmr/toroid.c.bak
+new file mode 100644
+index 0000000..c459e6d
+--- /dev/null
++++ b/rmr/toroid.c.bak
+@@ -0,0 +1,128 @@
++#include "pai_toroid.h"
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <math.h>
++
++#ifndef M_PI
++#define M_PI 3.14159265358979323846
++#endif
++
++typedef struct {
++    int nu, nv;
++    float R, r;
++    const char *tex;
++    const char *out;
++} tor_opt;
++
++static void *xmalloc(size_t n){
++    void *p = malloc(n);
++    if(!p){ perror("malloc"); exit(2); }
++    memset(p,0,n);
++    return p;
++}
++
++static unsigned char* load_pgm(const char *path, int *w, int *h){
++    FILE *f = fopen(path,"rb");
++    if(!f){ perror(path); return NULL; }
++
++    char magic[3];
++    fscanf(f,"%2s",magic);
++    if(strcmp(magic,"P5")!=0){ fclose(f); return NULL; }
++
++    int maxv;
++    fscanf(f,"%d %d %d",w,h,&maxv);
++    (void)fgetc(f); // newline
++
++    const size_t tw = (size_t)(*w);
++    const size_t th = (size_t)(*h);
++    unsigned char *buf = xmalloc(tw * th);
++    (void)fread(buf, 1, tw * th, f);
++    fclose(f);
++    return buf;
++}
++
++int pai_cmd_toroid(int argc, char **argv){
++    tor_opt o;
++    o.nu = 256;
++    o.nv = 128;
++    o.R  = 1.0f;
++    o.r  = 0.35f;
++    o.tex = NULL;
++    o.out = "out_toroid";
++
++    for(int i=2;i<argc;i++){
++        if(!strcmp(argv[i],"--nu") && i+1<argc) o.nu = atoi(argv[++i]);
++        else if(!strcmp(argv[i],"--nv") && i+1<argc) o.nv = atoi(argv[++i]);
++        else if(!strcmp(argv[i],"--R") && i+1<argc) o.R = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--r") && i+1<argc) o.r = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--tex") && i+1<argc) o.tex = argv[++i];
++        else if(!strcmp(argv[i],"--out") && i+1<argc) o.out = argv[++i];
++    }
++
++    if(!o.tex){
++        fprintf(stderr,"uso: pai toroid --tex out_geom/geom.pgm [--out out_toroid]\n");
++        return 1;
++    }
++
++    int tw,th;
++    unsigned char *tex = load_pgm(o.tex,&tw,&th);
++    if(!tex){ fprintf(stderr,"erro lendo textura\n"); return 2; }
++
++    pai_mkdir_p(o.out);
++
++    char objpath[1024], mtlpath[1024], texpath[1024];
++    snprintf(objpath,sizeof(objpath),"%s/toroid.obj",o.out);
++    snprintf(mtlpath,sizeof(mtlpath),"%s/toroid.mtl",o.out);
++    snprintf(texpath,sizeof(texpath),"%s/toroid_texture.pgm",o.out);
++
++    // copia textura
++    FILE *ft = fopen(texpath,"wb");
++    fprintf(ft,"P5\n%d %d\n255\n",tw,th);
++    fwrite(tex, 1, (size_t)tw * (size_t)th, ft);
++    fclose(ft);
++
++    FILE *obj = fopen(objpath,"wb");
++    FILE *mtl = fopen(mtlpath,"wb");
++
++    fprintf(mtl,"newmtl torus\nmap_Kd toroid_texture.pgm\n");
++    fprintf(obj,"mtllib toroid.mtl\nusemtl torus\n");
++
++    // vértices
++    for(int j=0;j<=o.nv;j++){
++        const float two_pi = (float)(2.0 * M_PI);
++        float v = ((float)j/(float)o.nv) * two_pi;
++        for(int i=0;i<=o.nu;i++){
++            float u = ((float)i/(float)o.nu) * two_pi;
++
++            float x = (o.R + o.r*cosf(v)) * cosf(u);
++            float y = (o.R + o.r*cosf(v)) * sinf(u);
++            float z = o.r * sinf(v);
++
++            fprintf(obj,"v %f %f %f\n",x,y,z);
++            fprintf(obj,"vt %f %f\n",(float)i/o.nu,1.0f-(float)j/o.nv);
++        }
++    }
++
++    int cols = o.nu + 1;
++
++    for(int j=0;j<o.nv;j++){
++        for(int i=0;i<o.nu;i++){
++            int a = j*cols + i + 1;
++            int b = a + 1;
++            int c = a + cols;
++            int d = c + 1;
++            fprintf(obj,"f %d/%d %d/%d %d/%d\n",a,a,c,c,b,b);
++            fprintf(obj,"f %d/%d %d/%d %d/%d\n",b,b,c,c,d,d);
++        }
++    }
++
++    fclose(obj);
++    fclose(mtl);
++    free(tex);
++
++    printf("[OK] obj: %s\n",objpath);
++    printf("[OK] mtl: %s\n",mtlpath);
++    printf("[OK] texture: %s\n",texpath);
++    return 0;
++}
+diff --git a/rmr/toroid.c.pre_warnfix.bak b/rmr/toroid.c.pre_warnfix.bak
+new file mode 100644
+index 0000000..c459e6d
+--- /dev/null
++++ b/rmr/toroid.c.pre_warnfix.bak
+@@ -0,0 +1,128 @@
++#include "pai_toroid.h"
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <math.h>
++
++#ifndef M_PI
++#define M_PI 3.14159265358979323846
++#endif
++
++typedef struct {
++    int nu, nv;
++    float R, r;
++    const char *tex;
++    const char *out;
++} tor_opt;
++
++static void *xmalloc(size_t n){
++    void *p = malloc(n);
++    if(!p){ perror("malloc"); exit(2); }
++    memset(p,0,n);
++    return p;
++}
++
++static unsigned char* load_pgm(const char *path, int *w, int *h){
++    FILE *f = fopen(path,"rb");
++    if(!f){ perror(path); return NULL; }
++
++    char magic[3];
++    fscanf(f,"%2s",magic);
++    if(strcmp(magic,"P5")!=0){ fclose(f); return NULL; }
++
++    int maxv;
++    fscanf(f,"%d %d %d",w,h,&maxv);
++    (void)fgetc(f); // newline
++
++    const size_t tw = (size_t)(*w);
++    const size_t th = (size_t)(*h);
++    unsigned char *buf = xmalloc(tw * th);
++    (void)fread(buf, 1, tw * th, f);
++    fclose(f);
++    return buf;
++}
++
++int pai_cmd_toroid(int argc, char **argv){
++    tor_opt o;
++    o.nu = 256;
++    o.nv = 128;
++    o.R  = 1.0f;
++    o.r  = 0.35f;
++    o.tex = NULL;
++    o.out = "out_toroid";
++
++    for(int i=2;i<argc;i++){
++        if(!strcmp(argv[i],"--nu") && i+1<argc) o.nu = atoi(argv[++i]);
++        else if(!strcmp(argv[i],"--nv") && i+1<argc) o.nv = atoi(argv[++i]);
++        else if(!strcmp(argv[i],"--R") && i+1<argc) o.R = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--r") && i+1<argc) o.r = (float)atof(argv[++i]);
++        else if(!strcmp(argv[i],"--tex") && i+1<argc) o.tex = argv[++i];
++        else if(!strcmp(argv[i],"--out") && i+1<argc) o.out = argv[++i];
++    }
++
++    if(!o.tex){
++        fprintf(stderr,"uso: pai toroid --tex out_geom/geom.pgm [--out out_toroid]\n");
++        return 1;
++    }
++
++    int tw,th;
++    unsigned char *tex = load_pgm(o.tex,&tw,&th);
++    if(!tex){ fprintf(stderr,"erro lendo textura\n"); return 2; }
++
++    pai_mkdir_p(o.out);
++
++    char objpath[1024], mtlpath[1024], texpath[1024];
++    snprintf(objpath,sizeof(objpath),"%s/toroid.obj",o.out);
++    snprintf(mtlpath,sizeof(mtlpath),"%s/toroid.mtl",o.out);
++    snprintf(texpath,sizeof(texpath),"%s/toroid_texture.pgm",o.out);
++
++    // copia textura
++    FILE *ft = fopen(texpath,"wb");
++    fprintf(ft,"P5\n%d %d\n255\n",tw,th);
++    fwrite(tex, 1, (size_t)tw * (size_t)th, ft);
++    fclose(ft);
++
++    FILE *obj = fopen(objpath,"wb");
++    FILE *mtl = fopen(mtlpath,"wb");
++
++    fprintf(mtl,"newmtl torus\nmap_Kd toroid_texture.pgm\n");
++    fprintf(obj,"mtllib toroid.mtl\nusemtl torus\n");
++
++    // vértices
++    for(int j=0;j<=o.nv;j++){
++        const float two_pi = (float)(2.0 * M_PI);
++        float v = ((float)j/(float)o.nv) * two_pi;
++        for(int i=0;i<=o.nu;i++){
++            float u = ((float)i/(float)o.nu) * two_pi;
++
++            float x = (o.R + o.r*cosf(v)) * cosf(u);
++            float y = (o.R + o.r*cosf(v)) * sinf(u);
++            float z = o.r * sinf(v);
++
++            fprintf(obj,"v %f %f %f\n",x,y,z);
++            fprintf(obj,"vt %f %f\n",(float)i/o.nu,1.0f-(float)j/o.nv);
++        }
++    }
++
++    int cols = o.nu + 1;
++
++    for(int j=0;j<o.nv;j++){
++        for(int i=0;i<o.nu;i++){
++            int a = j*cols + i + 1;
++            int b = a + 1;
++            int c = a + cols;
++            int d = c + 1;
++            fprintf(obj,"f %d/%d %d/%d %d/%d\n",a,a,c,c,b,b);
++            fprintf(obj,"f %d/%d %d/%d %d/%d\n",b,b,c,c,d,d);
++        }
++    }
++
++    fclose(obj);
++    fclose(mtl);
++    free(tex);
++
++    printf("[OK] obj: %s\n",objpath);
++    printf("[OK] mtl: %s\n",mtlpath);
++    printf("[OK] texture: %s\n",texpath);
++    return 0;
++}
+diff --git a/rmr/toroid.o b/rmr/toroid.o
+new file mode 100644
+index 0000000..0f7b3d8
+Binary files /dev/null and b/rmr/toroid.o differ
+diff --git a/rmr/util.c b/rmr/util.c
+new file mode 100644
+index 0000000..8ed91b3
+--- /dev/null
++++ b/rmr/util.c
+@@ -0,0 +1,34 @@
++#define _XOPEN_SOURCE 700
++#include "pai.h"
++#include <errno.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/stat.h>
++
++void pai_die(const char *msg) {
++    perror(msg);
++    exit(1);
++}
++
++int pai_mkdir_p(const char *path) {
++    char tmp[PAI_MAX_PATH];
++    size_t len = strlen(path);
++    if (len == 0 || len >= sizeof(tmp)) {
++        errno = EINVAL;
++        fprintf(stderr, "mkdir_p: path invalido\n");
++        return -1;
++    }
++    memcpy(tmp, path, len + 1);
++    if (tmp[len - 1] == '/') tmp[len - 1] = 0;
++
++    for (char *p = tmp + 1; *p; p++) {
++        if (*p == '/') {
++            *p = 0;
++            if (mkdir(tmp, 0755) != 0 && errno != EEXIST) return -1;
++            *p = '/';
++        }
++    }
++    if (mkdir(tmp, 0755) != 0 && errno != EEXIST) return -1;
++    return 0;
++}
+diff --git a/rmr/util.o b/rmr/util.o
+new file mode 100644
+index 0000000..e7c8bd1
+Binary files /dev/null and b/rmr/util.o differ
