@@ -39,3 +39,36 @@ Essa separação evita confusão de licença e facilita auditoria:
 3. Prefira alterações pequenas e mensuráveis.
 4. Use `c/rmr_arch.h` como ponto único para expandir seleção de
    arquitetura e caminhos de assembly.
+
+## Mapa de seleção por arquitetura/OS/compilador
+
+O ponto central de seleção agora é `c/rmr_dispatch.h`, que deriva flags
+de build a partir de `c/rmr_arch.h` e das macros do compilador. Ele
+expõe `RMR_HAS_*` (ex.: `RMR_HAS_AVX2`, `RMR_HAS_NEON`) e preserva os
+`RMR_OS_*`/`RMR_ARCH_*` para orientar o build e o código C. Essa camada
+serve como referência única para decidir quais backends devem entrar no
+binário.
+
+### Seleção de ASM (x86-64)
+
+- **Windows + MSVC**: usa `c/blake3_*_x86-64_windows_msvc.asm` via CMake.
+- **Windows + GCC/Clang (MinGW/Cygwin)**: usa `c/blake3_*_x86-64_windows_gnu.S`.
+- **Linux/macOS/BSD + GCC/Clang**: usa `c/blake3_*_x86-64_unix.S`.
+
+Essas escolhas são controladas no `c/CMakeLists.txt` e no
+`c/Makefile.testing` com base nos flags `RMR_ARCH_X86_64` e `RMR_OS_*`.
+
+### Seleção de C intrinsics
+
+- **x86 32-bit**: usa `c/blake3_sse2.c`, `c/blake3_sse41.c`,
+  `c/blake3_avx2.c`, `c/blake3_avx512.c` com flags do compilador
+  (`-msse2`, `-msse4.1`, `-mavx2`, `-mavx512f -mavx512vl` ou `/arch:*`).
+- **ARM/AArch64**: usa `c/blake3_neon.c` com `BLAKE3_USE_NEON=1` e,
+  quando necessário, `-mfpu=neon`.
+
+### Código portable e dispatcher
+
+- **C portable**: `c/blake3_portable.c` sempre disponível.
+- **Dispatcher**: `c/blake3_dispatch.c` escolhe em runtime o backend
+  SIMD, enquanto `c/rmr_dispatch.h` expõe a matriz de compatibilidade
+  em tempo de compilação.
