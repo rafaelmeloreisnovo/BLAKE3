@@ -168,6 +168,8 @@ proveniência:
 - `src/rmr.rs`: núcleo de configuração do módulo RMR.
 - `c/rmr_lowlevel.h`: helpers low-level e modo sem libc para integração
   bare-metal.
+- `c/rmr_arch.h`: detecção de arquitetura/OS/compilador para seleção
+  low-level e caminhos de assembly.
 - `rmr/`: documentação e licença específica do módulo.
 
 ### Integração entre os blocos
@@ -178,6 +180,8 @@ Integrações deliberadas e explícitas entre upstream e RMR:
   buffer de leitura.
 - `c/blake3.c` e `c/main.c` usam macros/asserções definidas em
   `c/rmr_lowlevel.h` para rotinas low-level e validações.
+- `c/rmr_lowlevel.h` inclui `c/rmr_arch.h` para consolidar detecção de
+  plataforma e preparar caminhos específicos por hardware.
 
 Essa separação serve como trilha de auditoria: o que é upstream mantém
 os créditos originais, e o que é RMR permanece delimitado no módulo.
