@@ -203,7 +203,10 @@ int pai_scan_run(const pai_scan_opts *opt) {
     }
     closedir(test);
 
-    pai_mkdir_p(opt->out_dir);
+    if (pai_mkdir_p(opt->out_dir) != 0) {
+        perror("mkdir");
+        return 4;
+    }
 
     char manifest_path[PAI_MAX_PATH];
     char merkle_path[PAI_MAX_PATH];

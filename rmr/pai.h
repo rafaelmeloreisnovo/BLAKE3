@@ -20,7 +20,7 @@ typedef struct {
 
 // --- tiny helpers ---
 void pai_die(const char *msg);
-void pai_mkdir_p(const char *path);
+int pai_mkdir_p(const char *path);
 
 // --- cli ---
 int pai_main(int argc, char **argv);

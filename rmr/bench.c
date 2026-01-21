@@ -15,6 +15,32 @@ static double now_ms(void){
     return (double)ts.tv_sec*1000.0 + (double)ts.tv_nsec/1000000.0;
 }
 
+static int deterministic_enabled(void){
+    const char *env = getenv("RMR_DETERMINISTIC");
+    return env && strcmp(env, "1") == 0;
+}
+
+static void report_timestamp(struct tm *out_tm){
+    if(deterministic_enabled()){
+        memset(out_tm, 0, sizeof(*out_tm));
+        out_tm->tm_year = 70;
+        out_tm->tm_mon = 0;
+        out_tm->tm_mday = 1;
+        return;
+    }
+
+    time_t tt = time(NULL);
+    struct tm *tm = gmtime(&tt);
+    if(tm){
+        *out_tm = *tm;
+        return;
+    }
+    memset(out_tm, 0, sizeof(*out_tm));
+    out_tm->tm_year = 70;
+    out_tm->tm_mon = 0;
+    out_tm->tm_mday = 1;
+}
+
 static int mkdir_p(const char *path){
     if(mkdir(path,0700)==0) return 0;
     if(errno==EEXIST) return 0;
@@ -124,16 +150,16 @@ int pai_cmd_bench(int argc, char **argv){
 
     double avg = sum / (double)repeat;
 
-    time_t tt = time(NULL);
-    struct tm *tm = gmtime(&tt);
+    struct tm tm;
+    report_timestamp(&tm);
 
     FILE *rpt = fopen(rptpath,"w");
     if(!rpt){ perror("fopen"); return 6; }
 
     fprintf(rpt,"PAI BENCH v1\n");
     fprintf(rpt,"timestamp=%04d-%02d-%02dT%02d:%02d:%02dZ\n",
-        tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
-        tm->tm_hour, tm->tm_min, tm->tm_sec);
+        tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday,
+        tm.tm_hour, tm.tm_min, tm.tm_sec);
     fprintf(rpt,"cmd=%s\n", cmd);
     fprintf(rpt,"repeat=%d\n", repeat);
     fprintf(rpt,"ok=%d/%d\n", okcount, repeat);

@@ -69,7 +69,11 @@ int pai_cmd_toroid(int argc, char **argv){
     unsigned char *tex = load_pgm(o.tex,&tw,&th);
     if(!tex){ fprintf(stderr,"erro lendo textura\n"); return 2; }
 
-    pai_mkdir_p(o.out);
+    if (pai_mkdir_p(o.out) != 0) {
+        perror("mkdir");
+        free(tex);
+        return 3;
+    }
 
     char objpath[1024], mtlpath[1024], texpath[1024];
     snprintf(objpath,sizeof(objpath),"%s/toroid.obj",o.out);
@@ -78,12 +82,28 @@ int pai_cmd_toroid(int argc, char **argv){
 
     // copia textura
     FILE *ft = fopen(texpath,"wb");
+    if (!ft) {
+        perror("toroid_texture");
+        free(tex);
+        return 4;
+    }
     fprintf(ft,"P5\n%d %d\n255\n",tw,th);
     fwrite(tex, 1, (size_t)tw * (size_t)th, ft);
     fclose(ft);
 
     FILE *obj = fopen(objpath,"wb");
+    if (!obj) {
+        perror("toroid_obj");
+        free(tex);
+        return 5;
+    }
     FILE *mtl = fopen(mtlpath,"wb");
+    if (!mtl) {
+        perror("toroid_mtl");
+        fclose(obj);
+        free(tex);
+        return 6;
+    }
 
     fprintf(mtl,"newmtl torus\nmap_Kd toroid_texture.pgm\n");
     fprintf(obj,"mtllib toroid.mtl\nusemtl torus\n");

@@ -266,7 +266,10 @@ int pai_cmd_geom(int argc, char **argv) {
     if(o.size < 64) o.size = 64;
     if(o.size > 4096) o.size = 4096;
 
-    pai_mkdir_p(o.out);
+    if (pai_mkdir_p(o.out) != 0) {
+        perror("mkdir");
+        return 1;
+    }
 
     int n = o.size;
     size_t N = SZ(n) * SZ(n);

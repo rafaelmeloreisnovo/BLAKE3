@@ -11,12 +11,13 @@ void pai_die(const char *msg) {
     exit(1);
 }
 
-void pai_mkdir_p(const char *path) {
+int pai_mkdir_p(const char *path) {
     char tmp[PAI_MAX_PATH];
     size_t len = strlen(path);
     if (len == 0 || len >= sizeof(tmp)) {
+        errno = EINVAL;
         fprintf(stderr, "mkdir_p: path invalido\n");
-        exit(1);
+        return -1;
     }
     memcpy(tmp, path, len + 1);
     if (tmp[len - 1] == '/') tmp[len - 1] = 0;
@@ -24,9 +25,10 @@ void pai_mkdir_p(const char *path) {
     for (char *p = tmp + 1; *p; p++) {
         if (*p == '/') {
             *p = 0;
-            if (mkdir(tmp, 0755) != 0 && errno != EEXIST) pai_die("mkdir");
+            if (mkdir(tmp, 0755) != 0 && errno != EEXIST) return -1;
             *p = '/';
         }
     }
-    if (mkdir(tmp, 0755) != 0 && errno != EEXIST) pai_die("mkdir");
+    if (mkdir(tmp, 0755) != 0 && errno != EEXIST) return -1;
+    return 0;
 }
