@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9...3.18 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
 # respect C_EXTENSIONS OFF without explicitly setting C_STANDARD
 if (POLICY CMP0128)
@@ -23,7 +23,6 @@ option(BLAKE3_FETCH_TBB "Allow fetching oneTBB from GitHub if not found on syste
 include(CTest)
 include(FeatureSummary)
 include(GNUInstallDirs)
-include(BLAKE3/Utils)
 
 add_subdirectory(dependencies)
 
@@ -31,65 +30,6 @@ add_subdirectory(dependencies)
 set(BLAKE3_AMD64_NAMES amd64 AMD64 x86_64)
 set(BLAKE3_X86_NAMES i686 x86 X86)
 set(BLAKE3_ARMv8_NAMES aarch64 AArch64 arm64 ARM64 armv8 armv8a)
-
-# Map platform data to the RMR_ARCH_* and RMR_OS_* selection flags.
-set(RMR_OS_WINDOWS OFF)
-set(RMR_OS_DARWIN OFF)
-set(RMR_OS_LINUX OFF)
-set(RMR_OS_ANDROID OFF)
-set(RMR_OS_FREEBSD OFF)
-set(RMR_OS_OPENBSD OFF)
-set(RMR_OS_NETBSD OFF)
-
-if(WIN32 OR CYGWIN)
-  set(RMR_OS_WINDOWS ON)
-elseif(APPLE)
-  set(RMR_OS_DARWIN ON)
-elseif(ANDROID OR CMAKE_SYSTEM_NAME STREQUAL "Android")
-  set(RMR_OS_ANDROID ON)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  set(RMR_OS_LINUX ON)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-  set(RMR_OS_FREEBSD ON)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
-  set(RMR_OS_OPENBSD ON)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
-  set(RMR_OS_NETBSD ON)
-endif()
-
-set(RMR_ARCH_X86_64 OFF)
-set(RMR_ARCH_X86_32 OFF)
-set(RMR_ARCH_AARCH64 OFF)
-set(RMR_ARCH_ARM OFF)
-set(RMR_ARCH_PPC64 OFF)
-set(RMR_ARCH_PPC32 OFF)
-set(RMR_ARCH_RISCV OFF)
-
-if(CMAKE_SYSTEM_PROCESSOR IN_LIST BLAKE3_AMD64_NAMES)
-  set(RMR_ARCH_X86_64 ON)
-elseif(CMAKE_SYSTEM_PROCESSOR IN_LIST BLAKE3_X86_NAMES)
-  set(RMR_ARCH_X86_32 ON)
-elseif(CMAKE_SYSTEM_PROCESSOR IN_LIST BLAKE3_ARMv8_NAMES)
-  set(RMR_ARCH_AARCH64 ON)
-elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|armv[0-9]+)")
-  set(RMR_ARCH_ARM ON)
-elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(ppc64|powerpc64)")
-  set(RMR_ARCH_PPC64 ON)
-elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(ppc|powerpc)")
-  set(RMR_ARCH_PPC32 ON)
-elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(riscv|riscv64|riscv32)")
-  set(RMR_ARCH_RISCV ON)
-endif()
-
-if(MSVC AND DEFINED CMAKE_C_COMPILER_ARCHITECTURE_ID)
-  if(CMAKE_C_COMPILER_ARCHITECTURE_ID MATCHES "[Xx]64")
-    set(RMR_ARCH_X86_64 ON)
-  elseif(CMAKE_C_COMPILER_ARCHITECTURE_ID MATCHES "[Xx]86")
-    set(RMR_ARCH_X86_32 ON)
-  elseif(CMAKE_C_COMPILER_ARCHITECTURE_ID MATCHES "[Aa][Rr][Mm]64")
-    set(RMR_ARCH_AARCH64 ON)
-  endif()
-endif()
 # default SIMD compiler flag configuration (can be overriden by toolchains or CLI)
 if(MSVC)
   set(BLAKE3_CFLAGS_SSE2 "/arch:SSE2" CACHE STRING "the compiler flags to enable SSE2")
@@ -98,14 +38,12 @@ if(MSVC)
   set(BLAKE3_CFLAGS_AVX2 "/arch:AVX2" CACHE STRING "the compiler flags to enable AVX2")
   set(BLAKE3_CFLAGS_AVX512 "/arch:AVX512" CACHE STRING "the compiler flags to enable AVX512")
 
-  if(RMR_ARCH_X86_64)
-    set(BLAKE3_AMD64_ASM_SOURCES
-      blake3_avx2_x86-64_windows_msvc.asm
-      blake3_avx512_x86-64_windows_msvc.asm
-      blake3_sse2_x86-64_windows_msvc.asm
-      blake3_sse41_x86-64_windows_msvc.asm
-    )
-  endif()
+  set(BLAKE3_AMD64_ASM_SOURCES
+    blake3_avx2_x86-64_windows_msvc.asm
+    blake3_avx512_x86-64_windows_msvc.asm
+    blake3_sse2_x86-64_windows_msvc.asm
+    blake3_sse41_x86-64_windows_msvc.asm
+  )
 
 elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU"
        OR CMAKE_C_COMPILER_ID STREQUAL "Clang"
@@ -115,22 +53,21 @@ elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU"
   set(BLAKE3_CFLAGS_AVX2 "-mavx2" CACHE STRING "the compiler flags to enable AVX2")
   set(BLAKE3_CFLAGS_AVX512 "-mavx512f -mavx512vl" CACHE STRING "the compiler flags to enable AVX512")
 
-  if(RMR_ARCH_X86_64)
-    if (RMR_OS_WINDOWS)
-      set(BLAKE3_AMD64_ASM_SOURCES
-        blake3_avx2_x86-64_windows_gnu.S
-        blake3_avx512_x86-64_windows_gnu.S
-        blake3_sse2_x86-64_windows_gnu.S
-        blake3_sse41_x86-64_windows_gnu.S
-      )
-    elseif(RMR_OS_LINUX OR RMR_OS_DARWIN OR RMR_OS_FREEBSD OR RMR_OS_OPENBSD OR RMR_OS_NETBSD)
-      set(BLAKE3_AMD64_ASM_SOURCES
-        blake3_avx2_x86-64_unix.S
-        blake3_avx512_x86-64_unix.S
-        blake3_sse2_x86-64_unix.S
-        blake3_sse41_x86-64_unix.S
-      )
-    endif()
+  if (WIN32 OR CYGWIN)
+    set(BLAKE3_AMD64_ASM_SOURCES
+      blake3_avx2_x86-64_windows_gnu.S
+      blake3_avx512_x86-64_windows_gnu.S
+      blake3_sse2_x86-64_windows_gnu.S
+      blake3_sse41_x86-64_windows_gnu.S
+    )
+
+  elseif(UNIX)
+    set(BLAKE3_AMD64_ASM_SOURCES
+      blake3_avx2_x86-64_unix.S
+      blake3_avx512_x86-64_unix.S
+      blake3_sse2_x86-64_unix.S
+      blake3_sse41_x86-64_unix.S
+    )
   endif()
 
   if (CMAKE_SYSTEM_PROCESSOR IN_LIST BLAKE3_ARMv8_NAMES
@@ -144,17 +81,31 @@ mark_as_advanced(BLAKE3_CFLAGS_SSE2 BLAKE3_CFLAGS_SSE4.1 BLAKE3_CFLAGS_AVX2 BLAK
 mark_as_advanced(BLAKE3_AMD64_ASM_SOURCES)
 
 message(STATUS "BLAKE3 SIMD configuration: ${CMAKE_C_COMPILER_ARCHITECTURE_ID}")
-if(RMR_ARCH_X86_64 AND DEFINED BLAKE3_AMD64_ASM_SOURCES)
+if(MSVC AND DEFINED CMAKE_C_COMPILER_ARCHITECTURE_ID)
+  if(CMAKE_C_COMPILER_ARCHITECTURE_ID MATCHES "[Xx]86")
+    set(BLAKE3_SIMD_TYPE "x86-intrinsics" CACHE STRING "the SIMD acceleration type to use")
+
+  elseif(CMAKE_C_COMPILER_ARCHITECTURE_ID MATCHES "[Xx]64")
+    set(BLAKE3_SIMD_TYPE "amd64-asm" CACHE STRING "the SIMD acceleration type to use")
+
+  elseif(CMAKE_C_COMPILER_ARCHITECTURE_ID MATCHES "[Aa][Rr][Mm]64")
+    set(BLAKE3_SIMD_TYPE "neon-intrinsics" CACHE STRING "the SIMD acceleration type to use")
+
+  else()
+    set(BLAKE3_SIMD_TYPE "none" CACHE STRING "the SIMD acceleration type to use")
+  endif()
+
+elseif(CMAKE_SYSTEM_PROCESSOR IN_LIST BLAKE3_AMD64_NAMES)
   set(BLAKE3_SIMD_TYPE "amd64-asm" CACHE STRING "the SIMD acceleration type to use")
 
-elseif((RMR_ARCH_X86_64 OR RMR_ARCH_X86_32)
+elseif(CMAKE_SYSTEM_PROCESSOR IN_LIST BLAKE3_X86_NAMES
        AND DEFINED BLAKE3_CFLAGS_SSE2
        AND DEFINED BLAKE3_CFLAGS_SSE4.1
        AND DEFINED BLAKE3_CFLAGS_AVX2
        AND DEFINED BLAKE3_CFLAGS_AVX512)
   set(BLAKE3_SIMD_TYPE "x86-intrinsics" CACHE STRING "the SIMD acceleration type to use")
 
-elseif((RMR_ARCH_AARCH64 OR RMR_ARCH_ARM
+elseif((CMAKE_SYSTEM_PROCESSOR IN_LIST BLAKE3_ARMv8_NAMES
           OR ANDROID_ABI STREQUAL "armeabi-v7a"
           OR BLAKE3_USE_NEON_INTRINSICS)
         AND (DEFINED BLAKE3_CFLAGS_NEON
@@ -188,15 +139,6 @@ target_include_directories(blake3 PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
-foreach(rmr_def IN ITEMS
-    RMR_OS_WINDOWS RMR_OS_DARWIN RMR_OS_LINUX RMR_OS_ANDROID RMR_OS_FREEBSD
-    RMR_OS_OPENBSD RMR_OS_NETBSD
-    RMR_ARCH_X86_64 RMR_ARCH_X86_32 RMR_ARCH_AARCH64 RMR_ARCH_ARM
-    RMR_ARCH_PPC64 RMR_ARCH_PPC32 RMR_ARCH_RISCV)
-  if(${rmr_def})
-    target_compile_definitions(blake3 PUBLIC "${rmr_def}=1")
-  endif()
-endforeach()
 set_target_properties(blake3 PROPERTIES
   VERSION ${PROJECT_VERSION}
   SOVERSION 0
@@ -254,15 +196,6 @@ elseif(BLAKE3_SIMD_TYPE STREQUAL "neon-intrinsics")
   target_sources(blake3 PRIVATE
     blake3_neon.c
   )
-  if(RMR_ARCH_AARCH64 AND NOT RMR_OS_WINDOWS)
-    target_sources(blake3 PRIVATE
-      blake3_neon_aarch64_unix.S
-    )
-  elseif(RMR_ARCH_ARM AND NOT RMR_OS_WINDOWS)
-    target_sources(blake3 PRIVATE
-      blake3_neon_armv7_unix.S
-    )
-  endif()
   target_compile_definitions(blake3 PRIVATE
     BLAKE3_USE_NEON=1
   )
@@ -307,12 +240,7 @@ if(BLAKE3_USE_TBB)
       PUBLIC
         BLAKE3_USE_TBB)
   endif()
-  if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(TBB_PC_NAME tbb)
-  else()
-    set(TBB_PC_NAME tbb32)
-  endif()
-  list(APPEND PKG_CONFIG_REQUIRES "${TBB_PC_NAME} >= ${TBB_VERSION}")
+  list(APPEND PKG_CONFIG_REQUIRES "tbb >= ${TBB_VERSION}")
   list(APPEND PKG_CONFIG_CFLAGS -DBLAKE3_USE_TBB)
   include(CheckCXXSymbolExists)
   check_cxx_symbol_exists(_LIBCPP_VERSION "version" BLAKE3_HAVE_LIBCPP)
@@ -330,19 +258,32 @@ if(BLAKE3_USE_TBB)
     set(APPEND BLAKE3_CXX_STANDARD_FLAGS_GNU -std=c++20)
     set(APPEND BLAKE3_CXX_STANDARD_FLAGS_MSVC /std:c++20)
   endif()
-
   set(BLAKE3_CXXFLAGS_GNU "-fno-exceptions;-fno-rtti;${BLAKE3_CXX_STANDARD_FLAGS_GNU}" CACHE STRING "C++ flags used for compiling private BLAKE3 library components with GNU-like compiler frontends.")
   set(BLAKE3_CXXFLAGS_MSVC "/EHs-c-;/GR-;${BLAKE3_CXX_STANDARD_FLAGS_MSVC}" CACHE STRING "C++ flags used for compiling private BLAKE3 library components with MSVC-like compiler frontends.")
+  # Get the C++ compiler name without extension
+  get_filename_component(BLAKE3_CMAKE_CXX_COMPILER_NAME "${CMAKE_CXX_COMPILER}" NAME_WE)
+  # Strip any trailing versioning from the C++ compiler name
+  string(REGEX MATCH "^(clang\\+\\+|clang-cl)" BLAKE3_CMAKE_CXX_COMPILER_NAME "${BLAKE3_CMAKE_CXX_COMPILER_NAME}")
 
-  if(BLAKE3_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "GNU")
+  # TODO: Simplify with CMAKE_CXX_COMPILER_FRONTEND_VARIANT once min CMake version is 3.14.
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
     target_compile_options(blake3 PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${BLAKE3_CXXFLAGS_GNU}>)
-  elseif(BLAKE3_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    if(BLAKE3_CMAKE_CXX_COMPILER_NAME STREQUAL "clang++")
+      target_compile_options(blake3 PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${BLAKE3_CXXFLAGS_GNU}>)
+    elseif(BLAKE3_CMAKE_CXX_COMPILER_NAME STREQUAL "clang-cl")
+      target_compile_options(blake3 PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${BLAKE3_CXXFLAGS_MSVC}>)
+    endif()
+  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(blake3 PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${BLAKE3_CXXFLAGS_GNU}>)
+  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(blake3 PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${BLAKE3_CXXFLAGS_MSVC}>)
   endif()
 
   # Undefine scratch variables
   unset(BLAKE3_CXX_STANDARD_FLAGS_GNU)
   unset(BLAKE3_CXX_STANDARD_FLAGS_MSVC)
+  unset(BLAKE3_CMAKE_CXX_COMPILER_NAME)
   unset(BLAKE3_CXXFLAGS_GNU)
   unset(BLAKE3_CXXFLAGS_MSVC)
 endif()

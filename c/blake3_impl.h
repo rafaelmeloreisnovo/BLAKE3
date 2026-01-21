@@ -1,12 +1,13 @@
 #ifndef BLAKE3_IMPL_H
 #define BLAKE3_IMPL_H
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "blake3.h"
-#include "rmr_lowlevel.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,23 +30,6 @@ enum blake3_flags {
 #define INLINE static __forceinline
 #else
 #define INLINE static inline __attribute__((always_inline))
-#endif
-
-#if defined(__GNUC__) || defined(__clang__)
-#define BLAKE3_LIKELY(x) __builtin_expect(!!(x), 1)
-#define BLAKE3_UNLIKELY(x) __builtin_expect(!!(x), 0)
-#define BLAKE3_ASSUME(x)   \
-  do {                     \
-    if (!(x)) {            \
-      __builtin_unreachable(); \
-    }                      \
-  } while (0)
-#define BLAKE3_PREFETCH(addr) __builtin_prefetch((addr))
-#else
-#define BLAKE3_LIKELY(x) (x)
-#define BLAKE3_UNLIKELY(x) (x)
-#define BLAKE3_ASSUME(x) ((void)(x))
-#define BLAKE3_PREFETCH(addr) ((void)(addr))
 #endif
 
 #ifdef __cplusplus
@@ -103,19 +87,6 @@ static const uint32_t IV[8] = {0x6A09E667UL, 0xBB67AE85UL, 0x3C6EF372UL,
                                0xA54FF53AUL, 0x510E527FUL, 0x9B05688CUL,
                                0x1F83D9ABUL, 0x5BE0CD19UL};
 
-static const uint32_t IV_MATRIX[2][4] = {
-    {IV[0], IV[1], IV[2], IV[3]},
-    {IV[4], IV[5], IV[6], IV[7]},
-};
-
-static inline const uint32_t *blake3_iv_matrix_row(size_t row) {
-  return IV_MATRIX[row];
-}
-
-static inline size_t blake3_iv_matrix_rows(void) { return 2; }
-
-static inline size_t blake3_iv_matrix_cols(void) { return 4; }
-
 static const uint8_t MSG_SCHEDULE[7][16] = {
     {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
     {2, 6, 3, 10, 7, 0, 4, 13, 1, 11, 12, 5, 9, 14, 15, 8},
@@ -128,7 +99,7 @@ static const uint8_t MSG_SCHEDULE[7][16] = {
 
 /* Find index of the highest set bit */
 /* x is assumed to be nonzero.       */
-INLINE unsigned int highest_one(uint64_t x) {
+static unsigned int highest_one(uint64_t x) {
 #if defined(__GNUC__) || defined(__clang__)
   return 63 ^ (unsigned int)__builtin_clzll(x);
 #elif defined(_MSC_VER) && defined(IS_X86_64)
@@ -338,7 +309,7 @@ void blake3_hash_many_avx512(const uint8_t *const *inputs, size_t num_inputs,
                              uint8_t flags, uint8_t flags_start,
                              uint8_t flags_end, uint8_t *out);
 
-#if !defined(_WIN32) && !defined(__CYGWIN__)
+#if !defined(_WIN32)
 void blake3_xof_many_avx512(const uint32_t cv[8],
                             const uint8_t block[BLAKE3_BLOCK_LEN],
                             uint8_t block_len, uint64_t counter, uint8_t flags,
