@@ -144,6 +144,44 @@ alternativas sob Apache 2.0 e Apache 2.0 com exceções LLVM.
 - `reference_impl/README.md`: detalhes da implementação de referência.
 - `CONTRIBUTING.md`: guia de contribuição.
 
+## Proveniência e autoria (BLAKE3 vs RMR)
+
+Esta árvore contém o **BLAKE3** (upstream) e extensões do módulo
+**RMR** (Rafael Melo Reis). Para evitar confusão de autoria e manter
+conformidade de licença, a separação operacional é a seguinte:
+
+### Núcleo BLAKE3 (upstream)
+
+Componentes que seguem o projeto original, com licenças CC0/Apache (e
+variações conforme os arquivos):
+
+- `src/` (exceto `src/rmr.rs`): API principal e IO padrão.
+- `c/` (exceto `c/rmr_lowlevel.h`): implementação C oficial.
+- `reference_impl/`: implementação de referência.
+- `b3sum/`, `tools/`, `media/`: utilitários e documentação upstream.
+
+### Extensões RMR (autoria do módulo)
+
+Componentes autorais do módulo RMR, isolados para evitar mistura de
+proveniência:
+
+- `src/rmr.rs`: núcleo de configuração do módulo RMR.
+- `c/rmr_lowlevel.h`: helpers low-level e modo sem libc para integração
+  bare-metal.
+- `rmr/`: documentação e licença específica do módulo.
+
+### Integração entre os blocos
+
+Integrações deliberadas e explícitas entre upstream e RMR:
+
+- `src/io.rs` consome `crate::rmr::IO_READ_BUF_LEN` para o tamanho de
+  buffer de leitura.
+- `c/blake3.c` e `c/main.c` usam macros/asserções definidas em
+  `c/rmr_lowlevel.h` para rotinas low-level e validações.
+
+Essa separação serve como trilha de auditoria: o que é upstream mantém
+os créditos originais, e o que é RMR permanece delimitado no módulo.
+
 ## Diretrizes low-level (RMR) e integrações bare-metal
 
 Esta seção descreve decisões de baixo nível voltadas a reduzir
