@@ -101,6 +101,12 @@ externa. O mapa de proveniência oficial está em `rmr/PROVENIENCE.md`.
 Qualquer novo arquivo autoral deve ficar em `rmr/` e ser registrado
 nesse documento.
 
+## Diferenças vs upstream (revisão atual)
+
+- Adicionado `rmr/include/rmr_governance.h` como contrato de governança
+  externo ao core.
+- Atualizações de documentação em `DOCUMENTACAO.md` e `rmr/ARCHITECTURE.md`.
+
 ## Observação final
 
 Esta árvore **não cria um novo hash** e **não renomeia** o BLAKE3. Ela
