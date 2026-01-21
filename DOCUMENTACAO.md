@@ -148,7 +148,15 @@ alternativas sob Apache 2.0 e Apache 2.0 com exceções LLVM.
 
 Esta árvore contém o **BLAKE3** (upstream) e extensões do módulo
 **RMR** (Rafael Melo Reis). Para evitar confusão de autoria e manter
-conformidade de licença, a separação operacional é a seguinte:
+conformidade de licença, a separação operacional é a seguinte. O
+documento `rmr/PROVENIENCE.md` serve como mapa oficial de proveniência
+por arquivo/pasta e **deve** ser atualizado sempre que houver inclusão
+de novos arquivos autorais do RMR.
+
+> **Regra de isolamento:** arquivos upstream não devem receber conteúdo
+> autoral do RMR, exceto por integrações explícitas e documentadas. Todo
+> novo arquivo RMR precisa de cabeçalho de copyright/licença e registro
+> no mapa de proveniência.
 
 ### Núcleo BLAKE3 (upstream)
 
