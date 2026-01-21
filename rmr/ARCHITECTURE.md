@@ -16,7 +16,8 @@ código criptográfico oficial.
 ## Componentes do RMR
 
 - `rmr/include/`: headers auxiliares do módulo externo
-  (ex.: detecção de arquitetura/OS, helpers low-level).
+  (ex.: detecção de arquitetura/OS, helpers low-level e contrato de
+  governança `rmr_governance.h`).
 - `rmr/rust/`: módulos Rust externos **não** integrados ao crate
   `blake3`.
 - `rmr/ARCHITECTURE.md`: este documento.
