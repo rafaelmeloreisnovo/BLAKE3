@@ -13,8 +13,8 @@ Essa separação evita confusão de licença e facilita auditoria:
 - **Upstream BLAKE3**: todo o conteúdo de `src/` exceto `src/rmr.rs`,
   além de `c/` (exceto `c/rmr_lowlevel.h`), `reference_impl/`, `b3sum/`
   e `tools/`.
-- **RMR**: `src/rmr.rs`, `c/rmr_lowlevel.h` e `rmr/` (documentação e
-  licença do módulo).
+- **RMR**: `src/rmr.rs`, `c/rmr_lowlevel.h`, `c/rmr_arch.h` e `rmr/`
+  (documentação e licença do módulo).
 
 ## Objetivos
 
@@ -29,9 +29,13 @@ Essa separação evita confusão de licença e facilita auditoria:
 - `src/rmr.rs`: ponto central do módulo, com configuração e versão.
 - `rmr/ARCHITECTURE.md`: documentação de arquitetura (este arquivo).
 - `rmr/LICENSE_RMR`: licença específica do módulo RMR.
+- `c/rmr_arch.h`: detecção de arquitetura/OS/compilador para seleção
+  low-level controlada.
 
 ## Diretrizes
 
 1. Qualquer ajuste deve ser acompanhado de testes e benchmarks.
 2. Evite dependências adicionais sem necessidade clara.
 3. Prefira alterações pequenas e mensuráveis.
+4. Use `c/rmr_arch.h` como ponto único para expandir seleção de
+   arquitetura e caminhos de assembly.
