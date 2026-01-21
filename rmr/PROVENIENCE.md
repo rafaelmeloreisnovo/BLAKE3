@@ -28,6 +28,7 @@ autoria entre o upstream **BLAKE3** e a camada externa **RMR**.
 | `media/` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
 | `README.md`, `CONTRIBUTING.md`, `LICENSE_*`, `Cargo.toml`, `Cargo.lock`, `build.rs` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
 | `rmr/` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/benchmark_framework/` | RMR autoral (blueprint) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `DOCUMENTACAO.md`, `MANIFESTO*.md` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 
 ## Observações sobre integração
@@ -37,3 +38,4 @@ autoria entre o upstream **BLAKE3** e a camada externa **RMR**.
   1. Ficar dentro de `rmr/`.
   2. Incluir cabeçalho de copyright/licença no próprio arquivo.
   3. Ser registrado neste documento.
+  4. Ser isolado do core (sem modificar `src/` ou `c/`).
