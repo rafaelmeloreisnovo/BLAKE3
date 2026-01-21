@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "rmr_arch.h"
+#include "rmr_dispatch.h"
 #if !defined(RMR_NO_LIBC)
 #include <errno.h>
 #include <stdlib.h>
