@@ -254,6 +254,15 @@ elseif(BLAKE3_SIMD_TYPE STREQUAL "neon-intrinsics")
   target_sources(blake3 PRIVATE
     blake3_neon.c
   )
+  if(RMR_ARCH_AARCH64 AND NOT RMR_OS_WINDOWS)
+    target_sources(blake3 PRIVATE
+      blake3_neon_aarch64_unix.S
+    )
+  elseif(RMR_ARCH_ARM AND NOT RMR_OS_WINDOWS)
+    target_sources(blake3 PRIVATE
+      blake3_neon_armv7_unix.S
+    )
+  endif()
   target_compile_definitions(blake3 PRIVATE
     BLAKE3_USE_NEON=1
   )
