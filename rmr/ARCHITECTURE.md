@@ -40,6 +40,29 @@ Essa separação evita confusão de licença e facilita auditoria:
 4. Use `c/rmr_arch.h` como ponto único para expandir seleção de
    arquitetura e caminhos de assembly.
 
+## Privacidade, telemetria e limites de logs
+
+- **Sem telemetria**: o módulo RMR não coleta nem transmite dados de
+  execução. Não há chamadas de rede ou coleta automática no caminho
+  crítico do hash.
+- **Sem logging de dados sensíveis**: entradas, chaves e saídas do hash
+  **não devem** ser registradas. Isso inclui stdout/stderr, arquivos de
+  log ou métricas agregadas.
+- **Uso de logs apenas em exemplos**: mensagens de erro/diagnóstico
+  aparecem somente em binários de exemplo ou testes (por exemplo, em
+  `c/example.c`, `c/example_tbb.c` e `c/main.c`). O caminho crítico do
+  hash em `src/` e `c/` permanece livre de logs.
+
+## Licenças e compliance (RMR + upstream)
+
+- **Upstream BLAKE3**: licenças no topo do repositório (`LICENSE_A2`,
+  `LICENSE_A2LLVM`, `LICENSE_CC0`) aplicam-se ao código upstream.
+- **RMR**: a licença específica do módulo está em `rmr/LICENSE_RMR`.
+
+Para auditorias, mantenha esta separação explícita: qualquer arquivo
+sob `rmr/` segue a licença do RMR, enquanto o restante do projeto segue
+as licenças upstream listadas acima.
+
 ## Mapa de seleção por arquitetura/OS/compilador
 
 O ponto central de seleção agora é `c/rmr_dispatch.h`, que deriva flags
