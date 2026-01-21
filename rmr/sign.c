@@ -6,6 +6,32 @@
 #include <time.h>
 #include <stdint.h>
 
+static int deterministic_enabled(void) {
+    const char *env = getenv("RMR_DETERMINISTIC");
+    return env && strcmp(env, "1") == 0;
+}
+
+static void signature_timestamp(struct tm *out_tm) {
+    if(deterministic_enabled()) {
+        memset(out_tm, 0, sizeof(*out_tm));
+        out_tm->tm_year = 70;
+        out_tm->tm_mon = 0;
+        out_tm->tm_mday = 1;
+        return;
+    }
+
+    time_t t = time(NULL);
+    struct tm *tm = gmtime(&t);
+    if(tm) {
+        *out_tm = *tm;
+        return;
+    }
+    memset(out_tm, 0, sizeof(*out_tm));
+    out_tm->tm_year = 70;
+    out_tm->tm_mon = 0;
+    out_tm->tm_mday = 1;
+}
+
 static void usage(void) {
     puts("uso:");
     puts("  pai sign --base DIR --scan SCANDIR --out DIR");
@@ -68,8 +94,8 @@ int pai_cmd_sign(int argc, char **argv) {
     char self_hex[65];
     hex32(hbin, self_hex);
 
-    time_t t = time(NULL);
-    struct tm *tm = gmtime(&t);
+    struct tm tm;
+    signature_timestamp(&tm);
 
     char sigpath[512];
     snprintf(sigpath, sizeof(sigpath), "%s/SIGNATURE.txt", out);
@@ -82,8 +108,8 @@ int pai_cmd_sign(int argc, char **argv) {
 
     fprintf(f, "PAI SIGNATURE v1\n");
     fprintf(f, "timestamp=%04d-%02d-%02dT%02d:%02d:%02dZ\n",
-        tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
-        tm->tm_hour, tm->tm_min, tm->tm_sec);
+        tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+        tm.tm_hour, tm.tm_min, tm.tm_sec);
 
     fprintf(f, "binary_sha256=%s\n", self_hex);
     fprintf(f, "merkle_root=%s", merkle);

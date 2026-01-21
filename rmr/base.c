@@ -121,7 +121,10 @@ static void write_report(
     const int64_t *vals, int nvals,
     const int *bases, int nbases
 ) {
-    pai_mkdir_p(out_dir);
+    if (pai_mkdir_p(out_dir) != 0) {
+        perror("mkdir");
+        return;
+    }
 
     char path[PAI_MAX_PATH];
     snprintf(path, sizeof(path), "%s/bases.txt", out_dir);
