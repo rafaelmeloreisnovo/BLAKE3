@@ -4,13 +4,15 @@
  * C code.
  */
 
+#include <assert.h>
+#include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "blake3.h"
 #include "blake3_impl.h"
-#include "rmr_lowlevel.h"
 
 #define HASH_MODE 0
 #define KEYED_HASH_MODE 1
@@ -29,7 +31,7 @@ static void hex_char_value(uint8_t c, uint8_t *value, bool *valid) {
 }
 
 static int parse_key(char *hex_key, uint8_t out[BLAKE3_KEY_LEN]) {
-  size_t hex_len = rmr_ll_strlen(hex_key);
+  size_t hex_len = strlen(hex_key);
   if (hex_len != 64) {
     fprintf(stderr, "Expected a 64-char hexadecimal key, got %zu chars.\n",
             hex_len);
@@ -78,20 +80,23 @@ int main(int argc, char **argv) {
       fprintf(stderr, "Odd number of arguments.\n");
       return 1;
     }
-    if (rmr_ll_strcmp("--length", argv[1]) == 0) {
-      size_t parsed_len = 0;
-      if (!rmr_ll_parse_size(argv[2], &parsed_len)) {
+    if (strcmp("--length", argv[1]) == 0) {
+      char *endptr = NULL;
+      errno = 0;
+      unsigned long long out_len_ll = strtoull(argv[2], &endptr, 10);
+      if (errno != 0 || out_len_ll > SIZE_MAX || endptr == argv[2] ||
+          *endptr != 0) {
         fprintf(stderr, "Bad length argument.\n");
         return 1;
       }
-      out_len = parsed_len;
-    } else if (rmr_ll_strcmp("--keyed", argv[1]) == 0) {
+      out_len = (size_t)out_len_ll;
+    } else if (strcmp("--keyed", argv[1]) == 0) {
       mode = KEYED_HASH_MODE;
       int ret = parse_key(argv[2], key);
       if (ret != 0) {
         return ret;
       }
-    } else if (rmr_ll_strcmp("--derive-key", argv[1]) == 0) {
+    } else if (strcmp("--derive-key", argv[1]) == 0) {
       mode = DERIVE_KEY_MODE;
       context = argv[2];
     } else {
@@ -108,8 +113,8 @@ int main(int argc, char **argv) {
    * than 1 MiB.
    */
   size_t buf_capacity = 1 << 20;
-  uint8_t *buf = rmr_ll_malloc(buf_capacity);
-  RMR_ASSERT(buf != NULL);
+  uint8_t *buf = malloc(buf_capacity);
+  assert(buf != NULL);
   size_t buf_len = 0;
   while (1) {
     size_t n = fread(&buf[buf_len], 1, buf_capacity - buf_len, stdin);
@@ -117,7 +122,7 @@ int main(int argc, char **argv) {
       break;
     }
     buf_len += n;
-    RMR_ASSERT(buf_len < buf_capacity);
+    assert(buf_len < buf_capacity);
   }
 
   const int mask = get_cpu_features();
@@ -137,13 +142,13 @@ int main(int argc, char **argv) {
       blake3_hasher_init_derive_key(&hasher, context);
       break;
     default:
-      RMR_TRAP();
+      abort();
     }
 
     blake3_hasher_update(&hasher, buf, buf_len);
 
     /* TODO: An incremental output reader API to avoid this allocation. */
-    uint8_t *out = rmr_ll_malloc(out_len);
+    uint8_t *out = malloc(out_len);
     if (out_len > 0 && out == NULL) {
       fprintf(stderr, "malloc() failed.\n");
       return 1;
@@ -153,9 +158,9 @@ int main(int argc, char **argv) {
       printf("%02x", out[i]);
     }
     printf("\n");
-    rmr_ll_free(out);
+    free(out);
     feature = (feature - mask) & mask;
   } while (feature != 0);
-  rmr_ll_free(buf);
+  free(buf);
   return 0;
 }

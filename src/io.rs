@@ -1,36 +1,24 @@
 //! Helper functions for efficient IO.
 
 #[cfg(feature = "std")]
-const READ_BUF_LEN: usize = crate::rmr::IO_READ_BUF_LEN;
-
-#[cfg(feature = "std")]
-thread_local! {
-    static READ_BUF: std::cell::RefCell<Vec<u8>> =
-        std::cell::RefCell::new(vec![0u8; READ_BUF_LEN]);
-}
-
-#[cfg(feature = "std")]
-#[inline]
 pub(crate) fn copy_wide(
     mut reader: impl std::io::Read,
     hasher: &mut crate::Hasher,
 ) -> std::io::Result<u64> {
-    READ_BUF.with(|buffer| {
-        let mut buffer = buffer.borrow_mut();
-        let mut total = 0;
-        loop {
-            match reader.read(&mut buffer) {
-                Ok(0) => return Ok(total),
-                Ok(n) => {
-                    hasher.update(&buffer[..n]);
-                    total += n as u64;
-                }
-                // see test_update_reader_interrupted
-                Err(e) if e.kind() == std::io::ErrorKind::Interrupted => continue,
-                Err(e) => return Err(e),
+    let mut buffer = [0; 65536];
+    let mut total = 0;
+    loop {
+        match reader.read(&mut buffer) {
+            Ok(0) => return Ok(total),
+            Ok(n) => {
+                hasher.update(&buffer[..n]);
+                total += n as u64;
             }
+            // see test_update_reader_interrupted
+            Err(e) if e.kind() == std::io::ErrorKind::Interrupted => continue,
+            Err(e) => return Err(e),
         }
-    })
+    }
 }
 
 // Mmap a file, if it looks like a good idea. Return None in cases where we know mmap will fail, or
@@ -59,7 +47,6 @@ pub(crate) fn copy_wide(
 // But if you "know what you're doing," I don't think *const i32 and &i32 are fundamentally
 // different here. Feedback needed.
 #[cfg(feature = "mmap")]
-#[inline]
 pub(crate) fn maybe_mmap_file(file: &std::fs::File) -> std::io::Result<Option<memmap2::Mmap>> {
     let metadata = file.metadata()?;
     let file_size = metadata.len();
