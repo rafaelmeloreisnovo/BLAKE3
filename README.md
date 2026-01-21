@@ -222,6 +222,24 @@ Alternatively, it is licensed under any of the following:
 - [@veorq] and [@oconnor663] did [an interview with Cryptography FM](https://cryptography.fireside.fm/3).
 - [@oconnor663] did [an interview with Saito](https://www.youtube.com/watch?v=cJkmIt7yN_E).
 
+## Camadas (fork)
+
+Este repositório é uma **distribuição de um fork** do BLAKE3 upstream.
+O núcleo criptográfico permanece inalterado; qualquer código adicional
+vive **fora** do núcleo em `rmr/`. Esta distribuição **não é afiliada**
+ao time oficial do BLAKE3.
+
+## Build Termux (fork)
+
+Para Android/Termux (camada externa do fork), use:
+
+```bash
+pkg update
+pkg install git clang make cmake python rust
+cmake -S c -B build-termux
+cmake --build build-termux
+```
+
 [@oconnor663]: https://github.com/oconnor663
 [@sneves]: https://github.com/sneves
 [@veorq]: https://github.com/veorq

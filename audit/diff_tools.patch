@@ -1,0 +1,60 @@
+diff --git a/tools/benchmark_example.sh b/tools/benchmark_example.sh
+new file mode 100755
+index 0000000..8855f06
+--- /dev/null
++++ b/tools/benchmark_example.sh
+@@ -0,0 +1,16 @@
++#!/usr/bin/env bash
++set -euo pipefail
++
++FILE_PATH="${1:-/tmp/bigfile}"
++SIZE_BYTES="${2:-1000000000}"
++
++if [[ ! -f "${FILE_PATH}" ]]; then
++  echo "Criando arquivo de teste: ${FILE_PATH} (${SIZE_BYTES} bytes)"
++  head -c "${SIZE_BYTES}" /dev/zero > "${FILE_PATH}"
++fi
++
++echo "SHA-256 (openssl) — ${FILE_PATH}"
++time openssl sha256 "${FILE_PATH}"
++
++echo "BLAKE3 (b3sum) — ${FILE_PATH}"
++time b3sum "${FILE_PATH}"
+diff --git a/tools/compiler_version/Cargo.toml b/tools/compiler_version/Cargo.toml
+index b5f8482..8625094 100644
+--- a/tools/compiler_version/Cargo.toml
++++ b/tools/compiler_version/Cargo.toml
+@@ -1,7 +1,7 @@
+ [package]
+ name = "compiler_version"
+ version = "0.0.0"
+-edition = "2024"
++edition = "2021"
+ 
+ [build-dependencies]
+ cc = "1.0.50"
+diff --git a/tools/instruction_set_support/Cargo.toml b/tools/instruction_set_support/Cargo.toml
+index 39eed0a..eef8a80 100644
+--- a/tools/instruction_set_support/Cargo.toml
++++ b/tools/instruction_set_support/Cargo.toml
+@@ -1,6 +1,6 @@
+ [package]
+ name = "instruction_set_support"
+ version = "0.0.0"
+-edition = "2024"
++edition = "2021"
+ 
+ [dependencies]
+diff --git a/tools/release.md b/tools/release.md
+index bb34142..26c4927 100644
+--- a/tools/release.md
++++ b/tools/release.md
+@@ -3,7 +3,7 @@
+ - Make sure `cargo outdated -R` is clean in the root and in b3sum/.
+ - Bump the version in the root Cargo.toml.
+ - Bump the version in b3sum/Cargo.toml.
+-    - Bump the dependency on the root crate too, if new features are used.
++    - Bump the dependency version too, if new features are used.
+ - Delete b3sum/Cargo.lock and recreate it with `cargo build` or similar.
+ - Update the `-h` output in b3sum/README.md if it's changed.
+ - Bump `BLAKE3_VERSION_STRING` in c/blake3.h.

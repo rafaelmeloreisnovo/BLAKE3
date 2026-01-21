@@ -1295,7 +1295,7 @@ INLINE void hash_one_avx512(const uint8_t *input, size_t blocks,
                             uint8_t flags, uint8_t flags_start,
                             uint8_t flags_end, uint8_t out[BLAKE3_OUT_LEN]) {
   uint32_t cv[8];
-  rmr_memcpy(cv, key, BLAKE3_KEY_LEN);
+  memcpy(cv, key, BLAKE3_KEY_LEN);
   uint8_t block_flags = flags | flags_start;
   while (blocks > 0) {
     if (blocks == 1) {
@@ -1307,7 +1307,7 @@ INLINE void hash_one_avx512(const uint8_t *input, size_t blocks,
     blocks -= 1;
     block_flags = flags;
   }
-  rmr_memcpy(out, cv, BLAKE3_OUT_LEN);
+  memcpy(out, cv, BLAKE3_OUT_LEN);
 }
 
 void blake3_hash_many_avx512(const uint8_t *const *inputs, size_t num_inputs,

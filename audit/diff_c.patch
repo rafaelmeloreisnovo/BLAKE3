@@ -1,0 +1,315 @@
+diff --git a/c/CMakeLists.txt b/c/CMakeLists.txt
+index 28127d4..ac4a079 100644
+--- a/c/CMakeLists.txt
++++ b/c/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.9...3.18 FATAL_ERROR)
++cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+ 
+ # respect C_EXTENSIONS OFF without explicitly setting C_STANDARD
+ if (POLICY CMP0128)
+@@ -10,7 +10,7 @@ if (POLICY CMP0102)
+ endif()
+ 
+ project(libblake3
+-  VERSION 1.8.3
++  VERSION 1.8.2
+   DESCRIPTION "BLAKE3 C implementation"
+   LANGUAGES C CXX ASM
+ )
+@@ -23,7 +23,6 @@ option(BLAKE3_FETCH_TBB "Allow fetching oneTBB from GitHub if not found on syste
+ include(CTest)
+ include(FeatureSummary)
+ include(GNUInstallDirs)
+-include(BLAKE3/Utils)
+ 
+ add_subdirectory(dependencies)
+ 
+@@ -241,12 +240,7 @@ if(BLAKE3_USE_TBB)
+       PUBLIC
+         BLAKE3_USE_TBB)
+   endif()
+-  if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+-    set(TBB_PC_NAME tbb)
+-  else()
+-    set(TBB_PC_NAME tbb32)
+-  endif()
+-  list(APPEND PKG_CONFIG_REQUIRES "${TBB_PC_NAME} >= ${TBB_VERSION}")
++  list(APPEND PKG_CONFIG_REQUIRES "tbb >= ${TBB_VERSION}")
+   list(APPEND PKG_CONFIG_CFLAGS -DBLAKE3_USE_TBB)
+   include(CheckCXXSymbolExists)
+   check_cxx_symbol_exists(_LIBCPP_VERSION "version" BLAKE3_HAVE_LIBCPP)
+@@ -264,19 +258,32 @@ if(BLAKE3_USE_TBB)
+     set(APPEND BLAKE3_CXX_STANDARD_FLAGS_GNU -std=c++20)
+     set(APPEND BLAKE3_CXX_STANDARD_FLAGS_MSVC /std:c++20)
+   endif()
+-
+   set(BLAKE3_CXXFLAGS_GNU "-fno-exceptions;-fno-rtti;${BLAKE3_CXX_STANDARD_FLAGS_GNU}" CACHE STRING "C++ flags used for compiling private BLAKE3 library components with GNU-like compiler frontends.")
+   set(BLAKE3_CXXFLAGS_MSVC "/EHs-c-;/GR-;${BLAKE3_CXX_STANDARD_FLAGS_MSVC}" CACHE STRING "C++ flags used for compiling private BLAKE3 library components with MSVC-like compiler frontends.")
++  # Get the C++ compiler name without extension
++  get_filename_component(BLAKE3_CMAKE_CXX_COMPILER_NAME "${CMAKE_CXX_COMPILER}" NAME_WE)
++  # Strip any trailing versioning from the C++ compiler name
++  string(REGEX MATCH "^(clang\\+\\+|clang-cl)" BLAKE3_CMAKE_CXX_COMPILER_NAME "${BLAKE3_CMAKE_CXX_COMPILER_NAME}")
+ 
+-  if(BLAKE3_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "GNU")
++  # TODO: Simplify with CMAKE_CXX_COMPILER_FRONTEND_VARIANT once min CMake version is 3.14.
++  if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
++    target_compile_options(blake3 PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${BLAKE3_CXXFLAGS_GNU}>)
++  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
++    if(BLAKE3_CMAKE_CXX_COMPILER_NAME STREQUAL "clang++")
++      target_compile_options(blake3 PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${BLAKE3_CXXFLAGS_GNU}>)
++    elseif(BLAKE3_CMAKE_CXX_COMPILER_NAME STREQUAL "clang-cl")
++      target_compile_options(blake3 PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${BLAKE3_CXXFLAGS_MSVC}>)
++    endif()
++  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+     target_compile_options(blake3 PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${BLAKE3_CXXFLAGS_GNU}>)
+-  elseif(BLAKE3_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
++  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+     target_compile_options(blake3 PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${BLAKE3_CXXFLAGS_MSVC}>)
+   endif()
+ 
+   # Undefine scratch variables
+   unset(BLAKE3_CXX_STANDARD_FLAGS_GNU)
+   unset(BLAKE3_CXX_STANDARD_FLAGS_MSVC)
++  unset(BLAKE3_CMAKE_CXX_COMPILER_NAME)
+   unset(BLAKE3_CXXFLAGS_GNU)
+   unset(BLAKE3_CXXFLAGS_MSVC)
+ endif()
+diff --git a/c/blake3.h b/c/blake3.h
+index c9303ec..9301cea 100644
+--- a/c/blake3.h
++++ b/c/blake3.h
+@@ -26,11 +26,17 @@
+ # endif
+ #endif
+ 
++#if defined(__GNUC__) || defined(__clang__)
++#define BLAKE3_RESTRICT __restrict__
++#else
++#define BLAKE3_RESTRICT
++#endif
++
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+ 
+-#define BLAKE3_VERSION_STRING "1.8.3"
++#define BLAKE3_VERSION_STRING "1.8.2"
+ #define BLAKE3_KEY_LEN 32
+ #define BLAKE3_OUT_LEN 32
+ #define BLAKE3_BLOCK_LEN 64
+@@ -61,23 +67,27 @@ typedef struct {
+ } blake3_hasher;
+ 
+ BLAKE3_API const char *blake3_version(void);
+-BLAKE3_API void blake3_hasher_init(blake3_hasher *self);
+-BLAKE3_API void blake3_hasher_init_keyed(blake3_hasher *self,
++BLAKE3_API void blake3_hasher_init(blake3_hasher *BLAKE3_RESTRICT self);
++BLAKE3_API void blake3_hasher_init_keyed(blake3_hasher *BLAKE3_RESTRICT self,
+                                          const uint8_t key[BLAKE3_KEY_LEN]);
+-BLAKE3_API void blake3_hasher_init_derive_key(blake3_hasher *self, const char *context);
+-BLAKE3_API void blake3_hasher_init_derive_key_raw(blake3_hasher *self, const void *context,
++BLAKE3_API void blake3_hasher_init_derive_key(blake3_hasher *BLAKE3_RESTRICT self,
++                                              const char *context);
++BLAKE3_API void blake3_hasher_init_derive_key_raw(blake3_hasher *BLAKE3_RESTRICT self,
++                                                  const void *context,
+                                                   size_t context_len);
+-BLAKE3_API void blake3_hasher_update(blake3_hasher *self, const void *input,
++BLAKE3_API void blake3_hasher_update(blake3_hasher *BLAKE3_RESTRICT self,
++                                     const void *input,
+                                      size_t input_len);
+ #if defined(BLAKE3_USE_TBB)
+-BLAKE3_API void blake3_hasher_update_tbb(blake3_hasher *self, const void *input,
++BLAKE3_API void blake3_hasher_update_tbb(blake3_hasher *BLAKE3_RESTRICT self,
++                                         const void *input,
+                                          size_t input_len);
+ #endif // BLAKE3_USE_TBB
+-BLAKE3_API void blake3_hasher_finalize(const blake3_hasher *self, uint8_t *out,
++BLAKE3_API void blake3_hasher_finalize(const blake3_hasher *self, uint8_t *BLAKE3_RESTRICT out,
+                                        size_t out_len);
+ BLAKE3_API void blake3_hasher_finalize_seek(const blake3_hasher *self, uint64_t seek,
+-                                            uint8_t *out, size_t out_len);
+-BLAKE3_API void blake3_hasher_reset(blake3_hasher *self);
++                                            uint8_t *BLAKE3_RESTRICT out, size_t out_len);
++BLAKE3_API void blake3_hasher_reset(blake3_hasher *BLAKE3_RESTRICT self);
+ 
+ #ifdef __cplusplus
+ }
+diff --git a/c/blake3_c_rust_bindings/Cargo.toml b/c/blake3_c_rust_bindings/Cargo.toml
+index 8cb53d4..4c3a252 100644
+--- a/c/blake3_c_rust_bindings/Cargo.toml
++++ b/c/blake3_c_rust_bindings/Cargo.toml
+@@ -7,7 +7,7 @@
+ name = "blake3_c_rust_bindings"
+ version = "0.0.0"
+ description = "TESTING ONLY Rust bindings for the BLAKE3 C implementation"
+-edition = "2024"
++edition = "2021"
+ 
+ [features]
+ # By default the x86-64 build uses assembly implementations. This feature makes
+diff --git a/c/blake3_c_rust_bindings/src/lib.rs b/c/blake3_c_rust_bindings/src/lib.rs
+index f5f7023..c2b3989 100644
+--- a/c/blake3_c_rust_bindings/src/lib.rs
++++ b/c/blake3_c_rust_bindings/src/lib.rs
+@@ -133,7 +133,7 @@ pub mod ffi {
+         pub cv_stack: [u8; 1728usize],
+     }
+ 
+-    unsafe extern "C" {
++    extern "C" {
+         // public interface
+         pub fn blake3_hasher_init(self_: *mut blake3_hasher);
+         pub fn blake3_hasher_init_keyed(self_: *mut blake3_hasher, key: *const u8);
+@@ -198,7 +198,7 @@ pub mod ffi {
+ 
+     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+     pub mod x86 {
+-        unsafe extern "C" {
++        extern "C" {
+             // SSE2 low level functions
+             pub fn blake3_compress_in_place_sse2(
+                 cv: *mut u32,
+@@ -314,7 +314,7 @@ pub mod ffi {
+ 
+     #[cfg(feature = "neon")]
+     pub mod neon {
+-        unsafe extern "C" {
++        extern "C" {
+             // NEON low level functions
+             pub fn blake3_hash_many_neon(
+                 inputs: *const *const u8,
+diff --git a/c/blake3_dispatch.c b/c/blake3_dispatch.c
+index 14dfbbe..87a544a 100644
+--- a/c/blake3_dispatch.c
++++ b/c/blake3_dispatch.c
+@@ -115,7 +115,7 @@ static
+ 
+   /* If TSAN detects a data race here, try compiling with -DBLAKE3_ATOMICS=1 */
+   enum cpu_feature features = ATOMIC_LOAD(g_cpu_features);
+-  if (features != UNDEFINED) {
++  if (BLAKE3_LIKELY(features != UNDEFINED)) {
+     return features;
+   } else {
+ #if defined(IS_X86)
+@@ -173,7 +173,7 @@ void blake3_compress_in_place(uint32_t cv[8],
+   const enum cpu_feature features = get_cpu_features();
+   MAYBE_UNUSED(features);
+ #if !defined(BLAKE3_NO_AVX512)
+-  if (features & AVX512VL) {
++  if (BLAKE3_LIKELY(features & AVX512VL)) {
+     blake3_compress_in_place_avx512(cv, block, block_len, counter, flags);
+     return;
+   }
+diff --git a/c/blake3_impl.h b/c/blake3_impl.h
+index 88e71e4..facd599 100644
+--- a/c/blake3_impl.h
++++ b/c/blake3_impl.h
+@@ -309,7 +309,7 @@ void blake3_hash_many_avx512(const uint8_t *const *inputs, size_t num_inputs,
+                              uint8_t flags, uint8_t flags_start,
+                              uint8_t flags_end, uint8_t *out);
+ 
+-#if !defined(_WIN32) && !defined(__CYGWIN__)
++#if !defined(_WIN32)
+ void blake3_xof_many_avx512(const uint32_t cv[8],
+                             const uint8_t block[BLAKE3_BLOCK_LEN],
+                             uint8_t block_len, uint64_t counter, uint8_t flags,
+diff --git a/c/blake3_neon.c b/c/blake3_neon.c
+index 794ea80..53ce83c 100644
+--- a/c/blake3_neon.c
++++ b/c/blake3_neon.c
+@@ -243,11 +243,10 @@ INLINE void load_counters4(uint64_t counter, bool increment_counter,
+       counter_high(counter + (mask & 2)), counter_high(counter + (mask & 3)));
+ }
+ 
+-static void blake3_hash4_neon(const uint8_t *const *inputs, size_t blocks,
+-                              const uint32_t key[8], uint64_t counter,
+-                              bool increment_counter, uint8_t flags,
+-                              uint8_t flags_start, uint8_t flags_end, 
+-                              uint8_t *out) {
++void blake3_hash4_neon(const uint8_t *const *inputs, size_t blocks,
++                       const uint32_t key[8], uint64_t counter,
++                       bool increment_counter, uint8_t flags,
++                       uint8_t flags_start, uint8_t flags_end, uint8_t *out) {
+   uint32x4_t h_vecs[8] = {
+       set1_128(key[0]), set1_128(key[1]), set1_128(key[2]), set1_128(key[3]),
+       set1_128(key[4]), set1_128(key[5]), set1_128(key[6]), set1_128(key[7]),
+diff --git a/c/blake3_neon_aarch64_unix.S b/c/blake3_neon_aarch64_unix.S
+new file mode 100644
+index 0000000..d9882fd
+--- /dev/null
++++ b/c/blake3_neon_aarch64_unix.S
+@@ -0,0 +1,19 @@
++// SPDX-License-Identifier: (MIT OR Apache-2.0 OR CC0-1.0)
++// Minimal AArch64 ASM marker for the BLAKE3 NEON path.
++//
++// This file documents the ABI expectations for AArch64 (AAPCS64):
++// - Arguments: x0-x7
++// - Return: x0
++// - Callee-saved: x19-x28, fp(x29), lr(x30), v8-v15
++// - Stack alignment: 16 bytes at call boundaries
++//
++// The symbol below is intentionally a no-op marker so the build can
++// include arch-specific ASM without changing the functional pipeline.
++
++.text
++.global blake3_neon_abi_marker
++.type blake3_neon_abi_marker, %function
++blake3_neon_abi_marker:
++  ret
++
++.size blake3_neon_abi_marker, .-blake3_neon_abi_marker
+diff --git a/c/blake3_neon_armv7_unix.S b/c/blake3_neon_armv7_unix.S
+new file mode 100644
+index 0000000..7d060a6
+--- /dev/null
++++ b/c/blake3_neon_armv7_unix.S
+@@ -0,0 +1,19 @@
++// SPDX-License-Identifier: (MIT OR Apache-2.0 OR CC0-1.0)
++// Minimal ARMv7 ASM marker for the BLAKE3 NEON path.
++//
++// ABI expectations for ARMv7 AAPCS:
++// - Arguments: r0-r3
++// - Return: r0
++// - Callee-saved: r4-r11, sp, lr
++// - Stack alignment: 8 bytes at call boundaries (AAPCS)
++//
++// The symbol below is intentionally a no-op marker so the build can
++// include arch-specific ASM without changing the functional pipeline.
++
++.text
++.global blake3_neon_abi_marker
++.type blake3_neon_abi_marker, %function
++blake3_neon_abi_marker:
++  bx lr
++
++.size blake3_neon_abi_marker, .-blake3_neon_abi_marker
+diff --git a/c/test.py b/c/test.py
+index 98b1c3d..5d2d896 100755
+--- a/c/test.py
++++ b/c/test.py
+@@ -7,7 +7,8 @@ import subprocess
+ 
+ HERE = path.dirname(__file__)
+ TEST_VECTORS_PATH = path.join(HERE, "..", "test_vectors", "test_vectors.json")
+-TEST_VECTORS = json.load(open(TEST_VECTORS_PATH))
++with open(TEST_VECTORS_PATH, "r", encoding="utf-8") as test_vectors_file:
++    TEST_VECTORS = json.load(test_vectors_file)
+ 
+ 
+ def run_blake3(args, input):
+@@ -23,11 +24,11 @@ def run_blake3(args, input):
+ # to swapping any two adjacent input blocks or chunks will give the same
+ # answer.
+ def make_test_input(length):
+-    i = 0
++    pattern = bytes(range(251))
+     buf = bytearray()
+     while len(buf) < length:
+-        buf.append(i)
+-        i = (i + 1) % 251
++        remaining = length - len(buf)
++        buf.extend(pattern[:remaining])
+     return buf
+ 
+ 

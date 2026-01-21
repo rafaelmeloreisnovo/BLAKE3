@@ -1,0 +1,108 @@
+ .github/workflows/ci.yml                 |    2 +-
+ AGENTS.md                                |   16 +
+ Cargo.toml                               |   19 +-
+ DOCUMENTACAO.md                          |   85 +
+ FORK_NOTES.md                            |   53 +
+ MANIFESTO.md                             |  102 +
+ MANIFESTO_RAFAELIA.md                    |   70 +
+ README.md                                |   18 +
+ RELATORIO_AUDITORIA.md                   |  292 ++
+ audit/diff_bindings.patch                |    0
+ audit/diff_c.patch                       |  315 ++
+ audit/diff_name_status.txt               |   94 +
+ audit/diff_python.patch                  |    0
+ audit/diff_rmr.patch                     | 5008 ++++++++++++++++++++++++++++++
+ audit/diff_scripts.patch                 |    0
+ audit/diff_src.patch                     |  656 ++++
+ audit/diff_stat.txt                      |   95 +
+ audit/diff_tools.patch                   |   60 +
+ b3sum/Cargo.lock                         |  282 +-
+ b3sum/Cargo.toml                         |    4 +-
+ b3sum/src/main.rs                        |   39 +-
+ c/CMakeLists.txt                         |   31 +-
+ c/blake3.h                               |   30 +-
+ c/blake3_c_rust_bindings/Cargo.toml      |    2 +-
+ c/blake3_c_rust_bindings/src/lib.rs      |    6 +-
+ c/blake3_dispatch.c                      |    4 +-
+ c/blake3_impl.h                          |    2 +-
+ c/blake3_neon.c                          |    9 +-
+ c/blake3_neon_aarch64_unix.S             |   19 +
+ c/blake3_neon_armv7_unix.S               |   19 +
+ c/test.py                                |    9 +-
+ reference_impl/Cargo.toml                |    2 +-
+ rmr/ARCHITECTURE.md                      |   39 +
+ rmr/LICENSE_RMR                          |   21 +
+ rmr/PRIVACY.md                           |   30 +
+ rmr/PROVENIENCE.md                       |   39 +
+ rmr/REVIEW.md                            |   38 +
+ rmr/base.c                               |  199 ++
+ rmr/base.o                               |  Bin 0 -> 7760 bytes
+ rmr/bench.c                              |  184 ++
+ rmr/bench.o                              |  Bin 0 -> 7624 bytes
+ rmr/bench_termux.sh                      |   79 +
+ rmr/benchdiff.c                          |  121 +
+ rmr/benchdiff.o                          |  Bin 0 -> 5968 bytes
+ rmr/build_termux.sh                      |    6 +
+ rmr/cli.c                                |   78 +
+ rmr/cli.o                                |  Bin 0 -> 6312 bytes
+ rmr/fix_geom_N_all_scopes.py             |  100 +
+ rmr/fix_geom_N_scope.py                  |   89 +
+ rmr/fix_pai_warnings.py                  |  167 +
+ rmr/geom.c                               |  312 ++
+ rmr/geom.c.bak                           |  304 ++
+ rmr/geom.c.pre_fix.1768878317.bak        |  310 ++
+ rmr/geom.c.pre_fix.1768917982.bak        |  308 ++
+ rmr/geom.o                               |  Bin 0 -> 10496 bytes
+ rmr/geom.pre_fix.1768918156.bak          |  308 ++
+ rmr/geom.pre_fix.1768918259.bak          |  308 ++
+ rmr/hash_sha256.c                        |  123 +
+ rmr/hash_sha256.c.bak                    |  122 +
+ rmr/hash_sha256.c.pre_warnfix.bak        |  123 +
+ rmr/hash_sha256.o                        |  Bin 0 -> 4464 bytes
+ rmr/include/rmr_arch.h                   |   67 +
+ rmr/include/rmr_dispatch.h               |   57 +
+ rmr/include/rmr_lowlevel.h               |  207 ++
+ rmr/main.c                               |    5 +
+ rmr/main.o                               |  Bin 0 -> 1048 bytes
+ rmr/pai.h                                |   26 +
+ rmr/pai_base.h                           |    8 +
+ rmr/pai_bench.h                          |    6 +
+ rmr/pai_benchdiff.h                      |    6 +
+ rmr/pai_geom.h                           |    4 +
+ rmr/pai_hash.h                           |   18 +
+ rmr/pai_scan.h                           |   19 +
+ rmr/pai_sign.h                           |    6 +
+ rmr/pai_toroid.h                         |    4 +
+ rmr/rust/rmr.rs                          |   28 +
+ rmr/scan.c                               |  278 ++
+ rmr/scan.o                               |  Bin 0 -> 10512 bytes
+ rmr/sign.c                               |  121 +
+ rmr/sign.o                               |  Bin 0 -> 4264 bytes
+ rmr/toroid.c                             |  148 +
+ rmr/toroid.c.bak                         |  128 +
+ rmr/toroid.c.pre_warnfix.bak             |  128 +
+ rmr/toroid.o                             |  Bin 0 -> 6088 bytes
+ rmr/util.c                               |   34 +
+ rmr/util.o                               |  Bin 0 -> 2464 bytes
+ src/ffi_avx2.rs                          |    3 +-
+ src/ffi_avx512.rs                        |    6 +-
+ src/ffi_neon.rs                          |    5 +-
+ src/ffi_sse2.rs                          |    5 +-
+ src/ffi_sse41.rs                         |    5 +-
+ src/guts.rs                              |    3 +
+ src/hazmat.rs                            |    4 +
+ src/join.rs                              |    4 +-
+ src/lib.rs                               |   22 +-
+ src/platform.rs                          |   11 +
+ src/portable.rs                          |    4 +
+ src/rust_avx2.rs                         |    2 +
+ src/rust_sse2.rs                         |    5 +
+ src/rust_sse41.rs                        |    5 +
+ src/traits.rs                            |   16 +-
+ src/wasm32_simd.rs                       |    5 +
+ test_vectors/Cargo.toml                  |    2 +-
+ tools/benchmark_example.sh               |   16 +
+ tools/compiler_version/Cargo.toml        |    2 +-
+ tools/instruction_set_support/Cargo.toml |    2 +-
+ tools/release.md                         |    2 +-
+ 107 files changed, 11910 insertions(+), 268 deletions(-)

@@ -1,6 +1,7 @@
 #include "blake3.h"
-#include "rmr_lowlevel.h"
+#include <errno.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
 int main(void) {
@@ -17,7 +18,7 @@ int main(void) {
     } else if (n == 0) {
       break; // end of file
     } else {
-      fprintf(stderr, "read failed: %s\n", rmr_ll_strerror(errno));
+      fprintf(stderr, "read failed: %s\n", strerror(errno));
       return 1;
     }
   }
