@@ -40,3 +40,11 @@ autoria entre o upstream **BLAKE3** e a camada externa **RMR**.
   2. Incluir cabeçalho de copyright/licença no próprio arquivo.
   3. Ser registrado neste documento.
   4. Ser isolado do core (sem modificar `src/` ou `c/`).
+Compliance Notice
+
+All licensing and provenance decisions in this repository
+are manually reviewed by the author.
+
+No automated tool or AI system is authorized to alter
+licensing terms, introduce legal assumptions, or publish
+code on behalf of the author.
