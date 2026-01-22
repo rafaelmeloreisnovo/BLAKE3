@@ -1,5 +1,13 @@
 //! RMR module (experimental).
 //!
+//! * Copyright (c) 2024–2026 Rafael Melo Reis
+//! * Licensed under LICENSE_RMR.
+//! *
+//! * This file is part of the RMR module.
+//! It does not modify or replace the BLAKE3 core.
+ 
+
+
 //! Este módulo define uma base mínima para futuras otimizações e
 //! extensões de arquitetura relacionadas a desempenho. Ele é um ponto
 //! de integração isolado para evitar mudanças amplas no restante do
