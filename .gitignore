@@ -1,2 +1,13 @@
 Cargo.lock
 target
+
+# RMR build/backup artifacts (local only)
+rmr/*.o
+rmr/*.bak
+rmr/*.tmp
+rmr/*.temp
+rmr/*.orig
+rmr/*.rej
+rmr/*~
+rmr/*.swp
+rmr/*.swo

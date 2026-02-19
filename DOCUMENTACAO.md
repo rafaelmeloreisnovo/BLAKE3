@@ -101,11 +101,24 @@ externa. O mapa de proveniência oficial está em `rmr/PROVENIENCE.md`.
 Qualquer novo arquivo autoral deve ficar em `rmr/` e ser registrado
 nesse documento.
 
+## Política de artefatos de build (RMR)
+
+Artefatos de build e arquivos temporários do módulo `rmr/` (por exemplo,
+`*.o`, `*.bak` e variantes temporárias) devem ser gerados **apenas localmente**
+durante compilação/depuração.
+
+- Esses arquivos **não** fazem parte do código-fonte.
+- Esses arquivos **não** devem ser versionados no Git.
+- O repositório mantém regras em `.gitignore` para impedir novo versionamento
+  acidental desses artefatos.
+
 ## Diferenças vs upstream (revisão atual)
 
 - Adicionado `rmr/include/rmr_governance.h` como contrato de governança
   externo ao core.
 - Atualizações de documentação em `DOCUMENTACAO.md` e `rmr/ARCHITECTURE.md`.
+- Limpeza organizacional no módulo externo `rmr/`: remoção de artefatos de
+  build/backup do versionamento e reforço das regras de ignore.
 
 ## Observação final
 
