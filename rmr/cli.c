@@ -63,6 +63,23 @@ static int cmd_hash(int argc, char **argv) {
 }
 
 int pai_main(int argc, char **argv) {
+    typedef int (*pai_cmd_fn)(int argc, char **argv);
+    struct pai_route {
+        const char *name;
+        pai_cmd_fn fn;
+    };
+
+    static const struct pai_route routes[] = {
+        { "hash", cmd_hash },
+        { "scan", pai_cmd_scan },
+        { "bases", pai_cmd_bases },
+        { "geom", pai_cmd_geom },
+        { "toroid", pai_cmd_toroid },
+        { "sign", pai_cmd_sign },
+        { "bench", pai_cmd_bench },
+        { "benchdiff", pai_cmd_benchdiff },
+    };
+
     if(argc < 2) { usage(); return 0; }
 
     if(!strcmp(argv[1], "--help") || !strcmp(argv[1], "-h")) {
@@ -70,15 +87,11 @@ int pai_main(int argc, char **argv) {
         return 0;
     }
 
-    if(!strcmp(argv[1], "hash"))  return cmd_hash(argc, argv);
-    if(!strcmp(argv[1], "scan"))  return pai_cmd_scan(argc, argv);
-    if(!strcmp(argv[1], "bases")) return pai_cmd_bases(argc, argv);
-    if(!strcmp(argv[1], "geom"))  return pai_cmd_geom(argc, argv);
-    if(!strcmp(argv[1], "toroid")) return pai_cmd_toroid(argc, argv);
-    if(!strcmp(argv[1], "sign"))   return pai_cmd_sign(argc, argv);
-    if(!strcmp(argv[1], "bench"))  return pai_cmd_bench(argc, argv);
-    if(!strcmp(argv[1], "benchdiff")) return pai_cmd_benchdiff(argc, argv);
-    if(!strcmp(argv[1], "benchdiff")) return pai_cmd_benchdiff(argc, argv);
+    for(size_t i = 0; i < sizeof(routes) / sizeof(routes[0]); i++) {
+        if(!strcmp(argv[1], routes[i].name)) {
+            return routes[i].fn(argc, argv);
+        }
+    }
 
     fprintf(stderr,"[erro] comando desconhecido: %s\n", argv[1]);
     usage();
