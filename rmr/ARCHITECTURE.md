@@ -64,3 +64,37 @@ código criptográfico oficial.
 O RMR pode conter experimentos de performance ou infraestrutura
 auxiliar, mas **não** substitui nem modifica o núcleo BLAKE3. Qualquer
 consumidor deve tratá-lo como **camada externa**.
+
+
+## Detector de capacidades em runtime (`rmr/detect/`)
+
+Para seleção de caminhos SIMD com prioridade em runtime, o RMR agora usa
+um detector autoral separado por arquitetura:
+
+- `rmr/detect/detect_x86.c`: leitura direta de CPUID/XGETBV por inline asm
+  para mapear `SSE2`, `SSE4.1`, `AVX2` e `AVX512`.
+- `rmr/detect/detect_aarch64.c`: leitura de registradores de
+  identificação em contexto privilegiado opcional
+  (`RMR_AARCH64_ASSUME_PRIVILEGED`) e fallback seguro em userland.
+- `rmr/detect/detect_fallback.c`: implementação conservadora para
+  arquiteturas sem detector dedicado.
+- `rmr/include/rmr_detect.h`: contrato único de saída (`rmr_cpu_caps`).
+
+### Contrato (`rmr_cpu_caps`)
+
+A estrutura `rmr_cpu_caps` expõe os campos normalizados:
+
+1. `architecture`: família da CPU detectada.
+2. `simd_extensions`: bitmask de extensões SIMD suportadas.
+3. `endianness`: little/big endian.
+4. `register_width`: largura do registrador alvo (bits).
+5. `execution_mode`: modo de execução observado (user/kernel/hypervisor/baremetal).
+
+### Limitações conhecidas
+
+- Em AArch64 userland, ler registradores EL1 pode causar exceção; por
+  isso o modo padrão usa fallback seguro sem `MRS` privilegiado.
+- Em x86, `AVX2`/`AVX512` só são marcados quando CPU **e** OS habilitam
+  estado estendido em `XCR0`.
+- `rmr/include/rmr_dispatch.h` mantém flags compile-time como fallback,
+  mas prioriza os bits detectados em runtime por `rmr_get_cpu_caps()`.
