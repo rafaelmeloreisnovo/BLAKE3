@@ -13,11 +13,37 @@ código criptográfico oficial.
 - **RMR (externo)**: concentrado em `rmr/`, sem integração obrigatória
   com o núcleo BLAKE3.
 
+## Cadeia de execução (casca Java → dispatcher C → backend ASM)
+
+```text
+[Java shell / casca externa]
+          |
+          v
+[rmr/rafaelia_core.c]
+  bootstrap C + detector runtime
+          |
+          v
+[rmr/rmr_hwif.c]
+  seleciona ABI interna de hardware
+          |
+   +------+------+
+   |             |
+   v             v
+[aarch64 ASM] [x86_64 ASM]
+ tempo/cpu_id/raw_write (mesma ABI)
+          |
+          v
+ fallback C determinístico (quando ASM indisponível)
+```
+
 ## Componentes do RMR
 
 - `rmr/include/`: headers auxiliares do módulo externo
-  (ex.: detecção de arquitetura/OS, helpers low-level e contrato de
-  governança `rmr_governance.h`).
+  (ex.: detecção de arquitetura/OS, contrato de governança e `rmr_hwif.h`).
+- `rmr/rmr_hwif.c`: detector runtime e seleção de backend.
+- `rmr/rafaelia_core.c`: dispatcher C que consome apenas `rmr_hwif`.
+- `rmr/asm/aarch64/`: backend ASM AArch64 (ABI `rmr_hwif_*`).
+- `rmr/asm/x86_64/`: backend ASM x86_64 (ABI `rmr_hwif_*`).
 - `rmr/rust/`: módulos Rust externos **não** integrados ao crate
   `blake3`.
 - `rmr/ARCHITECTURE.md`: este documento.
