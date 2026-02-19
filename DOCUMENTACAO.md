@@ -106,7 +106,9 @@ nesse documento.
 - Adicionado `rmr/include/rmr_governance.h` como contrato de governança
   externo ao core.
 - Atualizações de documentação em `DOCUMENTACAO.md` e `rmr/ARCHITECTURE.md`.
-- Nova cadeia externa RMR para hardware dispatch isolado: `rmr/include/rmr_hwif.h`, `rmr/rmr_hwif.c`, `rmr/asm/aarch64/*` e `rmr/asm/x86_64/*`.
+- Ajuste organizacional não-críptico em `rmr/cli.c`: roteamento de
+  subcomandos consolidado em tabela única (remoção de branch duplicado de
+  `benchdiff`), mantendo a mudança isolada no módulo RMR.
 
 ## Observação final
 
