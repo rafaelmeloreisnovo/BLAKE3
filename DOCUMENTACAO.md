@@ -105,7 +105,11 @@ nesse documento.
 
 - Adicionado `rmr/include/rmr_governance.h` como contrato de governança
   externo ao core.
-- Atualizações de documentação em `DOCUMENTACAO.md` e `rmr/ARCHITECTURE.md`.
+- Adicionada infraestrutura externa de detecção de CPU em runtime em
+  `rmr/detect/` + `rmr/include/rmr_detect.h`, mantendo isolamento do
+  núcleo criptográfico upstream.
+- Atualizações de documentação em `DOCUMENTACAO.md`,
+  `rmr/ARCHITECTURE.md` e `rmr/PROVENIENCE.md`.
 
 ## Observação final
 
