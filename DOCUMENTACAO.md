@@ -98,6 +98,12 @@ rmr-bench --profile pipeline --runs 5 --save report.json
 Saídas previstas: JSON, CSV e Markdown, com registro de seed, tamanho, threads,
 flags, commit e timestamp.
 
+## Política de licença no módulo RMR
+
+No módulo `rmr/`, o arquivo `rmr/LICENSE_RMR` contém **somente** o texto legal
+da licença. Conteúdos não jurídicos (manifestos, notas conceituais e blocos
+técnicos ilustrativos) ficam separados em `rmr/MANIFESTO_RAFAELIA.md`.
+
 ## Proveniência e autoria
 
 Este repositório separa explicitamente o upstream BLAKE3 da camada
@@ -134,7 +140,8 @@ durante compilação/depuração.
 
 - Adicionado `rmr/include/rmr_governance.h` como contrato de governança
   externo ao core.
-- Atualizações de documentação em `DOCUMENTACAO.md` e `rmr/ARCHITECTURE.md`.
+- Atualizações de documentação em `DOCUMENTACAO.md`, `rmr/ARCHITECTURE.md` e
+  material não jurídico segregado em `rmr/MANIFESTO_RAFAELIA.md`.
 - Limpeza organizacional no módulo externo `rmr/`: remoção de artefatos de
   build/backup do versionamento e reforço das regras de ignore.
 
