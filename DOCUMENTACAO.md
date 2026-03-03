@@ -211,6 +211,9 @@ justificativa explícita:
   material não jurídico segregado em `rmr/MANIFESTO_RAFAELIA.md`.
 - Limpeza organizacional no módulo externo `rmr/`: remoção de artefatos de
   build/backup do versionamento e reforço das regras de ignore.
+- Adicionados `tools/check_rmr_headers.py` e `tools/check_rmr_headers.sh`
+  como automação externa para validar `LICENSE_RMR`, shebang e escopo de
+  mudanças permitidas (sem alterar o núcleo criptográfico).
 
 ## Matriz de detecção e despacho por arquitetura/SO (RMR)
 
