@@ -125,6 +125,10 @@ permitidos quando explicitamente catalogados na seção
 Esse recorte de fronteira/licença deve permanecer idêntico ao descrito em
 `rmr/PROVENIENCE.md`.
 
+As regras para exceções de cabeçalho de licença inline (critérios,
+registro obrigatório e fallback documental) estão definidas em
+`rmr/ARCHITECTURE.md`, na seção **"Exceções explícitas de cabeçalho inline"**.
+
 ## Política de artefatos de build (RMR)
 
 Artefatos de build e arquivos temporários do módulo `rmr/` (por exemplo,
