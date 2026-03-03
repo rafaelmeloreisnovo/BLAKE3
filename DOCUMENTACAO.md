@@ -140,6 +140,69 @@ durante compilação/depuração.
 - O repositório mantém regras em `.gitignore` para impedir novo versionamento
   acidental desses artefatos.
 
+## Política de cabeçalhos de licença em `rmr/`
+
+Esta política define como declarar copyright/licença em arquivos autorais da
+camada externa `rmr/`. As fontes normativas são:
+
+- `rmr/LICENSE_RMR` (texto legal aplicável ao módulo RMR).
+- `rmr/PROVENIENCE.md` (classificação upstream vs externo e escopo de autoria).
+
+### Escopo
+
+- Obrigatória para **novos arquivos autorais** dentro de `rmr/`.
+- Obrigatória para arquivos existentes em `rmr/` quando forem alterados de forma
+  substancial.
+- Não se aplica a arquivos upstream fora de `rmr/`.
+
+### Tipos suportados (padrão técnico por extensão)
+
+O cabeçalho deve aparecer no topo do arquivo com um destes formatos:
+
+- `*.c`, `*.h`, `*.rs`, `*.s`, `*.S`, `*.inc`, `*.ld`:
+
+  ```text
+  /*
+   * Copyright (c) 2025 Rafael
+   * License: RMR Module License (see rmr/LICENSE_RMR)
+   */
+  ```
+
+- `*.sh`, `*.bash`, `*.py`, `*.rb`, `*.pl`, `Makefile`, `*.mk`:
+
+  ```text
+  # Copyright (c) 2025 Rafael
+  # License: RMR Module License (see rmr/LICENSE_RMR)
+  ```
+
+- `*.md`, `*.txt`, `*.yaml`, `*.yml`, `*.toml`, `*.json`:
+
+  ```text
+  <!--
+  Copyright (c) 2025 Rafael
+  License: RMR Module License (see rmr/LICENSE_RMR)
+  -->
+  ```
+
+### Exceções formais
+
+Exceções só são válidas quando documentadas em `rmr/PROVENIENCE.md` com
+justificativa explícita:
+
+1. Arquivos de terceiros importados para `rmr/` com licença própria.
+2. Arquivos gerados automaticamente cujo formato quebra com comentário de topo.
+3. Casos legais/comerciais onde o cabeçalho precisa de texto adicional aprovado.
+
+### Processo de revisão
+
+- Em cada commit/PR que tocar `rmr/`, verificar se o cabeçalho segue o padrão
+  por extensão.
+- Confirmar que exceções estão registradas em `rmr/PROVENIENCE.md`.
+- Reforçar que `rmr/LICENSE_RMR` e `rmr/PROVENIENCE.md` são a referência
+  normativa para dúvidas de classificação e licença.
+- Executar verificação estática periódica para detectar ausência/inconsistência
+  de cabeçalhos no escopo `rmr/`.
+
 ## Diferenças vs upstream (revisão atual)
 
 - Adicionado `rmr/include/rmr_governance.h` como contrato de governança

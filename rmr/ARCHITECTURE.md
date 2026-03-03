@@ -50,6 +50,71 @@ código criptográfico oficial.
 - `rmr/PROVENIENCE.md`: mapa de proveniência e licenças.
 - `rmr/LICENSE_RMR`: licença do módulo RMR.
 
+
+## Política de cabeçalhos de licença em `rmr/`
+
+A política abaixo deve permanecer textual e semanticamente consistente com
+`DOCUMENTACAO.md`. As fontes normativas são `rmr/LICENSE_RMR` e
+`rmr/PROVENIENCE.md`.
+
+### Escopo
+
+- Obrigatória para **novos arquivos autorais** dentro de `rmr/`.
+- Obrigatória para arquivos existentes em `rmr/` quando forem alterados de forma
+  substancial.
+- Não se aplica a arquivos upstream fora de `rmr/`.
+
+### Padrão técnico por extensão (texto exato)
+
+- `*.c`, `*.h`, `*.rs`, `*.s`, `*.S`, `*.inc`, `*.ld`:
+
+  ```text
+  /*
+   * Copyright (c) 2025 Rafael
+   * License: RMR Module License (see rmr/LICENSE_RMR)
+   */
+  ```
+
+- `*.sh`, `*.bash`, `*.py`, `*.rb`, `*.pl`, `Makefile`, `*.mk`:
+
+  ```text
+  # Copyright (c) 2025 Rafael
+  # License: RMR Module License (see rmr/LICENSE_RMR)
+  ```
+
+- `*.md`, `*.txt`, `*.yaml`, `*.yml`, `*.toml`, `*.json`:
+
+  ```text
+  <!--
+  Copyright (c) 2025 Rafael
+  License: RMR Module License (see rmr/LICENSE_RMR)
+  -->
+  ```
+
+### Exceções formais
+
+Exceções só são válidas quando documentadas em `rmr/PROVENIENCE.md` com
+justificativa explícita:
+
+1. Arquivos de terceiros importados para `rmr/` com licença própria.
+2. Arquivos gerados automaticamente cujo formato quebra com comentário de topo.
+3. Casos legais/comerciais onde o cabeçalho precisa de texto adicional aprovado.
+
+### Auditoria contínua
+
+Checklist mínimo por commit/PR que tocar `rmr/`:
+
+- [ ] Cabeçalho presente e em conformidade com o padrão técnico por extensão.
+- [ ] Referência de licença apontando para `rmr/LICENSE_RMR`.
+- [ ] Classificação de proveniência consistente com `rmr/PROVENIENCE.md`.
+- [ ] Exceções formais registradas em `rmr/PROVENIENCE.md`.
+
+Verificação estática periódica (recomendação operacional):
+
+- Rodar uma checagem automatizada no escopo `rmr/` para detectar ausência de
+  cabeçalho e divergência de texto por extensão.
+- Reportar não conformidades no fluxo de revisão e corrigi-las antes de merge.
+
 ## Diretrizes
 
 1. **Não tocar no núcleo**: o RMR não deve alterar arquivos do upstream.
