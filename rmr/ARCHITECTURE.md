@@ -59,6 +59,47 @@ código criptográfico oficial.
    licença e registro em `rmr/PROVENIENCE.md`.
 4. **Sem telemetria**: o módulo não coleta nem transmite dados.
 
+## Exceções explícitas de cabeçalho inline
+
+Como regra geral, arquivos autorais/externos devem carregar cabeçalho de
+licença inline no próprio arquivo. Exceções são permitidas apenas quando
+houver impedimento técnico objetivo.
+
+### Critérios objetivos para exceção
+
+Uma exceção só é válida quando se enquadrar em pelo menos um critério:
+
+1. **Arquivo gerado automaticamente** cuja regeneração sobrescreve conteúdo
+   textual (incluindo cabeçalho) de forma não controlável no pipeline.
+2. **Formato binário ou não textual** que não comporte comentário/cabeçalho
+   sem corromper o artefato.
+3. **Exigência técnica de posição de bytes/assinatura** (offset fixo,
+   magic number, assinatura criptográfica ou layout estrito) em que inserir
+   cabeçalho altere semântica/validade.
+4. **Outro requisito técnico verificável** que torne a inserção inline
+   impossível sem quebrar compatibilidade funcional.
+
+### Lista nominal inicial de exceções
+
+No estado atual, **não há exceções nominais registradas**.
+
+Quando existir exceção, registrar nominalmente (arquivo/padrão afetado,
+motivo e data) nesta seção.
+
+### Registro obrigatório de novas exceções
+
+Cada nova exceção deve ser registrada com:
+
+- identificação do arquivo (ou padrão de arquivos);
+- justificativa técnica curta e objetiva;
+- data de inclusão (`YYYY-MM-DD`).
+
+### Regra de fallback documental
+
+Quando não for possível usar cabeçalho inline, a licença/proveniência deve
+ser registrada no inventário documental, preferencialmente na tabela de
+`rmr/PROVENIENCE.md`, com referência cruzada à exceção nesta arquitetura.
+
 ## Observações de uso
 
 O RMR pode conter experimentos de performance ou infraestrutura
