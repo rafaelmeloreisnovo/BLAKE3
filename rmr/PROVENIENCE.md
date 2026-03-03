@@ -32,7 +32,22 @@ autoria entre o upstream **BLAKE3** e a camada externa **RMR**.
 | `rmr/include/rmr_governance.h` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/include/rmr_hwif.h`, `rmr/rmr_hwif.c`, `rmr/asm/aarch64/`, `rmr/asm/x86_64/` | RMR autoral (interface HW + backends ASM) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `DOCUMENTACAO.md`, `MANIFESTO*.md` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/MANIFESTO_RAFAELIA.md` | RMR autoral (texto não jurídico) | RMR Module License (`rmr/LICENSE_RMR`) |
 
+## Itens fora de `rmr/` sob autoria externa
+
+Os itens abaixo são **externos ao upstream** e ficam fora de `rmr/` por decisão
+organizacional. Eles devem manter rastreabilidade de licença e finalidade:
+
+| Caminho | Origem | Licença aplicável | Finalidade |
+| --- | --- | --- | --- |
+| `DOCUMENTACAO.md` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Fronteiras de escopo, operação e integração |
+| `MANIFESTO.md` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Manifesto e diretrizes de projeto |
+| `MANIFESTO_RAFAELIA.md` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Manifesto complementar/autoral |
+| `FORK_NOTES.md` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Notas de distribuição do fork |
+| `RELATORIO.md` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Relatório técnico consolidado |
+| `RELATORIO_AUDITORIA.md` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Relatório de auditoria e conformidade |
+| `AGENTS.md` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Governança operacional para agentes |
 ## Observações sobre integração
 
 - O RMR é **externo** e não integra o núcleo BLAKE3 por padrão.
@@ -49,3 +64,9 @@ are manually reviewed by the author.
 No automated tool or AI system is authorized to alter
 licensing terms, introduce legal assumptions, or publish
 code on behalf of the author.
+
+## Separação entre conteúdo jurídico e não jurídico
+
+- `rmr/LICENSE_RMR` deve conter apenas o texto legal da licença RMR.
+- Conteúdos técnicos/conceituais não jurídicos ficam em
+  `rmr/MANIFESTO_RAFAELIA.md`.
