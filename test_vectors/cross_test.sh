@@ -1,5 +1,12 @@
 #! /usr/bin/env bash
 
+# Copyright (c) 2024–2026 Rafael Melo Reis
+# Licensed under LICENSE_RMR.
+#
+# This file is part of the RMR module.
+# It does not modify or replace the BLAKE3 core.
+
+
 # This hacky script works around the fact that `cross test` does not support
 # path dependencies. (It uses a docker shared folder to let the guest access
 # project files, so parent directories aren't available.) Solve this problem by

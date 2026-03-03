@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 /*
  * Copyright (c) 2024–2026 Rafael Melo Reis
  * Licensed under LICENSE_RMR.
@@ -6,7 +7,6 @@
  * It does not modify or replace the BLAKE3 core.
  */
 
-#!/usr/bin/env python3
 from pathlib import Path
 import time, re
 
