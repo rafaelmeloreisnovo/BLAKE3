@@ -12,8 +12,9 @@ locais de organização e experimentação.
 > **Resumo de escopo**
 > - **Núcleo BLAKE3**: código upstream original (C, ASM, Rust, vetores
 >   de teste e documentação oficial).
-> - **Camada externa**: conteúdo adicional isolado em `rmr/` e scripts
->   auxiliares. Essa camada **não modifica** o núcleo.
+> - **Camada externa**: conteúdo adicional isolado em `rmr/` e documentos
+>   autorais fora de `rmr/` (ex.: `DOCUMENTACAO.md`, `RELATORIO*.md`).
+>   Essa camada **não modifica** o núcleo.
 
 ## Camadas e fronteiras
 
@@ -40,6 +41,9 @@ separados:
     (isolado do core).
 - Scripts ou automações específicos (quando existirem) devem evitar
   tocar no núcleo.
+- Documentos autorais em raiz (como `DOCUMENTACAO.md`, `RELATORIO.md`,
+  `RELATORIO_AUDITORIA.md`, `MANIFESTO*.md`, `FORK_NOTES.md`, `AGENTS.md`)
+  também compõem a camada externa e seguem licença RMR.
 
 > **Regra:** código externo **pode usar** o BLAKE3 como biblioteca, mas
 > **nunca** deve modificar ou invadir o núcleo.
@@ -104,8 +108,22 @@ técnicos ilustrativos) ficam separados em `rmr/MANIFESTO_RAFAELIA.md`.
 
 Este repositório separa explicitamente o upstream BLAKE3 da camada
 externa. O mapa de proveniência oficial está em `rmr/PROVENIENCE.md`.
-Qualquer novo arquivo autoral deve ficar em `rmr/` e ser registrado
-nesse documento.
+Qualquer novo arquivo autoral deve ser registrado nesse documento com
+origem, licença e finalidade. Itens autorais fora de `rmr/` também são
+permitidos quando explicitamente catalogados na seção
+"Itens fora de `rmr/` sob autoria externa".
+
+
+### Licenças por fronteira
+
+- **Upstream BLAKE3** (`src/`, `c/`, `b3sum/`, `reference_impl/`, `test_vectors/`,
+  `tools/`, `benches/`, `media/` e metadados oficiais):
+  **CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions** (conforme `LICENSE_*`).
+- **Camada externa autoral** (`rmr/` + documentos autorais fora de `rmr/`):
+  **RMR Module License** (`rmr/LICENSE_RMR`).
+
+Esse recorte de fronteira/licença deve permanecer idêntico ao descrito em
+`rmr/PROVENIENCE.md`.
 
 ## Política de artefatos de build (RMR)
 
