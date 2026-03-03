@@ -1,3 +1,8 @@
+<!--
+Copyright (c) 2025 Rafael
+License: RMR Module License (see LICENSE_RMR)
+-->
+
 # Documentação do repositório BLAKE3 (fork distribuído)
 
 ## Introdução

@@ -1,3 +1,8 @@
+<!--
+Copyright (c) 2025 Rafael
+License: RMR Module License (see LICENSE_RMR)
+-->
+
 # Revisão de determinismo (rmr/ e c/)
 
 Este documento define uma **lista de verificação** para auditorias no

@@ -1,3 +1,8 @@
+<!--
+Copyright (c) 2025 Rafael
+License: RMR Module License (see LICENSE_RMR)
+-->
+
 # RELATORIO_AUDITORIA — Diff oficial vs upstream BLAKE3
 
 ## Metadados de execução (reprodutível)

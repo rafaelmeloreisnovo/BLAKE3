@@ -1,3 +1,8 @@
+<!--
+Copyright (c) 2025 Rafael
+License: RMR Module License (see LICENSE_RMR)
+-->
+
 # Relatório de Auditoria Total — Fork BLAKE3 vs Upstream
 
 ## Metadados de geração (reprodutibilidade)

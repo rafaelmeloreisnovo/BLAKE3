@@ -1,3 +1,8 @@
+<!--
+Copyright (c) 2025 Rafael
+License: RMR Module License (see LICENSE_RMR)
+-->
+
 # Notas do Fork BLAKE3
 
 ## O que mudou em relação ao upstream
