@@ -32,6 +32,7 @@ autoria entre o upstream **BLAKE3** e a camada externa **RMR**.
 | `rmr/include/rmr_governance.h` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/include/rmr_hwif.h`, `rmr/rmr_hwif.c`, `rmr/asm/aarch64/`, `rmr/asm/x86_64/` | RMR autoral (interface HW + backends ASM) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `DOCUMENTACAO.md`, `MANIFESTO*.md` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/MANIFESTO_RAFAELIA.md` | RMR autoral (texto não jurídico) | RMR Module License (`rmr/LICENSE_RMR`) |
 
 ## Observações sobre integração
 
@@ -49,3 +50,9 @@ are manually reviewed by the author.
 No automated tool or AI system is authorized to alter
 licensing terms, introduce legal assumptions, or publish
 code on behalf of the author.
+
+## Separação entre conteúdo jurídico e não jurídico
+
+- `rmr/LICENSE_RMR` deve conter apenas o texto legal da licença RMR.
+- Conteúdos técnicos/conceituais não jurídicos ficam em
+  `rmr/MANIFESTO_RAFAELIA.md`.
