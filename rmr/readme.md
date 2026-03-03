@@ -1,3 +1,8 @@
+<!--
+Copyright (c) 2025 Rafael
+License: RMR Module License (see LICENSE_RMR)
+-->
+
 All code under rmr/ is licensed under LICENSE_RMR.
 Upstream BLAKE3 code remains under its original license.
 

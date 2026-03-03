@@ -1,3 +1,8 @@
+<!--
+Copyright (c) 2025 Rafael
+License: RMR Module License (see LICENSE_RMR)
+-->
+
 # Manifesto Integral de Semântica, Sinergia e Contextualização em Oito Áreas do Conhecimento
 
 ## Preâmbulo

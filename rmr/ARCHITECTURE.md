@@ -1,3 +1,8 @@
+<!--
+Copyright (c) 2025 Rafael
+License: RMR Module License (see LICENSE_RMR)
+-->
+
 # Arquitetura do módulo RMR (camada externa)
 
 Este documento descreve a arquitetura do módulo **RMR** dentro deste

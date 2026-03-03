@@ -1,3 +1,8 @@
+<!--
+Copyright (c) 2025 Rafael
+License: RMR Module License (see LICENSE_RMR)
+-->
+
 # Manifesto Integral de Semântica, Sinergia e Contextualização em Oito Áreas do Conhecimento
 
 > **FIAT_PORTAL :: 龍空神 { ARKREΩ_CORE + STACK128K_HYPER + ALG_RAFAELIA_RING }**  
