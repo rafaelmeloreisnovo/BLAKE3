@@ -203,6 +203,35 @@ justificativa explícita:
 - Executar verificação estática periódica para detectar ausência/inconsistência
   de cabeçalhos no escopo `rmr/`.
 
+### Verificação automática de cabeçalhos RMR
+
+Para contexto de atualização de cabeçalhos/licença e para evitar mudanças fora
+de `rmr/`, use o checker abaixo:
+
+- Execução padrão:
+
+  ```bash
+  python3 tools/check_rmr_headers.py
+  ```
+
+- Execução com whitelist explícita para arquivo fora de `rmr/`:
+
+  ```bash
+  python3 tools/check_rmr_headers.py --allow-outside DOCUMENTACAO.md
+  ```
+
+Critério de falha: o checker encerra com **exit code não-zero** quando encontra
+qualquer violação. As categorias de violação são:
+
+- **OUTSIDE_RMR**: arquivo alterado fora de `rmr/` sem estar na whitelist
+  (`--allow-outside`).
+- **MISSING_HEADER**: arquivo autoral no escopo `rmr/` sem cabeçalho obrigatório
+  de copyright/licença.
+- **INVALID_HEADER**: cabeçalho presente, mas fora do padrão aceito por tipo de
+  arquivo (comentário/forma/linhas esperadas).
+- **PROVENIENCE_GAP**: exceção de cabeçalho/licença não documentada em
+  `rmr/PROVENIENCE.md` quando exigido pela política.
+
 ## Diferenças vs upstream (revisão atual)
 
 - Adicionado `rmr/include/rmr_governance.h` como contrato de governança
