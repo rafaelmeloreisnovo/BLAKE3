@@ -1,3 +1,8 @@
+<!--
+Copyright (c) 2025 Rafael
+License: RMR Module License (see rmr/LICENSE_RMR)
+-->
+
 # Release checklist
 
 - Make sure `cargo outdated -R` is clean in the root and in b3sum/.

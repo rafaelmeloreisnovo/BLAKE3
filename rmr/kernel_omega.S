@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Rafael
+ * License: RMR Module License (see rmr/LICENSE_RMR)
+ */
+
 /* ---------------------------------------------------------
  * RAFAELIA OMEGA - ARM64 (no-libc) :: SYS + REGS
  * --------------------------------------------------------- */

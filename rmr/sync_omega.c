@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Rafael
+ * License: RMR Module License (see rmr/LICENSE_RMR)
+ */
+
 /* ---------------------------------------------------------
    RAFAELIA_SYNC_OMEGA - C puro (no-libc / freestanding)
    - Lê ATA_OMEGA.bin

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Rafael
+ * License: RMR Module License (see rmr/LICENSE_RMR)
+ */
+
 /* ---------------------------------------------------------
  * RAFAELIA_SYNC_OMEGA - ASM ARM64 (no-libc)
  * syscalls + registradores de tempo + auto-id

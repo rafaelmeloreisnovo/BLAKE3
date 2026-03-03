@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Rafael
+ * License: RMR Module License (see rmr/LICENSE_RMR)
+ */
+
 fn main() {
     let build = cc::Build::new();
     let compiler = build.get_compiler();

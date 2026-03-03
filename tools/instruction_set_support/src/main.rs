@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Rafael
+ * License: RMR Module License (see rmr/LICENSE_RMR)
+ */
+
 fn main() {
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     {

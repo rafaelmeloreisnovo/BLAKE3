@@ -1,3 +1,8 @@
+<!--
+Copyright (c) 2025 Rafael
+License: RMR Module License (see rmr/LICENSE_RMR)
+-->
+
 [package]
 name = "instruction_set_support"
 version = "0.0.0"

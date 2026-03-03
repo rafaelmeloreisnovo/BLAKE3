@@ -1,6 +1,6 @@
 <!--
 Copyright (c) 2025 Rafael
-License: RMR Module License (see LICENSE_RMR)
+License: RMR Module License (see rmr/LICENSE_RMR)
 -->
 
 # Revisão de determinismo (rmr/ e c/)
