@@ -1,3 +1,8 @@
+<!--
+Copyright (c) 2025 Rafael
+License: RMR Module License (see rmr/LICENSE_RMR)
+-->
+
 # Privacidade, logs e compliance (RMR + upstream)
 
 Este documento consolida as políticas de privacidade/logs do repositório

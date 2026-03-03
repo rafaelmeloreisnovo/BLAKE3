@@ -1,3 +1,8 @@
+<!--
+Copyright (c) 2025 Rafael
+License: RMR Module License (see rmr/LICENSE_RMR)
+-->
+
 # Manifesto RAFAELIA (texto não jurídico)
 
 Este documento guarda material conceitual e técnico que **não** faz parte do
