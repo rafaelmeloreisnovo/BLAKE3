@@ -8,6 +8,7 @@
 
 #include "pai_base.h"
 #include "pai.h"
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,7 +17,7 @@
 static int is_prime_i64(int64_t x) {
     if (x < 2) return 0;
     if (x % 2 == 0) return x == 2;
-    for (int64_t d = 3; d*d <= x; d += 2) {
+    for (int64_t d = 3; d <= x / d; d += 2) {
         if (x % d == 0) return 0;
     }
     return 1;
@@ -31,9 +32,13 @@ int64_t pai_prev_prime(int64_t n) {
 }
 
 int64_t pai_next_prime(int64_t n) {
-    if (n < 2) n = 2;
-    for (int64_t x = n + 1; ; ++x) {
+    if (n == INT64_MAX) return -1;
+
+    int64_t x = (n < 2) ? 2 : n + 1;
+    for (;;) {
         if (is_prime_i64(x)) return x;
+        if (x == INT64_MAX) return -1;
+        ++x;
     }
 }
 
@@ -149,7 +154,16 @@ static void write_report(
         int64_t pnext = pai_next_prime(v);
 
         fprintf(f, "== value: %lld ==\n", (long long)v);
-        fprintf(f, "prev_prime=%lld next_prime=%lld\n", (long long)pprev, (long long)pnext);
+        if (pprev < 0) {
+            fprintf(f, "prev_prime=-1 (sem primo anterior representavel em int64)\n");
+        } else {
+            fprintf(f, "prev_prime=%lld\n", (long long)pprev);
+        }
+        if (pnext < 0) {
+            fprintf(f, "next_prime=-1 (sem proximo primo representavel em int64)\n");
+        } else {
+            fprintf(f, "next_prime=%lld\n", (long long)pnext);
+        }
 
         // extras: “pontos bonitos”
         // 12^2=144, 42-30=12 etc (só calcula, não dogmatiza)
