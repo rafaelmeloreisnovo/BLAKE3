@@ -6,16 +6,15 @@
  * It does not modify or replace the BLAKE3 core.
  */
 
-#include "pai_benchdiff.h"
+#include "pai_base.h"
 #include "pai_bench.h"
-#include "pai_sign.h"
-#include "pai_sign.h"
-#include "pai_toroid.h"
-#include "pai.h"
+#include "pai_benchdiff.h"
+#include "pai_geom.h"
 #include "pai_hash.h"
 #include "pai_scan.h"
-#include "pai_base.h"
-#include "pai_geom.h"
+#include "pai_sign.h"
+#include "pai_toroid.h"
+
 #include <stdio.h>
 #include <string.h>
 
