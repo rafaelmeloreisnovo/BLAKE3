@@ -14,6 +14,10 @@ typedef long rmr_s64;
 
 typedef struct rmr_hwif_ops {
     rmr_u64 (*read_time_raw)(void);
+    /*
+     * read_cpu_id_raw returns a deterministic 64-bit CPU capability
+     * fingerprint mixed from architecture-specific ID/feature registers.
+     */
     rmr_u64 (*read_cpu_id_raw)(void);
     rmr_s64 (*raw_write)(int fd, const void* buf, rmr_u64 len);
     const char* backend_name;
