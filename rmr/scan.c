@@ -93,6 +93,7 @@ static int scan_dir_rec(
     FILE *mf,
     pai_sha256_ctx *mctx
 ) {
+    int ret = 0;
     if(opt->max_depth >= 0 && depth > opt->max_depth) return 0;
 
     if(is_excluded(opt, base, dirpath)) return 0;
@@ -116,19 +117,28 @@ static int scan_dir_rec(
         if(!opt->include_hidden && is_hidden_name(name)) continue;
 
         if(n >= PAI_MAX_ENTRIES) {
-            closedir(d);
             fprintf(stderr,"[scan] limite de entradas atingido\n");
-            return -1;
+            ret = -1;
+            goto fail;
         }
 
         if(n==cap) {
             cap = cap? cap*2 : 128;
-            entries = (entry_t*)realloc(entries, cap*sizeof(entry_t));
-            if(!entries) { closedir(d); perror("realloc"); return -1; }
+            entry_t *tmp = (entry_t*)realloc(entries, cap*sizeof(entry_t));
+            if(!tmp) {
+                perror("realloc");
+                ret = -1;
+                goto fail;
+            }
+            entries = tmp;
         }
 
         entries[n].name = strdup(name);
-        if(!entries[n].name) { closedir(d); perror("strdup"); return -1; }
+        if(!entries[n].name) {
+            perror("strdup");
+            ret = -1;
+            goto fail;
+        }
 
         char full[PAI_MAX_PATH];
         join_path(full, sizeof(full), dirpath, name);
@@ -147,6 +157,7 @@ static int scan_dir_rec(
     }
 
     closedir(d);
+    d = NULL;
 
     if(errno != 0) {
         fprintf(stderr, "[scan] erro readdir em %s: %s\n", dirpath, strerror(errno));
@@ -160,6 +171,7 @@ static int scan_dir_rec(
 
         if(is_excluded(opt, base, full)) {
             free(entries[i].name);
+            entries[i].name = NULL;
             continue;
         }
 
@@ -167,6 +179,7 @@ static int scan_dir_rec(
         int rc = opt->follow_symlinks ? stat(full, &st) : lstat(full, &st);
         if(rc != 0) {
             free(entries[i].name);
+            entries[i].name = NULL;
             continue;
         }
 
@@ -177,6 +190,7 @@ static int scan_dir_rec(
             long long sz = (long long)st.st_size;
             if(opt->max_size >= 0 && sz > opt->max_size) {
                 free(entries[i].name);
+                entries[i].name = NULL;
                 continue;
             }
 
@@ -184,6 +198,7 @@ static int scan_dir_rec(
             char hex[65];
             if(pai_sha256_file(full, h) != 0) {
                 free(entries[i].name);
+                entries[i].name = NULL;
                 continue;
             }
             pai_sha256_hex(h, hex);
@@ -194,10 +209,15 @@ static int scan_dir_rec(
         }
 
         free(entries[i].name);
+        entries[i].name = NULL;
     }
 
+fail:
+    for(size_t j=0; j<n; j++) free(entries[j].name);
     free(entries);
-    return 0;
+    if(d) closedir(d);
+
+    return ret;
 }
 
 int pai_scan_run(const pai_scan_opts *opt) {
