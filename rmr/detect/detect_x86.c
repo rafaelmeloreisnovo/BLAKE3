@@ -8,6 +8,21 @@
 
 #include "../include/rmr_detect.h"
 
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L) && !defined(__STDC_NO_ATOMICS__)
+#include <stdatomic.h>
+#define RMR_INIT_LOAD_ACQUIRE(v) atomic_load_explicit(&(v), memory_order_acquire)
+#define RMR_INIT_STORE_RELEASE(v, x) atomic_store_explicit(&(v), (x), memory_order_release)
+#define RMR_INIT_CAS_ACQ_REL(v, expected, desired) \
+  atomic_compare_exchange_strong_explicit(&(v), &(expected), (desired), memory_order_acq_rel, memory_order_acquire)
+typedef atomic_uchar rmr_init_state_t;
+#else
+#define RMR_INIT_LOAD_ACQUIRE(v) __atomic_load_n(&(v), __ATOMIC_ACQUIRE)
+#define RMR_INIT_STORE_RELEASE(v, x) __atomic_store_n(&(v), (x), __ATOMIC_RELEASE)
+#define RMR_INIT_CAS_ACQ_REL(v, expected, desired) \
+  __atomic_compare_exchange_n(&(v), &(expected), (desired), 0, __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE)
+typedef uint8_t rmr_init_state_t;
+#endif
+
 #if defined(RMR_ARCH_X86_64) || defined(RMR_ARCH_X86_32)
 
 static void rmr_x86_cpuid(uint32_t leaf, uint32_t subleaf,
@@ -103,11 +118,26 @@ void rmr_detect_cpu_caps(rmr_cpu_caps *out_caps) {
 
 const rmr_cpu_caps *rmr_get_cpu_caps(void) {
   static rmr_cpu_caps caps;
-  static uint8_t initialized = 0;
+  static rmr_init_state_t init_state = 0;
+  uint8_t expected = 0;
+  uint8_t state = RMR_INIT_LOAD_ACQUIRE(init_state);
 
-  if (!initialized) {
+  /*
+   * Lazy initialization, thread-safe, lock-free.
+   * Contract: the returned pointer is stable and never observes a partially
+   * initialized structure.
+   */
+  if (state == 2) {
+    return &caps;
+  }
+
+  if (RMR_INIT_CAS_ACQ_REL(init_state, expected, 1)) {
     rmr_detect_cpu_caps(&caps);
-    initialized = 1;
+    RMR_INIT_STORE_RELEASE(init_state, 2);
+    return &caps;
+  }
+
+  while (RMR_INIT_LOAD_ACQUIRE(init_state) != 2) {
   }
 
   return &caps;
