@@ -69,30 +69,44 @@ A política abaixo deve permanecer textual e semanticamente consistente com
   substancial.
 - Não se aplica a arquivos upstream fora de `rmr/`.
 
-### Padrão técnico por extensão (texto exato)
+### Padrão técnico por extensão (texto canônico único)
+
+Em caso de conflito entre exemplos antigos, variações históricas ou comentários
+locais, **este texto canônico prevalece**.
+
+Referência cruzada obrigatória de classificação/licença:
+`rmr/PROVENIENCE.md`.
+
+#### Campos canônicos obrigatórios
+
+- Autor: `Rafael Melo Reis`
+- Intervalo de anos: `2024–2026`
+- Frase de licença: `Licensed under LICENSE_RMR.`
+
+#### Templates exatos por extensão suportada
 
 - `*.c`, `*.h`, `*.rs`, `*.s`, `*.S`, `*.inc`, `*.ld`:
 
   ```text
   /*
-   * Copyright (c) 2025 Rafael
-   * License: RMR Module License (see rmr/LICENSE_RMR)
+   * Copyright (c) 2024–2026 Rafael Melo Reis
+   * Licensed under LICENSE_RMR.
    */
   ```
 
 - `*.sh`, `*.bash`, `*.py`, `*.rb`, `*.pl`, `Makefile`, `*.mk`:
 
   ```text
-  # Copyright (c) 2025 Rafael
-  # License: RMR Module License (see rmr/LICENSE_RMR)
+  # Copyright (c) 2024–2026 Rafael Melo Reis
+  # Licensed under LICENSE_RMR.
   ```
 
 - `*.md`, `*.txt`, `*.yaml`, `*.yml`, `*.toml`, `*.json`:
 
   ```text
   <!--
-  Copyright (c) 2025 Rafael
-  License: RMR Module License (see rmr/LICENSE_RMR)
+  Copyright (c) 2024–2026 Rafael Melo Reis
+  Licensed under LICENSE_RMR.
   -->
   ```
 
@@ -169,63 +183,6 @@ Cada nova exceção deve ser registrada com:
 Quando não for possível usar cabeçalho inline, a licença/proveniência deve
 ser registrada no inventário documental, preferencialmente na tabela de
 `rmr/PROVENIENCE.md`, com referência cruzada à exceção nesta arquitetura.
-## Padrão de cabeçalhos por tipo de arquivo
-
-Todo arquivo novo em `rmr/` deve iniciar com o template de cabeçalho
-correspondente ao tipo. O texto canônico é **único e obrigatório**, sem
-variações de autor, intervalo de anos ou frase de licença.
-
-### Texto canônico obrigatório
-
-- Autor: `Rafael Melo Reis`
-- Intervalo de anos: `2024–2026`
-- Frase de licença: `Licensed under LICENSE_RMR.`
-
-### Templates exatos
-
-#### `.c`, `.h`, `.S`
-
-```c
-/*
- * Copyright (c) 2024–2026 Rafael Melo Reis
- * Licensed under LICENSE_RMR.
- */
-```
-
-#### `.sh`
-
-```sh
-#!/usr/bin/env bash
-# Copyright (c) 2024–2026 Rafael Melo Reis
-# Licensed under LICENSE_RMR.
-```
-
-> Observação: o comentário deve vir imediatamente após o shebang.
-
-#### `.py`
-
-```py
-#!/usr/bin/env python3
-# Copyright (c) 2024–2026 Rafael Melo Reis
-# Licensed under LICENSE_RMR.
-```
-
-> Quando houver shebang, o bloco `#` deve vir imediatamente após ele.
-
-#### `.md`
-
-```md
-<!--
-Copyright (c) 2024–2026 Rafael Melo Reis
-Licensed under LICENSE_RMR.
--->
-```
-
-### Regra de revisão
-
-Novos arquivos em `rmr/` só podem entrar em revisão/merge se já estiverem
-com o template correspondente aplicado no topo do arquivo.
-
 ## Observações de uso
 
 O RMR pode conter experimentos de performance ou infraestrutura

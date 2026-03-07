@@ -160,32 +160,44 @@ camada externa `rmr/`. As fontes normativas são:
   substancial.
 - Não se aplica a arquivos upstream fora de `rmr/`.
 
-### Tipos suportados (padrão técnico por extensão)
+### Tipos suportados (texto canônico único por extensão)
 
-O cabeçalho deve aparecer no topo do arquivo com um destes formatos:
+Em caso de conflito entre exemplos antigos, variações históricas ou comentários
+locais, **este texto canônico prevalece**.
+
+Referência cruzada obrigatória de classificação/licença:
+`rmr/PROVENIENCE.md`.
+
+#### Campos canônicos obrigatórios
+
+- Autor: `Rafael Melo Reis`
+- Intervalo de anos: `2024–2026`
+- Frase de licença: `Licensed under LICENSE_RMR.`
+
+#### Templates exatos por extensão suportada
 
 - `*.c`, `*.h`, `*.rs`, `*.s`, `*.S`, `*.inc`, `*.ld`:
 
   ```text
   /*
-   * Copyright (c) 2025 Rafael
-   * License: RMR Module License (see rmr/LICENSE_RMR)
+   * Copyright (c) 2024–2026 Rafael Melo Reis
+   * Licensed under LICENSE_RMR.
    */
   ```
 
 - `*.sh`, `*.bash`, `*.py`, `*.rb`, `*.pl`, `Makefile`, `*.mk`:
 
   ```text
-  # Copyright (c) 2025 Rafael
-  # License: RMR Module License (see rmr/LICENSE_RMR)
+  # Copyright (c) 2024–2026 Rafael Melo Reis
+  # Licensed under LICENSE_RMR.
   ```
 
 - `*.md`, `*.txt`, `*.yaml`, `*.yml`, `*.toml`, `*.json`:
 
   ```text
   <!--
-  Copyright (c) 2025 Rafael
-  License: RMR Module License (see rmr/LICENSE_RMR)
+  Copyright (c) 2024–2026 Rafael Melo Reis
+  Licensed under LICENSE_RMR.
   -->
   ```
 
