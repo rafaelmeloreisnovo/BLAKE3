@@ -214,7 +214,7 @@ variações de autor, intervalo de anos ou frase de licença.
 
 #### `.md`
 
-```md
+```html
 <!--
 Copyright (c) 2024–2026 Rafael Melo Reis
 Licensed under LICENSE_RMR.
