@@ -57,6 +57,11 @@ typedef struct rmr_cpu_caps {
 } rmr_cpu_caps;
 
 void rmr_detect_cpu_caps(rmr_cpu_caps *out_caps);
+/*
+ * Lazy one-time initialization of internal CPU capability cache.
+ * Thread-safe for concurrent callers; returns a stable pointer and never
+ * exposes a partially initialized rmr_cpu_caps.
+ */
 const rmr_cpu_caps *rmr_get_cpu_caps(void);
 
 #ifdef __cplusplus

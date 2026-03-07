@@ -23,7 +23,15 @@ typedef struct rmr_hwif_ops {
     const char* backend_name;
 } rmr_hwif_ops;
 
+/*
+ * Lazy one-time backend selection (bootstrap).
+ * Thread-safe for concurrent callers; publishes backend pointer coherently.
+ */
 const rmr_hwif_ops* rmr_hwif_bootstrap(void);
+/*
+ * Lazy accessor: triggers bootstrap on first use.
+ * Thread-safe; always returns a coherent backend pointer after publication.
+ */
 const rmr_hwif_ops* rmr_hwif_current(void);
 
 #endif
