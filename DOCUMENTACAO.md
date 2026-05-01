@@ -66,6 +66,72 @@ separados:
 - `rmr/`: camada externa isolada (ver `rmr/ARCHITECTURE.md`).
 - `rmr/benchmark_framework/`: blueprint do framework de benchmark (RMR).
 
+
+## Mapa de identidade de conceitos (estrutura × lógica)
+
+Para evitar a leitura de que o código é “óbvio” sem contexto, este mapa
+relaciona **caminhos reais** com o **papel lógico** de cada parte do sistema.
+A meta é tornar explícito o que é coletivo no programa (núcleo + interfaces +
+camada externa), sem misturar fronteiras.
+
+### 1) Núcleo algorítmico (imutável em relação ao upstream)
+
+- `src/portable.rs`: compressão/rounds portáveis e base sem SIMD específico.
+- `src/guts.rs`: regras internas de composição do hash em Rust.
+- `src/lib.rs`: API pública do crate `blake3` e composição dos modos.
+- `c/blake3.c` e `c/blake3.h`: núcleo C oficial (API/estado/rotinas base).
+- `reference_impl/reference_impl.rs`: referência didática mínima do algoritmo.
+
+**Identidade do conceito:** “motor criptográfico” (determinístico, estável,
+compatível com vetores oficiais).
+
+### 2) Aceleração por arquitetura (mesma semântica, execução distinta)
+
+- Rust SIMD/FFI: `src/ffi_sse2.rs`, `src/ffi_sse41.rs`, `src/ffi_avx2.rs`,
+  `src/ffi_avx512.rs`, `src/ffi_neon.rs`, `src/wasm32_simd.rs`.
+- Rust nativo especializado: `src/rust_sse41.rs`, `src/rust_avx2.rs`.
+- Detecção/plataforma: `src/platform.rs`.
+- C/ASM especializado em `c/` (SSE/AVX/NEON e dispatch).
+
+**Identidade do conceito:** “caminhos de execução equivalentes” (otimização de
+hardware sem alterar resultado criptográfico).
+
+### 3) Interface de uso e integração
+
+- `b3sum/src/main.rs`: CLI oficial (uso operacional por arquivo/STDIN).
+- `src/io.rs`: suporte de IO para uso incremental.
+- `src/traits.rs`: contratos/traits de integração na API Rust.
+
+**Identidade do conceito:** “superfície de consumo” (como o usuário/sistema
+acessa o mesmo núcleo).
+
+### 4) Validação, benchmark e garantia de coerência
+
+- `src/test.rs`, `b3sum/tests/cli_tests.rs`: testes de regressão/integração.
+- `benches/bench.rs`: medição de desempenho.
+- `test_vectors/`: vetores oficiais para conferir equivalência.
+
+**Identidade do conceito:** “prova de coerência” (mesma saída entre caminhos,
+plataformas e modos).
+
+### 5) Camada externa RMR (separação explícita)
+
+- `rmr/`: módulos/documentos autorais externos.
+- `rmr/PROVENIENCE.md`: fronteira upstream vs externo.
+- `tools/check_rmr_headers.py`: verificação de política documental RMR.
+
+**Identidade do conceito:** “governança externa” (organização/auditoria sem
+invadir o motor criptográfico).
+
+### Regra prática de leitura do repositório
+
+1. Primeiro identificar a camada: **núcleo**, **aceleração**, **interface**,
+   **validação** ou **externa RMR**.
+2. Depois avaliar mudança pela pergunta: “altera semântica criptográfica ou
+   só forma de execução/organização?”
+3. Se tocar semântica do núcleo upstream, a mudança deve ser bloqueada neste
+   fork; se for externa, manter isolamento em `rmr/` ou documentação.
+
 ## Build e testes (alinhado ao README oficial)
 
 > Os comandos abaixo seguem o README upstream. Consulte `README.md` e
