@@ -418,3 +418,11 @@ Os artefatos de benchmark agora registram perfil e flags finais efetivas para au
 - Foram adicionados callbacks abstratos de telemetria (`read_clock_sync`, `icmp_probe`, `jitter_sample`) sem acoplamento a stack específica de rede/clock.
 - O armazenamento de benchmark (`rmr/core/bench.c`) passa a persistir estado efetivo dessas políticas e metadados de clock/rede no `run_manifest.json` para correlação de desempenho com estabilidade de rede/clock.
 - Todo o escopo permanece isolado em `rmr/`, preservando o núcleo criptográfico upstream inalterado.
+
+## Trilha externa `rmr/pathcutter` (2026-05-02)
+
+- Foi criado o subdiretório `rmr/pathcutter/` para concentrar utilidades experimentais de redução de fricção operacional fora do núcleo upstream.
+- A interface pública consumida por `rmr/core` permanece estável (`pai_die`, `pai_mkdir_p`, `pai_xmalloc`, `pai_xfree`), com adaptação interna por `rmr/core/util.c` para símbolos `rmr_pc_*`.
+- Não há dependências externas adicionais; o módulo usa apenas C/POSIX e infraestrutura já existente no repositório.
+- Auditoria estática dedicada: `rmr/tools/audit_pathcutter_static.py` valida includes proibidos, heap em loops quentes e uso indevido de símbolos fora do contrato do módulo.
+- Classificação de autoria: trilha explicitamente marcada como **código autoral externo ao upstream BLAKE3**.
