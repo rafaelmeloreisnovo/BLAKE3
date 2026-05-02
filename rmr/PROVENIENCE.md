@@ -32,6 +32,7 @@ autoria entre o upstream **BLAKE3** e a camada externa **RMR**.
 | `rmr/ui/` | RMR autoral (front controller de modos) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/include/rmr_governance.h` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/hwif/include/rmr_hwif.h`, `rmr/hwif/rmr_hwif.c`, `rmr/hwif/asm/aarch64/`, `rmr/hwif/asm/x86_64/` | RMR autoral (interface HW + backends ASM) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/core/validate.c`, `rmr/core/pai_validate.h` | RMR autoral (validação determinística de invariantes) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `DOCUMENTACAO.md`, `MANIFESTO*.md` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/MANIFESTO_RAFAELIA.md` | RMR autoral (texto não jurídico) | RMR Module License (`rmr/LICENSE_RMR`) |
 
@@ -82,3 +83,7 @@ Mudanças de telemetria/armazenamento de benchmark permanecem restritas a `rmr/`
 ### Atualização 2026-05-02 (governança de telemetria)
 
 Extensões de governança/telemetria foram aplicadas apenas em `rmr/include/rmr_governance.h` e `rmr/core/bench.c`, mantendo isolamento no módulo RMR e sem alterações no núcleo BLAKE3 upstream (`src/`, `c/`, `reference_impl/`).
+
+### Atualização 2026-05-02 (validação RMR)
+
+Adicionado comando `pai validate` (arquivos `rmr/core/validate.c` e `rmr/core/pai_validate.h`) para validar invariantes matemáticos/operacionais do módulo RMR em runtime, mantendo isolamento da camada externa e sem alterar o núcleo criptográfico upstream.
