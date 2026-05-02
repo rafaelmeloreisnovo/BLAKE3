@@ -1,0 +1,4 @@
++---------------- BBS ----------------+
+  Item 1
+> Item 2 <
+[Pg 1/2] Use Up/Down, Enter=OK, Esc=Voltar
