@@ -28,7 +28,7 @@ código criptográfico oficial.
   bootstrap C + detector runtime
           |
           v
-[rmr/rmr_hwif.c]
+[rmr/hwif/rmr_hwif.c]
   seleciona ABI interna de hardware
           |
    +------+------+
@@ -45,13 +45,13 @@ código criptográfico oficial.
 
 - `rmr/include/`: headers auxiliares do módulo externo
   (ex.: detecção de arquitetura/OS, contrato de governança e `rmr_hwif.h`).
-- `rmr/rmr_hwif.c`: detector runtime e seleção de backend.
+- `rmr/hwif/rmr_hwif.c`: detector runtime e seleção de backend.
 - `rmr/rafaelia_core.c`: dispatcher C que consome apenas `rmr_hwif`.
-- `rmr/asm/aarch64/`: backend ASM AArch64 (ABI `rmr_hwif_*`).
-- `rmr/asm/x86_64/`: backend ASM x86_64 (ABI `rmr_hwif_*`).
+- `rmr/hwif/asm/aarch64/`: backend ASM AArch64 (ABI `rmr_hwif_*`).
+- `rmr/hwif/asm/x86_64/`: backend ASM x86_64 (ABI `rmr_hwif_*`).
 - `rmr/rust/`: módulos Rust externos **não** integrados ao crate
   `blake3`.
-- `rmr/ARCHITECTURE.md`: este documento.
+- `rmr/docs/ARCHITECTURE.md`: este documento.
 - `rmr/PROVENIENCE.md`: mapa de proveniência e licenças.
 - `rmr/LICENSE_RMR`: licença do módulo RMR.
 
@@ -202,7 +202,7 @@ um detector autoral separado por arquitetura:
   (`RMR_AARCH64_ASSUME_PRIVILEGED`) e fallback seguro em userland.
 - `rmr/detect/detect_fallback.c`: implementação conservadora para
   arquiteturas sem detector dedicado.
-- `rmr/include/rmr_detect.h`: contrato único de saída (`rmr_cpu_caps`).
+- `rmr/hwif/include/rmr_detect.h`: contrato único de saída (`rmr_cpu_caps`).
 
 ### Contrato (`rmr_cpu_caps`)
 

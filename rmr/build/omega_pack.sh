@@ -11,7 +11,7 @@ set -e
 # ---------------------------
 # 1) KERNEL OMEGA (ARM64)
 # ---------------------------
-cat <<'EOK' > kernel_omega.S
+cat <<'EOK' > ../runtime/kernel_omega.S
 /* ---------------------------------------------------------
  * RAFAELIA OMEGA - ARM64 NO-LIBC
  * sys_write / openat / close + cntvct_el0 + hw_sig
@@ -61,7 +61,7 @@ EOK
 # ---------------------------
 # 2) CORE OMEGA (C no-libc)
 # ---------------------------
-cat <<'EOC' > rafaelia_core.c
+cat <<'EOC' > ../runtime/rafaelia_core.c
 typedef unsigned long u64;
 typedef unsigned int  u32;
 
@@ -156,8 +156,8 @@ cat <<'EOB' > build_omega_ata.sh
 #!/data/data/com.termux/files/usr/bin/bash
 set -e
 echo "🔨 [OMEGA] Compilando (ARM64 / no-libc) + ATA..."
-clang -c rafaelia_core.c -o core.o -ffreestanding -O3 -fno-stack-protector
-clang -c kernel_omega.S -o kernel.o
+clang -c ../runtime/rafaelia_core.c -o core.o -ffreestanding -O3 -fno-stack-protector
+clang -c ../runtime/kernel_omega.S -o kernel.o
 clang kernel.o core.o -o rafaelia_omega_ata -nostdlib -Wl,-e,_start -pie
 echo "🚀 [OMEGA] Executando..."
 ./rafaelia_omega_ata
@@ -198,5 +198,5 @@ for i in range(recs):
 EOP
 chmod +x ata_decode.py
 
-echo "✅ Gerado: kernel_omega.S, rafaelia_core.c, build_omega_ata.sh, ata_decode.py"
+echo "✅ Gerado: ../runtime/kernel_omega.S, ../runtime/rafaelia_core.c, build_omega_ata.sh, ata_decode.py"
 echo "➡️ Rode agora: ./build_omega_ata.sh && ./ata_decode.py | head -n 60"

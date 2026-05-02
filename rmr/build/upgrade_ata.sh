@@ -8,7 +8,7 @@
 
 set -euo pipefail
 
-cat <<'ASM' > kernel_omega.S
+cat <<'ASM' > ../runtime/kernel_omega.S
 .section .text
 .global _start
 .global sys_write
@@ -56,7 +56,7 @@ get_cycles:
     ret
 ASM
 
-cat <<'C' > rafaelia_core.c
+cat <<'C' > ../runtime/rafaelia_core.c
 typedef unsigned long u64;
 
 extern void sys_write(int fd, const char* buf, u64 len);
@@ -143,8 +143,8 @@ cat <<'BUILD' > build_omega.sh
 #!/data/data/com.termux/files/usr/bin/bash
 set -euo pipefail
 echo "🔨 [OMEGA] Compilando (ARM64 / no-libc) + ATA..."
-clang -c rafaelia_core.c -o core.o -ffreestanding -fno-stack-protector -O2
-clang -c kernel_omega.S -o kernel.o
+clang -c ../runtime/rafaelia_core.c -o core.o -ffreestanding -fno-stack-protector -O2
+clang -c ../runtime/kernel_omega.S -o kernel.o
 clang kernel.o core.o -o rafaelia_omega -nostdlib -Wl,-e,_start -pie
 echo "🚀 [OMEGA] Executando..."
 ./rafaelia_omega
