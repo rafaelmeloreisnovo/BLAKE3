@@ -78,3 +78,7 @@ code on behalf of the author.
 ## Nota de auditoria (benchmark telemetry store)
 
 Mudanças de telemetria/armazenamento de benchmark permanecem restritas a `rmr/` (ex.: `rmr/core/bench.c`, `rmr/benchmark_framework/README.md`, `rmr/ui/mode_router.c`) e não alteram o núcleo criptográfico upstream (`src/`, `c/`, `reference_impl/`).
+
+### Atualização 2026-05-02 (governança de telemetria)
+
+Extensões de governança/telemetria foram aplicadas apenas em `rmr/include/rmr_governance.h` e `rmr/core/bench.c`, mantendo isolamento no módulo RMR e sem alterações no núcleo BLAKE3 upstream (`src/`, `c/`, `reference_impl/`).

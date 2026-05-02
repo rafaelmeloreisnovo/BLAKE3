@@ -23,6 +23,14 @@
 #define PAI_BENCH_MAX_REPEAT 4096
 
 static double now_ms(void){ struct timespec ts; clock_gettime(CLOCK_MONOTONIC, &ts); return (double)ts.tv_sec*1000.0 + (double)ts.tv_nsec/1000000.0; }
+static int env_flag(const char *name){ const char *e=getenv(name); return e && strcmp(e,"1")==0; }
+static long env_long_or(const char *name, long fallback){
+    const char *e=getenv(name); char *end=NULL; long v;
+    if(!e || !*e) return fallback;
+    errno=0; v=strtol(e,&end,10);
+    if(errno!=0 || end==e) return fallback;
+    return v;
+}
 static int deterministic_enabled(void){ const char *e=getenv("RMR_DETERMINISTIC"); return e && strcmp(e,"1")==0; }
 static void report_timestamp(struct tm *tm_out){
     if(deterministic_enabled()){ memset(tm_out,0,sizeof(*tm_out)); tm_out->tm_year=70; tm_out->tm_mon=0; tm_out->tm_mday=1; return; }
@@ -125,6 +133,18 @@ int pai_cmd_bench(int argc, char **argv){
     for(size_t i=0;i<strlen(tsv);i++){ outhash^=(unsigned char)tsv[i]; outhash*=1099511628211ull; }
     for(size_t i=0;i<strlen(rpt);i++){ outhash^=(unsigned char)rpt[i]; outhash*=1099511628211ull; }
 
+    const int gov_ntp_enabled = env_flag("RMR_GOV_NTP_ENABLED");
+    const int gov_icmp_probe_enabled = env_flag("RMR_GOV_ICMP_PROBE_ENABLED");
+    const int gov_jitter_sampling_enabled = env_flag("RMR_GOV_JITTER_SAMPLING_ENABLED");
+    const int gov_offline_deterministic = env_flag("RMR_GOV_OFFLINE_DETERMINISTIC") || deterministic_enabled();
+    const long gov_clock_sync_timeout_ms = env_long_or("RMR_GOV_CLOCK_SYNC_TIMEOUT_MS", 0);
+    const long gov_icmp_probe_timeout_ms = env_long_or("RMR_GOV_ICMP_PROBE_TIMEOUT_MS", 0);
+    const long gov_jitter_sample_window_ms = env_long_or("RMR_GOV_JITTER_SAMPLE_WINDOW_MS", 0);
+    const long gov_telemetry_rate_limit_per_minute = env_long_or("RMR_GOV_TELEMETRY_RATE_LIMIT_PER_MINUTE", 0);
+    const long gov_clock_sync_ms = env_long_or("RMR_GOV_LAST_CLOCK_SYNC_OFFSET_MS", 0);
+    const long gov_icmp_rtt_ms = env_long_or("RMR_GOV_LAST_ICMP_RTT_MS", 0);
+    const long gov_jitter_ppm = env_long_or("RMR_GOV_LAST_JITTER_PPM", 0);
+
     FILE *fman=fopen(mf,"w");
     if(fman){
         fprintf(fman,"{\n");
@@ -132,6 +152,7 @@ int pai_cmd_bench(int argc, char **argv){
         fprintf(fman,"  \"commit_hash\": \"%s\",\n", getenv("RMR_COMMIT_HASH")?getenv("RMR_COMMIT_HASH"):"unknown");
         fprintf(fman,"  \"config\": {\"repeat\": %d, \"bytes\": %lld, \"quiet\": %d, \"command\": \"%s\"},\n",repeat,bytes,quiet,argv[sep+1]);
         fprintf(fman,"  \"environment\": {\"cpu_arch\": %u, \"simd_detected\": \"%s\", \"rmr_cpu_caps\": {\"register_width\": %u}, \"build_profile\": \"%s\", \"effective_cflags\": \"%s\", \"effective_ldflags\": \"%s\"},\n",c->architecture,simd,c->register_width,getenv("RMR_BUILD_PROFILE")?getenv("RMR_BUILD_PROFILE"):"unknown",getenv("RMR_FINAL_CFLAGS")?getenv("RMR_FINAL_CFLAGS"):(getenv("CFLAGS")?getenv("CFLAGS"):"unknown"),getenv("RMR_FINAL_LDFLAGS")?getenv("RMR_FINAL_LDFLAGS"):"unknown");
+        fprintf(fman,"  \"governance\": {\"telemetry\": {\"ntp_enabled\": %d, \"icmp_probe_enabled\": %d, \"jitter_sampling_enabled\": %d, \"offline_deterministic\": %d, \"clock_sync_timeout_ms\": %ld, \"icmp_probe_timeout_ms\": %ld, \"jitter_sample_window_ms\": %ld, \"telemetry_rate_limit_per_minute\": %ld}, \"metadata\": {\"clock_sync_ms\": %ld, \"icmp_rtt_ms\": %ld, \"jitter_ppm\": %ld}},\n",gov_ntp_enabled,gov_icmp_probe_enabled,gov_jitter_sampling_enabled,gov_offline_deterministic,gov_clock_sync_timeout_ms,gov_icmp_probe_timeout_ms,gov_jitter_sample_window_ms,gov_telemetry_rate_limit_per_minute,gov_clock_sync_ms,gov_icmp_rtt_ms,gov_jitter_ppm);
         fprintf(fman,"  \"fingerprints\": {\"input_set\": \"%016llx\", \"snapshot_hash\": \"%016llx\", \"output_artifacts\": \"%016llx\"}\n",(unsigned long long)inhash,(unsigned long long)(inhash^outhash),(unsigned long long)outhash);
         fprintf(fman,"}\n");
         fclose(fman);
