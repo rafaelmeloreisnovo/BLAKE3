@@ -224,17 +224,17 @@ auxiliar, mas **não** substitui nem modifica o núcleo BLAKE3. Qualquer
 consumidor deve tratá-lo como **camada externa**.
 
 
-## Detector de capacidades em runtime (`rmr/detect/`)
+## Detector de capacidades em runtime (`rmr/hwif/detect/`)
 
 Para seleção de caminhos SIMD com prioridade em runtime, o RMR agora usa
 um detector autoral separado por arquitetura:
 
-- `rmr/detect/detect_x86.c`: leitura direta de CPUID/XGETBV por inline asm
+- `rmr/hwif/detect/detect_x86.c`: leitura direta de CPUID/XGETBV por inline asm
   para mapear `SSE2`, `SSE4.1`, `AVX2` e `AVX512`.
-- `rmr/detect/detect_aarch64.c`: leitura de registradores de
+- `rmr/hwif/detect/detect_aarch64.c`: leitura de registradores de
   identificação em contexto privilegiado opcional
   (`RMR_AARCH64_ASSUME_PRIVILEGED`) e fallback seguro em userland.
-- `rmr/detect/detect_fallback.c`: implementação conservadora para
+- `rmr/hwif/detect/detect_fallback.c`: implementação conservadora para
   arquiteturas sem detector dedicado.
 - `rmr/hwif/include/rmr_detect.h`: contrato único de saída (`rmr_cpu_caps`).
 
@@ -247,6 +247,30 @@ A estrutura `rmr_cpu_caps` expõe os campos normalizados:
 3. `endianness`: little/big endian.
 4. `register_width`: largura do registrador alvo (bits).
 5. `execution_mode`: modo de execução observado (user/kernel/hypervisor/baremetal).
+
+
+
+### Fluxo de bootstrap (ordem real)
+
+Sequência operacional do bootstrap de hardware no RMR:
+
+1. `rmr_hwif_bootstrap` inicializa a camada HWIF e solicita capacidades de CPU.
+2. Probe ASM por arquitetura:
+   - x86_64: consulta CPUID/XGETBV via `rmr/hwif/detect/detect_x86.c`;
+   - AArch64: consulta caminhos de identificação em `rmr/hwif/detect/detect_aarch64.c`.
+3. Se o probe específico não estiver disponível/seguro, aplica
+   `rmr/hwif/detect/detect_fallback.c` como rota conservadora.
+4. O resultado consolidado é exposto pelo contrato
+   `rmr/hwif/include/rmr_detect.h` e consumido pelo dispatcher externo.
+
+### Fronteira de responsabilidades: compile-time vs runtime
+
+- `rmr/include/rmr_dispatch.h`: define fallback **compile-time**
+  (macros/flags de seleção estática quando não há sinal de runtime).
+- `rmr_get_cpu_caps` / `rmr_detect_cpu_caps`: implementam detecção
+  **runtime** e fornecem a capacidade efetiva observada no host.
+- Regra de precedência: runtime válido tem prioridade; fallback
+  compile-time permanece como rede de segurança para portabilidade.
 
 ### Limitações conhecidas
 
