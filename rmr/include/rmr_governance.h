@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 #define RMR_GOVERNANCE_VERSION_MAJOR 0
-#define RMR_GOVERNANCE_VERSION_MINOR 1
+#define RMR_GOVERNANCE_VERSION_MINOR 2
 #define RMR_GOVERNANCE_VERSION_PATCH 0
 
 #define RMR_GOV_META_AGENT_ID_KEY "agent_id"
@@ -23,6 +23,13 @@ extern "C" {
 #define RMR_GOV_META_THROTTLE_KEY "throttle_ratio"
 #define RMR_GOV_META_CHECKPOINT_KEY "checkpoint"
 #define RMR_GOV_META_AUDIT_KEY "audit"
+#define RMR_GOV_META_NTP_ENABLED_KEY "ntp_enabled"
+#define RMR_GOV_META_ICMP_PROBE_ENABLED_KEY "icmp_probe_enabled"
+#define RMR_GOV_META_JITTER_SAMPLING_ENABLED_KEY "jitter_sampling_enabled"
+#define RMR_GOV_META_OFFLINE_DETERMINISTIC_KEY "offline_deterministic"
+#define RMR_GOV_META_CLOCK_SYNC_MS_KEY "clock_sync_ms"
+#define RMR_GOV_META_ICMP_RTT_MS_KEY "icmp_rtt_ms"
+#define RMR_GOV_META_JITTER_PPM_KEY "jitter_ppm"
 
 typedef enum rmr_governance_status {
   RMR_GOV_STATUS_OK = 0,
@@ -56,6 +63,18 @@ typedef struct rmr_governance_identity_policy {
   const char *static_identity;
 } rmr_governance_identity_policy;
 
+
+typedef struct rmr_governance_telemetry_policy {
+  bool ntp_enabled;
+  bool icmp_probe_enabled;
+  bool jitter_sampling_enabled;
+  bool offline_deterministic;
+  uint32_t clock_sync_timeout_ms;
+  uint32_t icmp_probe_timeout_ms;
+  uint32_t jitter_sample_window_ms;
+  uint32_t telemetry_rate_limit_per_minute;
+} rmr_governance_telemetry_policy;
+
 typedef float (*rmr_governance_read_temp_fn)(void *user_ctx);
 typedef size_t (*rmr_governance_write_audit_fn)(void *user_ctx,
                                                 const char *line,
@@ -65,11 +84,24 @@ typedef bool (*rmr_governance_checkpoint_fn)(void *user_ctx,
                                              size_t state_len);
 typedef const char *(*rmr_governance_identity_fn)(void *user_ctx);
 
+typedef bool (*rmr_governance_read_clock_sync_fn)(void *user_ctx,
+                                                  uint32_t timeout_ms,
+                                                  int32_t *offset_ms_out);
+typedef bool (*rmr_governance_icmp_probe_fn)(void *user_ctx,
+                                             uint32_t timeout_ms,
+                                             uint32_t *rtt_ms_out);
+typedef bool (*rmr_governance_jitter_sample_fn)(void *user_ctx,
+                                                 uint32_t sample_window_ms,
+                                                 uint32_t *jitter_ppm_out);
+
 typedef struct rmr_governance_callbacks {
   rmr_governance_read_temp_fn read_temp_c;
   rmr_governance_write_audit_fn write_audit_line;
   rmr_governance_checkpoint_fn checkpoint_state;
   rmr_governance_identity_fn identity;
+  rmr_governance_read_clock_sync_fn read_clock_sync;
+  rmr_governance_icmp_probe_fn icmp_probe;
+  rmr_governance_jitter_sample_fn jitter_sample;
 } rmr_governance_callbacks;
 
 typedef struct rmr_governance_config {
@@ -77,6 +109,7 @@ typedef struct rmr_governance_config {
   rmr_governance_checkpoint_policy checkpoint;
   rmr_governance_audit_policy audit;
   rmr_governance_identity_policy identity;
+  rmr_governance_telemetry_policy telemetry;
   rmr_governance_callbacks callbacks;
   void *user_ctx;
 } rmr_governance_config;
@@ -87,6 +120,9 @@ typedef struct rmr_governance_stats {
   uint64_t last_checkpoint_cycle;
   float last_temp_c;
   float last_throttle_ratio;
+  int32_t last_clock_sync_offset_ms;
+  uint32_t last_icmp_rtt_ms;
+  uint32_t last_jitter_ppm;
 } rmr_governance_stats;
 
 typedef struct rmr_governance_ctx {

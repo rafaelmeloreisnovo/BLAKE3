@@ -393,3 +393,10 @@ Perfis suportados:
 - `debug`
 
 Os artefatos de benchmark agora registram perfil e flags finais efetivas para auditoria e comparabilidade entre runs.
+
+## Atualização de governança de telemetria (2026-05-02)
+
+- O contrato `rmr/include/rmr_governance.h` foi estendido com política de telemetria controlada (`ntp_enabled`, `icmp_probe_enabled`, `jitter_sampling_enabled`), modo `offline_deterministic`, limites de timeout/janela e rate limit por minuto.
+- Foram adicionados callbacks abstratos de telemetria (`read_clock_sync`, `icmp_probe`, `jitter_sample`) sem acoplamento a stack específica de rede/clock.
+- O armazenamento de benchmark (`rmr/core/bench.c`) passa a persistir estado efetivo dessas políticas e metadados de clock/rede no `run_manifest.json` para correlação de desempenho com estabilidade de rede/clock.
+- Todo o escopo permanece isolado em `rmr/`, preservando o núcleo criptográfico upstream inalterado.
