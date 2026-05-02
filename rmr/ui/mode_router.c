@@ -37,6 +37,8 @@ static int run_helper_mode(void) {
     char input[256] = {0};
     char output[256] = {0};
     char confirm[16] = {0};
+    char metrics_store[256] = {0};
+    char session_mode[32] = {0};
 
     puts("[helper] wizard iniciado");
     if(helper_choose_profile(profile, sizeof(profile)) != 0) return 1;
@@ -49,10 +51,20 @@ static int run_helper_mode(void) {
     if(!fgets(output, sizeof(output), stdin)) return 1;
     output[strcspn(output, "\r\n")] = '\0';
 
+    printf("[helper] metrics store (--metrics-store): ");
+    if(!fgets(metrics_store, sizeof(metrics_store), stdin)) return 1;
+    metrics_store[strcspn(metrics_store, "\r\n")] = '\0';
+
+    printf("[helper] sessao (--append/--new-session): ");
+    if(!fgets(session_mode, sizeof(session_mode), stdin)) return 1;
+    session_mode[strcspn(session_mode, "\r\n")] = '\0';
+
     puts("[helper] resumo:");
     printf("  perfil: %s\n", profile);
     printf("  input : %s\n", input);
     printf("  saida : %s\n", output);
+    printf("  metrics-store: %s\n", metrics_store);
+    printf("  session-mode : %s\n", session_mode);
 
     printf("[helper] confirmar execucao? (y/N): ");
     if(!fgets(confirm, sizeof(confirm), stdin)) return 1;
@@ -68,7 +80,7 @@ static int run_helper_mode(void) {
 static int run_bbs_mode(void) {
     const char *items[] = {
         "CLI backend (pai_main)",
-        "Helper wizard",
+        "Helper wizard (metrics-store)",
         "Sair"
     };
     rmr_bbs_menu_state menu;
@@ -92,7 +104,7 @@ static int run_bbs_mode(void) {
 
         if(key == RMR_BBS_KEY_ENTER) {
             if(menu.selected == 0) {
-                puts("[bbs] opcao 1 selecionada: execute 'rmr run --mode cli ...'");
+                puts("[bbs] opcao 1 selecionada: execute 'rmr run --mode cli pai bench --metrics-store <path> --append|--new-session ...'");
                 return 0;
             }
             if(menu.selected == 1) return run_helper_mode();

@@ -73,3 +73,8 @@ code on behalf of the author.
 - `rmr/LICENSE_RMR` deve conter apenas o texto legal da licença RMR.
 - Conteúdos técnicos/conceituais não jurídicos ficam em
   `rmr/MANIFESTO_RAFAELIA.md`.
+
+
+## Nota de auditoria (benchmark telemetry store)
+
+Mudanças de telemetria/armazenamento de benchmark permanecem restritas a `rmr/` (ex.: `rmr/core/bench.c`, `rmr/benchmark_framework/README.md`, `rmr/ui/mode_router.c`) e não alteram o núcleo criptográfico upstream (`src/`, `c/`, `reference_impl/`).

@@ -96,3 +96,31 @@ rmr run --mode bbs
 - Nenhum arquivo do núcleo BLAKE3 deve ser modificado.
 - Toda evolução aqui permanece **estritamente em `rmr/`**.
 
+
+## Armazenamento operacional (`output/`)
+
+Sessões de benchmark agora podem persistir telemetria em:
+
+- `run_manifest.json`: configuração, ambiente, `snapshot_hash`, fingerprint de entrada/saída e commit.
+- `metrics.jsonl`: uma linha JSON por execução com `prev_run_hash` e `run_hash` encadeado.
+- `summary.json`: agregados (`min`, `max`, `mediana`, `p95`, `variância`) e comparação histórica por sessão/perfil.
+
+### Cadeia de custódia
+
+Cada sessão registra:
+
+1. hash do snapshot de entrada (`snapshot_hash`);
+2. hash dos artefatos de saída (`output_artifacts`);
+3. hash encadeado por execução (`prev_run_hash` -> `run_hash`).
+
+### Opções de CLI / helper / BBS
+
+- `--metrics-store <path>`
+- `--append`
+- `--new-session`
+
+Exemplo:
+
+```bash
+pai bench --repeat 5 --out out_bench --metrics-store rmr/benchmark_framework/output --new-session -- hash --file ./amostra.bin
+```

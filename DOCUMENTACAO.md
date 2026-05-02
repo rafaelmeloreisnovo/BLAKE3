@@ -170,6 +170,8 @@ rmr-bench --profile pipeline --runs 5 --save report.json
 Saídas previstas: JSON, CSV e Markdown, com registro de seed, tamanho, threads,
 flags, commit e timestamp.
 
+Armazenamento operacional padrão em `rmr/benchmark_framework/output/`: `run_manifest.json`, `metrics.jsonl` e `summary.json`, incluindo cadeia de custódia (`snapshot_hash`, `output_artifacts`, `prev_run_hash`).
+
 ## Política de licença no módulo RMR
 
 No módulo `rmr/`, o arquivo `rmr/LICENSE_RMR` contém **somente** o texto legal
