@@ -16,7 +16,7 @@ set -euo pipefail
 # - Prova: imprime ATA_HW_SIG(V20), ATA_LOADED, CYC0..2
 # ==========================================================
 
-cat <<'EOK' > sync_omega.S
+cat <<'EOK' > ../runtime/sync_omega.S
 /* ---------------------------------------------------------
  * RAFAELIA_SYNC_OMEGA - ASM ARM64 (no-libc)
  * syscalls + registradores de tempo + auto-id
@@ -74,7 +74,7 @@ rd_midr:
     ret
 EOK
 
-cat <<'EOC' > sync_omega.c
+cat <<'EOC' > ../runtime/sync_omega.c
 /* ---------------------------------------------------------
    RAFAELIA_SYNC_OMEGA - C puro (no-libc / freestanding)
    - Lê ATA_OMEGA.bin
@@ -249,8 +249,8 @@ cat <<'EOB' > build_sync.sh
 #!/data/data/com.termux/files/usr/bin/bash
 set -euo pipefail
 echo "🔨 [SYNC] Compilando (ARM64 / no-libc)..."
-clang -c sync_omega.c -o sync.o -ffreestanding -O2 -fno-stack-protector -fno-builtin
-clang -c sync_omega.S -o sync_asm.o
+clang -c ../runtime/sync_omega.c -o sync.o -ffreestanding -O2 -fno-stack-protector -fno-builtin
+clang -c ../runtime/sync_omega.S -o sync_asm.o
 clang sync_asm.o sync.o -o rafaelia_sync_omega -nostdlib -Wl,-e,_start -pie
 echo "🚀 [SYNC] Executando..."
 ./rafaelia_sync_omega
@@ -284,5 +284,5 @@ for i in range(min(recs, 60)):
 EOP
 
 chmod +x build_sync.sh ata_decode.py
-echo "✅ Gerado: sync_omega.S, sync_omega.c, build_sync.sh, ata_decode.py"
+echo "✅ Gerado: ../runtime/sync_omega.S, ../runtime/sync_omega.c, build_sync.sh, ata_decode.py"
 echo "➡️ Rode agora: ./build_sync.sh"

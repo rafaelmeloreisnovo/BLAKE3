@@ -13,10 +13,10 @@ CFLAGS="-O3 -ffreestanding -fno-stack-protector -fno-builtin -fPIC"
 LDFLAGS="-nostdlib -Wl,-e,_start -pie"
 
 echo "🔨 [OMEGA] ASM..."
-clang -c kernel_omega.S -o kernel.o
+clang -c ../runtime/kernel_omega.S -o kernel.o
 
 echo "🔨 [OMEGA] CORE..."
-clang -c rafaelia_core.c -o core.o $CFLAGS $INC_RMR
+clang -c ../runtime/rafaelia_core.c -o core.o $CFLAGS $INC_RMR
 
 echo "🔨 [OMEGA] BLAKE3 (portable+dispatch+neon)..."
 clang -c BLAKE3-master/c/blake3.c -o blake3.o $CFLAGS $INC_RMR

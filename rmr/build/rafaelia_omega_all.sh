@@ -10,10 +10,10 @@ set -euo pipefail
 
 # ------------------------------------------------------------
 # RAFAELIA OMEGA - ALL-IN-ONE (ARM64 / Termux)
-# Gera: kernel_omega.S, rafaelia_core.c, build_omega.sh
+# Gera: ../runtime/kernel_omega.S, ../runtime/rafaelia_core.c, build_omega.sh
 # ------------------------------------------------------------
 
-cat <<'ASM' > kernel_omega.S
+cat <<'ASM' > ../runtime/kernel_omega.S
 /* ---------------------------------------------------------
  * RAFAELIA OMEGA KERNEL - ARM64 (AArch64)
  * Syscalls: write/exit
@@ -57,7 +57,7 @@ get_cycles:
     ret
 ASM
 
-cat <<'C' > rafaelia_core.c
+cat <<'C' > ../runtime/rafaelia_core.c
 /* ---------------------------------------------------------
    RAFAELIA OMEGA CORE - C (NO-LIBC / FREESTANDING)
    - Auto-ID (hw signature) em Base20 (BITRAF V20)
@@ -156,11 +156,11 @@ set -euo pipefail
 echo "🔨 [OMEGA] Compilando (ARM64 / no-libc)..."
 
 # C freestanding
-clang -c rafaelia_core.c -o core.o \
+clang -c ../runtime/rafaelia_core.c -o core.o \
   -ffreestanding -fno-stack-protector -O2
 
 # ASM ARM64
-clang -c kernel_omega.S -o kernel.o
+clang -c ../runtime/kernel_omega.S -o kernel.o
 
 # Link no-libc, entrypoint _start, PIE (Android)
 clang kernel.o core.o -o rafaelia_omega \
@@ -171,5 +171,5 @@ echo "🚀 [OMEGA] Executando..."
 BUILD
 
 chmod +x build_omega.sh
-echo "✅ Gerado: kernel_omega.S, rafaelia_core.c, build_omega.sh"
+echo "✅ Gerado: ../runtime/kernel_omega.S, ../runtime/rafaelia_core.c, build_omega.sh"
 echo "➡️  Rode agora: ./build_omega.sh"

@@ -3,7 +3,7 @@
  * Licensed under LICENSE_RMR.
  */
 
-#include "include/rmr_hwif.h"
+#include "../hwif/include/rmr_hwif.h"
 
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L) && !defined(__STDC_NO_ATOMICS__)
 #include <stdatomic.h>
