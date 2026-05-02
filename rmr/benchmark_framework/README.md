@@ -43,6 +43,20 @@ rmr-bench --profile io --file ./big.dat --runs 5 --threads 1
 rmr-bench --profile pipeline --runs 5 --save report.json
 ```
 
+### Front controller (`rmr`)
+
+Interface unificada proposta com parser central (`rmr/ui/mode_router.c`):
+
+```bash
+rmr run --mode cli -- hash --file ./amostra.bin
+rmr run --mode helper
+rmr run --mode bbs
+```
+
+- `--mode cli`: encaminha argumentos para o backend `pai_main`.
+- `--mode helper`: wizard por etapas (perfil, input, saída, confirmação).
+- `--mode bbs`: menu textual com navegação por teclado e fallback para terminal simples.
+
 ### BBS / TUI (obrigatória)
 
 - Interface textual em modo “BBS” (menus, navegação por teclado).

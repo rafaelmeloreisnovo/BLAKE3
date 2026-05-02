@@ -6,8 +6,6 @@
  * It does not modify or replace the BLAKE3 core.
  */
 
-#include "../ui/mode_router.h"
+#pragma once
 
-int main(int argc, char **argv) {
-    return rmr_mode_router_main(argc, argv);
-}
+int rmr_mode_router_main(int argc, char **argv);

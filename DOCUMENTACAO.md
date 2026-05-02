@@ -65,6 +65,7 @@ separados:
 - `benches/`, `tools/`, `media/`: conteúdo upstream.
 - `rmr/`: camada externa isolada (ver `rmr/docs/ARCHITECTURE.md`).
 - `rmr/benchmark_framework/`: blueprint do framework de benchmark (RMR).
+- `rmr/ui/`: camada de front controller (`mode_router`) para modos de execução (`cli`, `helper`, `bbs`) com backend em `pai_main`.
 
 
 ## Mapa de identidade de conceitos (estrutura × lógica)
@@ -369,3 +370,11 @@ Checklist de revisão:
 Esta árvore **não cria um novo hash** e **não renomeia** o BLAKE3. Ela
 apenas redistribui o upstream com uma camada externa isolada e
 claramente documentada.
+
+### Registro de mudança organizacional (UI de modos RMR)
+
+- **Data:** 2026-05-02
+- **Escopo:** adição de `rmr/ui/mode_router.[ch]` e roteamento de `rmr/core/main.c` para front controller.
+- **Impacto no upstream BLAKE3:** nenhum (sem alterações em `src/`, `c/`, `b3sum/` ou ASM upstream).
+- **Backend preservado:** `pai_main` permanece como backend de operações, chamado pelo modo `cli`.
+
