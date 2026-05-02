@@ -66,6 +66,7 @@ separados:
 - `rmr/`: camada externa isolada (ver `rmr/docs/ARCHITECTURE.md`).
 - `rmr/benchmark_framework/`: blueprint do framework de benchmark (RMR).
 - `rmr/ui/`: camada de front controller (`mode_router`) para modos de execução (`cli`, `helper`, `bbs`) com backend em `pai_main`.
+- `rmr/core/validate.c`: validação determinística de invariantes RMR (alpha, atratores, capacidade geométrica e coprimalidade de passos) para uso em runtime sem tocar no núcleo BLAKE3.
 
 
 ## Mapa de identidade de conceitos (estrutura × lógica)

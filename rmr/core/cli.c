@@ -14,6 +14,7 @@
 #include "pai_scan.h"
 #include "pai_sign.h"
 #include "pai_toroid.h"
+#include "pai_validate.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -29,6 +30,7 @@ static void usage(void) {
     puts("  pai toroid --tex out_geom/geom.pgm --out out_toroid [--nu 256] [--nv 128] [--R 1.0] [--r 0.35]");
     puts("  pai bench --repeat N --out OUTDIR -- <comando> [args...]");
     puts("  pai benchdiff --a A.tsv --b B.tsv [--out OUTDIR] [--threshold 5]");
+    puts("  pai validate [--alpha 0.25] [--attractors 42] [--rows 10] [--cols 10] [--dr 7] [--dc 9] [--unique U] [--transitions T] [--len N]");
     puts("  pai sign   --base DIR --scan SCANDIR --out DIR");
     puts("");
     puts("Notas:");
@@ -77,6 +79,7 @@ int pai_main(int argc, char **argv) {
         { "sign", pai_cmd_sign },
         { "bench", pai_cmd_bench },
         { "benchdiff", pai_cmd_benchdiff },
+        { "validate", pai_cmd_validate },
     };
 
     if(argc < 2) { usage(); return 0; }
