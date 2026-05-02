@@ -1,0 +1,4 @@
++---------------- BBS ----------------+
+  Item 1
+\x1b[7m> Item 2 <\x1b[0m
+[Pg 1/2] Use Up/Down, Enter=OK, Esc=Voltar

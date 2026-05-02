@@ -6,7 +6,8 @@
  * It does not modify or replace the BLAKE3 core.
  */
 
-#include "mode_router.h"
+ #include "mode_router.h"
+#include "bbs/bbs.h"
 
 #include "../core/pai.h"
 
@@ -65,31 +66,43 @@ static int run_helper_mode(void) {
 }
 
 static int run_bbs_mode(void) {
-    char option[16] = {0};
-    puts("+----------------------------------+");
-    puts("| RMR BBS mode                     |");
-    puts("+----------------------------------+");
-    puts("| 1) CLI backend (pai_main)        |");
-    puts("| 2) Helper wizard                 |");
-    puts("| 3) Sair                          |");
-    puts("+----------------------------------+");
-    printf("Selecione uma opcao [1-3]: ");
+    const char *items[] = {
+        "CLI backend (pai_main)",
+        "Helper wizard",
+        "Sair"
+    };
+    rmr_bbs_menu_state menu;
+    rmr_bbs_theme theme;
+    char screen[1024];
+    char input[16];
+    rmr_bbs_term_mode mode = rmr_bbs_detect_terminal_mode();
 
-    if(!fgets(option, sizeof(option), stdin)) {
-        puts("[bbs] fallback: terminal sem suporte avancado, usando texto simples.");
-        return 1;
-    }
+    rmr_bbs_menu_init(&menu, items, 3, 2);
+    rmr_bbs_theme_load("rmr/ui/bbs/theme.ini", &theme);
 
-    switch(option[0]) {
-        case '1':
-            puts("[bbs] opcao 1 selecionada: execute 'rmr run --mode cli ...'");
+    for(;;) {
+        rmr_bbs_render_menu(&menu, &theme, mode, screen, sizeof(screen));
+        puts(screen);
+        if(!fgets(input, sizeof(input), stdin)) return 1;
+
+        rmr_bbs_key key = rmr_bbs_decode_input(input, strlen(input));
+        if(input[0] == 'w') key = RMR_BBS_KEY_UP;
+        if(input[0] == 's') key = RMR_BBS_KEY_DOWN;
+        if(input[0] == 'q') key = RMR_BBS_KEY_ESC;
+
+        if(key == RMR_BBS_KEY_ENTER) {
+            if(menu.selected == 0) {
+                puts("[bbs] opcao 1 selecionada: execute 'rmr run --mode cli ...'");
+                return 0;
+            }
+            if(menu.selected == 1) return run_helper_mode();
             return 0;
-        case '2':
-            puts("[bbs] opcao 2 selecionada: helper.");
-            return run_helper_mode();
-        default:
+        }
+        if(key == RMR_BBS_KEY_ESC) {
             puts("[bbs] encerrado.");
             return 0;
+        }
+        rmr_bbs_menu_apply_key(&menu, key);
     }
 }
 
