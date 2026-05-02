@@ -31,7 +31,7 @@ autoria entre o upstream **BLAKE3** e a camada externa **RMR**.
 | `rmr/benchmark_framework/` | RMR autoral (blueprint) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/ui/` | RMR autoral (front controller de modos) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/include/rmr_governance.h` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
-| `rmr/hwif/include/rmr_hwif.h`, `rmr/hwif/rmr_hwif.c`, `rmr/hwif/asm/aarch64/`, `rmr/hwif/asm/x86_64/` | RMR autoral (interface HW + backends ASM) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/hwif/include/rmr_hwif.h`, `rmr/hwif/include/rmr_detect.h`, `rmr/hwif/rmr_hwif.c`, `rmr/hwif/asm/aarch64/`, `rmr/hwif/asm/x86_64/`, `rmr/hwif/detect/detect_x86.c`, `rmr/hwif/detect/detect_aarch64.c`, `rmr/hwif/detect/detect_fallback.c` | RMR autoral (interface HW, detecção runtime e backends ASM) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/core/validate.c`, `rmr/core/pai_validate.h` | RMR autoral (validação determinística de invariantes) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `DOCUMENTACAO.md`, `MANIFESTO*.md` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/MANIFESTO_RAFAELIA.md` | RMR autoral (texto não jurídico) | RMR Module License (`rmr/LICENSE_RMR`) |
@@ -87,3 +87,10 @@ Extensões de governança/telemetria foram aplicadas apenas em `rmr/include/rmr_
 ### Atualização 2026-05-02 (validação RMR)
 
 Adicionado comando `pai validate` (arquivos `rmr/core/validate.c` e `rmr/core/pai_validate.h`) para validar invariantes matemáticos/operacionais do módulo RMR em runtime, mantendo isolamento da camada externa e sem alterar o núcleo criptográfico upstream.
+
+
+### Fronteira explícita (auditoria): upstream vs externo
+
+- **Upstream (imutável no núcleo criptográfico)**: `src/`, `c/`, `reference_impl/`, `b3sum/`, `test_vectors/`, `tools/`, `benches/`, `media/` e metadados oficiais.
+- **Externo autoral (isolado)**: `rmr/` e documentos autorais fora de `rmr/` listados neste arquivo.
+- **Regra operacional**: mudanças em detecção/dispatch do RMR devem permanecer no domínio externo (`rmr/*`) e nunca alterar a lógica criptográfica upstream.

@@ -173,6 +173,23 @@ flags, commit e timestamp.
 
 Armazenamento operacional padrão em `rmr/benchmark_framework/output/`: `run_manifest.json`, `metrics.jsonl` e `summary.json`, incluindo cadeia de custódia (`snapshot_hash`, `output_artifacts`, `prev_run_hash`).
 
+
+
+### Fronteira HWIF: fallback compile-time vs detecção runtime
+
+Na camada externa RMR, a fronteira de responsabilidades é explícita:
+
+- **Fallback compile-time**: `rmr/include/rmr_dispatch.h` mantém as
+  definições estáticas para ambientes sem sinalização dinâmica.
+- **Detecção runtime**: `rmr_get_cpu_caps` / `rmr_detect_cpu_caps`, com
+  implementação em `rmr/hwif/detect/detect_x86.c`,
+  `rmr/hwif/detect/detect_aarch64.c` e
+  `rmr/hwif/detect/detect_fallback.c`, consolidadas pelo contrato
+  `rmr/hwif/include/rmr_detect.h`.
+
+Essa divisão preserva a compatibilidade operacional sem alterar o núcleo
+criptográfico upstream.
+
 ## Política de licença no módulo RMR
 
 No módulo `rmr/`, o arquivo `rmr/LICENSE_RMR` contém **somente** o texto legal
@@ -341,23 +358,23 @@ qualquer violação. As categorias de violação são:
 
 | Arquitetura / SO alvo | Detector | Backend ativo esperado | Fallback | Requisitos de compilação | Riscos conhecidos | Validação (detector) | Validação (backend/fallback) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| x86_64 ou x86_32 (Linux, Windows, Darwin, BSD) | `rmr/detect/detect_x86.c` (`cpuid` + `xgetbv`) | Caminho x86 (flags `RMR_HAS_SSE2`, `RMR_HAS_SSE41`, `RMR_HAS_AVX2`, `RMR_HAS_AVX512` via `rmr/include/rmr_dispatch.h`) | Fallback compile-time (`RMR_COMPILETIME_HAS_*`) quando `RMR_DISABLE_RUNTIME_DETECT` ou sem `caps` | Macros de arquitetura em `rmr/include/rmr_arch.h`; compilador com inline asm x86 para `cpuid/xgetbv` | `AVX2/AVX512` dependem de `OSXSAVE + XCR0`; se o SO não habilitar contexto estendido, extensão não ativa | evidenciado por código | evidenciado por código |
-| AArch64 (Linux/Android/Darwin/BSD) | `rmr/detect/detect_aarch64.c` | Caminho ARM (`RMR_HAS_NEON` via `rmr/include/rmr_dispatch.h`) | Sem `RMR_AARCH64_ASSUME_PRIVILEGED`: usa apenas macro compile-time `__ARM_NEON`; com macro desligada mantém `execution_mode=user` | Arquitetura `RMR_ARCH_AARCH64`; para modo privilegiado, build com `RMR_AARCH64_ASSUME_PRIVILEGED` | Leitura de `ID_AA64ISAR0_EL1`/`CurrentEL` via `MRS` pode falhar em userland; modo padrão evita isso | evidenciado por código | evidenciado por código |
-| ARM/RISC-V/PPC e demais arquiteturas | `rmr/detect/detect_fallback.c` | Sem backend SIMD dedicado no detector; usa máscara mínima | `simd_extensions=0` (exceto `__ARM_NEON`) e largura de registrador por `sizeof(void*)` | Qualquer alvo não coberto por `RMR_ARCH_X86_*` e `RMR_ARCH_AARCH64` | Cobertura limitada de extensões SIMD (detecção conservadora) | evidenciado por código | evidenciado por código |
+| x86_64 ou x86_32 (Linux, Windows, Darwin, BSD) | `rmr/hwif/detect/detect_x86.c` (`cpuid` + `xgetbv`) | Caminho x86 (flags `RMR_HAS_SSE2`, `RMR_HAS_SSE41`, `RMR_HAS_AVX2`, `RMR_HAS_AVX512` via `rmr/include/rmr_dispatch.h`) | Fallback compile-time (`RMR_COMPILETIME_HAS_*`) quando `RMR_DISABLE_RUNTIME_DETECT` ou sem `caps` | Macros de arquitetura em `rmr/include/rmr_arch.h`; compilador com inline asm x86 para `cpuid/xgetbv` | `AVX2/AVX512` dependem de `OSXSAVE + XCR0`; se o SO não habilitar contexto estendido, extensão não ativa | evidenciado por código | evidenciado por código |
+| AArch64 (Linux/Android/Darwin/BSD) | `rmr/hwif/detect/detect_aarch64.c` | Caminho ARM (`RMR_HAS_NEON` via `rmr/include/rmr_dispatch.h`) | Sem `RMR_AARCH64_ASSUME_PRIVILEGED`: usa apenas macro compile-time `__ARM_NEON`; com macro desligada mantém `execution_mode=user` | Arquitetura `RMR_ARCH_AARCH64`; para modo privilegiado, build com `RMR_AARCH64_ASSUME_PRIVILEGED` | Leitura de `ID_AA64ISAR0_EL1`/`CurrentEL` via `MRS` pode falhar em userland; modo padrão evita isso | evidenciado por código | evidenciado por código |
+| ARM/RISC-V/PPC e demais arquiteturas | `rmr/hwif/detect/detect_fallback.c` | Sem backend SIMD dedicado no detector; usa máscara mínima | `simd_extensions=0` (exceto `__ARM_NEON`) e largura de registrador por `sizeof(void*)` | Qualquer alvo não coberto por `RMR_ARCH_X86_*` e `RMR_ARCH_AARCH64` | Cobertura limitada de extensões SIMD (detecção conservadora) | evidenciado por código | evidenciado por código |
 | Todas as combinações acima | Cobertura de validação automatizada para matriz de dispatch/detector | N/A | N/A | N/A | Sem suíte dedicada documentada para validar a matriz por arquitetura/SO nesta árvore | não evidenciado | não evidenciado |
 
 ### Limitações atuais consolidadas (detector/dispatch)
 
 1. **AArch64 privilegiado vs userland:** o modo detalhado de detecção (`RMR_AARCH64_ASSUME_PRIVILEGED`) depende de acesso a registradores EL1; em userland, o caminho seguro não consulta esses registradores.
 2. **Dependência de `XCR0` no x86:** `AVX2` e `AVX512` só são habilitados quando CPU e SO indicam suporte conjunto (`OSXSAVE` + bits necessários em `XCR0`).
-3. **Cobertura conservadora fora de x86/AArch64:** `rmr/detect/detect_fallback.c` não faz enumeração avançada de SIMD para RISC-V/PPC/outros.
+3. **Cobertura conservadora fora de x86/AArch64:** `rmr/hwif/detect/detect_fallback.c` não faz enumeração avançada de SIMD para RISC-V/PPC/outros.
 4. **Detecção de SO Android em `rmr/include/rmr_arch.h`:** a ordem atual verifica `__linux__` antes de `__ANDROID__`; em toolchains onde ambos são definidos, o alvo pode ser classificado como Linux.
 
 ### Checklist de atualização da matriz (obrigatório em mudanças de dispatch)
 
 Atualizar esta matriz sempre que houver mudanças em:
 
-- `rmr/detect/`
+- `rmr/hwif/detect/`
 - `rmr/asm/`
 - `rmr/include/rmr_dispatch.h`
 
