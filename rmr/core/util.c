@@ -8,6 +8,7 @@
 
 #define _XOPEN_SOURCE 700
 #include "pai.h"
+#include "rmr_lowlevel.h"
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,4 +40,18 @@ int pai_mkdir_p(const char *path) {
     }
     if (mkdir(tmp, 0755) != 0 && errno != EEXIST) return -1;
     return 0;
+}
+
+void *pai_xmalloc(size_t n) {
+    void *p = rmr_ll_malloc(n);
+    if (!p) {
+        perror("malloc");
+        exit(2);
+    }
+    memset(p, 0, n);
+    return p;
+}
+
+void pai_xfree(void *ptr) {
+    rmr_ll_free(ptr);
 }

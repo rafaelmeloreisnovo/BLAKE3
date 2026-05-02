@@ -38,13 +38,6 @@ typedef struct {
     int max_iter;
 } geom_opt;
 
-static void *xmalloc(size_t n) {
-    void *p = malloc(n);
-    if(!p) { perror("malloc"); exit(2); }
-    memset(p, 0, n);
-    return p;
-}
-
 static unsigned char u8_clamp(float x) {
     if(x < 0.0f) x = 0.0f;
     if(x > 1.0f) x = 1.0f;
@@ -281,9 +274,9 @@ int pai_cmd_geom(int argc, char **argv) {
 
     int n = o.size;
     size_t N = SZ(n) * SZ(n);
-    float *ov = (float*)xmalloc(N * sizeof(float));
-    float *mb = (float*)xmalloc(N * sizeof(float));
-    float *gf = (float*)xmalloc(N * sizeof(float));
+    float *ov = (float*)pai_xmalloc(N * sizeof(float));
+    float *mb = (float*)pai_xmalloc(N * sizeof(float));
+    float *gf = (float*)pai_xmalloc(N * sizeof(float));
 
     // shapes
     if(o.do_shapes) overlay_shapes(ov, n);
@@ -315,6 +308,6 @@ int pai_cmd_geom(int argc, char **argv) {
 
     write_report(o.out, &o);
 
-    free(ov); free(mb); free(gf);
+    pai_xfree(ov); pai_xfree(mb); pai_xfree(gf);
     return 0;
 }

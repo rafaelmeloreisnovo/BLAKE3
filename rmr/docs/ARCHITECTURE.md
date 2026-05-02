@@ -143,6 +143,40 @@ Verificação estática periódica (recomendação operacional):
    licença e registro em `rmr/PROVENIENCE.md`.
 4. **Sem telemetria**: o módulo não coleta nem transmite dados.
 
+## Política oficial de alocação no domínio `rmr/`
+
+Para manter comportamento uniforme entre módulos externos, a política de
+heap em `rmr/` é:
+
+- **API canônica de heap**: usar `rmr_ll_malloc`/`rmr_ll_free` (direto ou
+  por helper comum), evitando `malloc`/`free` ad-hoc por arquivo.
+- **Fail-fast padronizado**: quando o módulo exigir abortar em OOM, usar
+  wrapper único (`pai_xmalloc`) para manter **mesma mensagem** e **mesmo
+  código de saída** em todos os pontos.
+- **Sem duplicação local**: não criar `xmalloc` estático em arquivos
+  individuais; concentrar política em helper compartilhado.
+
+### Quando heap é permitido
+
+- Buffers cujo tamanho depende de entrada/configuração de runtime
+  (dimensões de malha, texturas, datasets variáveis).
+- Estruturas temporárias grandes cujo uso em stack arriscaria estouro.
+
+### Quando preferir stack/buffer fixo
+
+- Estruturas pequenas e de tamanho conhecido em compile-time.
+- Buffers de caminho/IO com limite explícito (ex.: `PAI_MAX_PATH`) e
+  escopo local curto.
+- Tabelas constantes/imediatas que possam ficar em dados estáticos.
+
+### Módulos com alocação dinâmica autorizada
+
+- `rmr/core/geom.c` (campos numéricos/imagens intermediárias).
+- `rmr/core/toroid.c` (texturas carregadas em runtime).
+- Outros módulos de `rmr/core/` podem alocar dinamicamente apenas quando
+  a necessidade for parametrizada por runtime e o caminho de liberação for
+  explícito e auditável.
+
 ## Exceções explícitas de cabeçalho inline
 
 Como regra geral, arquivos autorais/externos devem carregar cabeçalho de

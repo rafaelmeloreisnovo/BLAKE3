@@ -23,13 +23,6 @@ typedef struct {
     const char *out;
 } tor_opt;
 
-static void *xmalloc(size_t n){
-    void *p = malloc(n);
-    if(!p){ perror("malloc"); exit(2); }
-    memset(p,0,n);
-    return p;
-}
-
 static unsigned char* load_pgm(const char *path, int *w, int *h){
     FILE *f = fopen(path,"rb");
     if(!f){ perror(path); return NULL; }
@@ -44,7 +37,7 @@ static unsigned char* load_pgm(const char *path, int *w, int *h){
 
     const size_t tw = (size_t)(*w);
     const size_t th = (size_t)(*h);
-    unsigned char *buf = xmalloc(tw * th);
+    unsigned char *buf = pai_xmalloc(tw * th);
     (void)fread(buf, 1, tw * th, f);
     fclose(f);
     return buf;
@@ -79,7 +72,7 @@ int pai_cmd_toroid(int argc, char **argv){
 
     if (pai_mkdir_p(o.out) != 0) {
         perror("mkdir");
-        free(tex);
+        pai_xfree(tex);
         return 3;
     }
 
@@ -92,7 +85,7 @@ int pai_cmd_toroid(int argc, char **argv){
     FILE *ft = fopen(texpath,"wb");
     if (!ft) {
         perror("toroid_texture");
-        free(tex);
+        pai_xfree(tex);
         return 4;
     }
     fprintf(ft,"P5\n%d %d\n255\n",tw,th);
@@ -102,14 +95,14 @@ int pai_cmd_toroid(int argc, char **argv){
     FILE *obj = fopen(objpath,"wb");
     if (!obj) {
         perror("toroid_obj");
-        free(tex);
+        pai_xfree(tex);
         return 5;
     }
     FILE *mtl = fopen(mtlpath,"wb");
     if (!mtl) {
         perror("toroid_mtl");
         fclose(obj);
-        free(tex);
+        pai_xfree(tex);
         return 6;
     }
 
@@ -147,7 +140,7 @@ int pai_cmd_toroid(int argc, char **argv){
 
     fclose(obj);
     fclose(mtl);
-    free(tex);
+    pai_xfree(tex);
 
     printf("[OK] obj: %s\n",objpath);
     printf("[OK] mtl: %s\n",mtlpath);
