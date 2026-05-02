@@ -16,6 +16,14 @@ reprodutíveis.
 Garantir que qualquer caminho de execução do hash seja determinístico:
 mesma entrada + mesmo contexto de build ⇒ mesma saída.
 
+## Contrato normativo para hot path
+
+- Documento normativo: `rmr/docs/HOTPATH_CONTRACT.md`.
+- Referência de governança em código: `rmr/include/rmr_governance.h`
+  (`RMR_HOTPATH_CONTRACT_DOC` e `RMR_HOTPATH_CONTRACT_VERSION`).
+- Toda revisão deve validar explicitamente os invariantes por camada
+  (`rmr/hwif/asm/*`, `rmr/hwif/rmr_hwif.c`, `rmr/core/*`).
+
 ## Lista de verificação (auditoria)
 
 1. **Sem fontes de aleatoriedade**
@@ -34,10 +42,24 @@ mesma entrada + mesmo contexto de build ⇒ mesma saída.
 6. **Tratamento de erros previsível**
    - Erros devem falhar de forma consistente, sem comportamento
      dependente de timing ou condições externas.
+7. **Sem chamadas externas no ASM de backend**
+   - `rmr/hwif/asm/*` deve manter hot path ABI-safe e sem `call`/`bl`.
+8. **Sem heap em loop crítico de `rmr/core/*`**
+   - Se inevitável, alocação deve estar concentrada fora do loop e com
+     justificativa técnica no código.
+9. **Dispatcher leve e lock-free**
+   - `rmr/hwif/rmr_hwif.c` deve manter seleção atômica/lock-free sem
+     lógica pesada e sem IO.
 
 ## Evidências recomendadas
 
 - Rodar vetores de teste oficiais e comparar com a implementação de
   referência.
 - Revisar diffs em `rmr/` e `c/` buscando efeitos colaterais ou logs.
+- Executar triagem automática mínima:
 
+```sh
+rg -n "printf|fprintf|fopen|write\(|send\(|recv\(|socket\(" rmr/hwif rmr/core
+rg -n "malloc\(|calloc\(|realloc\(|free\(" rmr/core
+rg -n "\b(call|bl)\b" rmr/hwif/asm
+```
