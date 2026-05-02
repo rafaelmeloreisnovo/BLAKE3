@@ -94,3 +94,9 @@ Adicionado comando `pai validate` (arquivos `rmr/core/validate.c` e `rmr/core/pa
 - **Upstream (imutável no núcleo criptográfico)**: `src/`, `c/`, `reference_impl/`, `b3sum/`, `test_vectors/`, `tools/`, `benches/`, `media/` e metadados oficiais.
 - **Externo autoral (isolado)**: `rmr/` e documentos autorais fora de `rmr/` listados neste arquivo.
 - **Regra operacional**: mudanças em detecção/dispatch do RMR devem permanecer no domínio externo (`rmr/*`) e nunca alterar a lógica criptográfica upstream.
+
+### Atualização 2026-05-02 (trilha `pathcutter`)
+
+Criada trilha autoral externa `rmr/pathcutter/` para utilidades experimentais de redução de fricção operacional (mkdir recursivo, alocação segura e fail-fast), com interface estável consumida por `rmr/core/util.c` e sem qualquer alteração no núcleo BLAKE3 upstream (`src/`, `c/`, `reference_impl/`).
+
+Também foi adicionado o script de auditoria estática `rmr/tools/audit_pathcutter_static.py`, restrito ao módulo externo `rmr/pathcutter/`.
