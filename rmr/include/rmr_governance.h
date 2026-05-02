@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 #define RMR_GOVERNANCE_VERSION_MAJOR 0
-#define RMR_GOVERNANCE_VERSION_MINOR 2
+#define RMR_GOVERNANCE_VERSION_MINOR 3
 #define RMR_GOVERNANCE_VERSION_PATCH 0
 
 #define RMR_GOV_META_AGENT_ID_KEY "agent_id"
@@ -30,6 +30,9 @@ extern "C" {
 #define RMR_GOV_META_CLOCK_SYNC_MS_KEY "clock_sync_ms"
 #define RMR_GOV_META_ICMP_RTT_MS_KEY "icmp_rtt_ms"
 #define RMR_GOV_META_JITTER_PPM_KEY "jitter_ppm"
+
+#define RMR_HOTPATH_CONTRACT_DOC "rmr/docs/HOTPATH_CONTRACT.md"
+#define RMR_HOTPATH_CONTRACT_VERSION "1.0"
 
 typedef enum rmr_governance_status {
   RMR_GOV_STATUS_OK = 0,
