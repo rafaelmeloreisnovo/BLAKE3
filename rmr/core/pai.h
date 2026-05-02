@@ -29,6 +29,8 @@ typedef struct {
 // --- tiny helpers ---
 void pai_die(const char *msg);
 int pai_mkdir_p(const char *path);
+void *pai_xmalloc(size_t n);
+void pai_xfree(void *ptr);
 
 // --- cli ---
 int pai_main(int argc, char **argv);
