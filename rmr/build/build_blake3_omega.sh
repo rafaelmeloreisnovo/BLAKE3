@@ -9,8 +9,8 @@
 set -e
 
 INC_RMR="-IBLAKE3-master/rmr/include -IBLAKE3-master/c"
-CFLAGS="-O3 -ffreestanding -fno-stack-protector -fno-builtin -fPIC"
-LDFLAGS="-nostdlib -Wl,-e,_start -pie"
+CFLAGS="${RMR_FINAL_CFLAGS} -fPIC"
+LDFLAGS="${RMR_FINAL_LDFLAGS}"
 
 echo "🔨 [OMEGA] ASM..."
 clang -c ../runtime/kernel_omega.S -o kernel.o

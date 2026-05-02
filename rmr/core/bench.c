@@ -131,7 +131,7 @@ int pai_cmd_bench(int argc, char **argv){
         fprintf(fman,"  \"timestamp_utc\": \"%04d-%02d-%02dT%02d:%02d:%02dZ\",\n",tm.tm_year+1900,tm.tm_mon+1,tm.tm_mday,tm.tm_hour,tm.tm_min,tm.tm_sec);
         fprintf(fman,"  \"commit_hash\": \"%s\",\n", getenv("RMR_COMMIT_HASH")?getenv("RMR_COMMIT_HASH"):"unknown");
         fprintf(fman,"  \"config\": {\"repeat\": %d, \"bytes\": %lld, \"quiet\": %d, \"command\": \"%s\"},\n",repeat,bytes,quiet,argv[sep+1]);
-        fprintf(fman,"  \"environment\": {\"cpu_arch\": %u, \"simd_detected\": \"%s\", \"rmr_cpu_caps\": {\"register_width\": %u}, \"effective_cflags\": \"%s\"},\n",c->architecture,simd,c->register_width,getenv("CFLAGS")?getenv("CFLAGS"):"unknown");
+        fprintf(fman,"  \"environment\": {\"cpu_arch\": %u, \"simd_detected\": \"%s\", \"rmr_cpu_caps\": {\"register_width\": %u}, \"build_profile\": \"%s\", \"effective_cflags\": \"%s\", \"effective_ldflags\": \"%s\"},\n",c->architecture,simd,c->register_width,getenv("RMR_BUILD_PROFILE")?getenv("RMR_BUILD_PROFILE"):"unknown",getenv("RMR_FINAL_CFLAGS")?getenv("RMR_FINAL_CFLAGS"):(getenv("CFLAGS")?getenv("CFLAGS"):"unknown"),getenv("RMR_FINAL_LDFLAGS")?getenv("RMR_FINAL_LDFLAGS"):"unknown");
         fprintf(fman,"  \"fingerprints\": {\"input_set\": \"%016llx\", \"snapshot_hash\": \"%016llx\", \"output_artifacts\": \"%016llx\"}\n",(unsigned long long)inhash,(unsigned long long)(inhash^outhash),(unsigned long long)outhash);
         fprintf(fman,"}\n");
         fclose(fman);

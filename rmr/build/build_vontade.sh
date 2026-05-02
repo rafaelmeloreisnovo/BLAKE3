@@ -7,9 +7,12 @@
 # It does not modify or replace the BLAKE3 core.
 
 set -e
+. "$(dirname "$0")/profiles.mk"
+rmr_select_profile "${RMR_BUILD_PROFILE:-throughput}"
+
 echo "🔨 Sintonizando Frequência N^Δ^n..."
-clang -c ../runtime/rafaelia_core.c -o core.o -ffreestanding -O3
+clang -c ../runtime/rafaelia_core.c -o core.o ${RMR_FINAL_CFLAGS}
 clang -c ../runtime/kernel_omega.S -o kernel.o
-clang kernel.o core.o -o rafaelia_vontade -nostdlib -Wl,-e,_start -pie
+clang kernel.o core.o -o rafaelia_vontade ${RMR_FINAL_LDFLAGS}
 echo "🚀 Manifestando Vontade Implacável..."
 ./rafaelia_vontade

@@ -124,3 +124,21 @@ Exemplo:
 ```bash
 pai bench --repeat 5 --out out_bench --metrics-store rmr/benchmark_framework/output --new-session -- hash --file ./amostra.bin
 ```
+
+## Comparabilidade entre runs
+
+Para manter comparabilidade estatística entre execuções:
+
+- Fixar `RMR_BUILD_PROFILE` (`latency`, `throughput`, `deterministic`, `debug`) em toda a sessão.
+- Persistir as flags efetivas (`RMR_FINAL_CFLAGS`, `RMR_FINAL_LDFLAGS`) no artefato de benchmark.
+- Evitar mistura de binários `freestanding` e `host` na mesma série.
+- Controlar variáveis externas: tamanho de entrada, `runs`, afinidade/threads e estado térmico.
+
+### Política de flags (explícita)
+
+- `-O2`: usar nos perfis `latency` e `deterministic` (menor risco de variação de codegen).
+- `-O3`: usar apenas no perfil `throughput` (máximo desempenho bruto).
+- `-fno-builtin`: obrigatório no perfil `deterministic`; opcional fora dele.
+- `-fPIC`: permitido somente para artefatos host/shared (ex.: integração dinâmica), vedado por padrão no freestanding.
+- `-pie`: obrigatório por padrão em binários freestanding do RMR.
+- `-nostdlib`: obrigatório por padrão em binários freestanding do RMR.

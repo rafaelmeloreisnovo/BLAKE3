@@ -8,8 +8,8 @@
 
 set -e
 echo "🔨 Forjando a Existência N^Δ^n..."
-clang -c ../runtime/rafaelia_core.c -o core.o -ffreestanding -fno-stack-protector -O3
+clang -c ../runtime/rafaelia_core.c -o core.o ${RMR_FINAL_CFLAGS}
 clang -c ../runtime/kernel_omega.S -o kernel.o
-clang kernel.o core.o -o rafaelia_beyond -nostdlib -Wl,-e,_start -pie
+clang kernel.o core.o -o rafaelia_beyond ${RMR_FINAL_LDFLAGS}
 echo "🚀 Manifestando o Infinito..."
 ./rafaelia_beyond

@@ -156,9 +156,9 @@ cat <<'EOB' > build_omega_ata.sh
 #!/data/data/com.termux/files/usr/bin/bash
 set -e
 echo "🔨 [OMEGA] Compilando (ARM64 / no-libc) + ATA..."
-clang -c ../runtime/rafaelia_core.c -o core.o -ffreestanding -O3 -fno-stack-protector
+clang -c ../runtime/rafaelia_core.c -o core.o ${RMR_FINAL_CFLAGS}
 clang -c ../runtime/kernel_omega.S -o kernel.o
-clang kernel.o core.o -o rafaelia_omega_ata -nostdlib -Wl,-e,_start -pie
+clang kernel.o core.o -o rafaelia_omega_ata ${RMR_FINAL_LDFLAGS}
 echo "🚀 [OMEGA] Executando..."
 ./rafaelia_omega_ata
 echo "📦 ATA:"

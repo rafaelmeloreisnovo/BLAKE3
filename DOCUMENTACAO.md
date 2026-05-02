@@ -380,3 +380,16 @@ claramente documentada.
 - **Impacto no upstream BLAKE3:** nenhum (sem alterações em `src/`, `c/`, `b3sum/` ou ASM upstream).
 - **Backend preservado:** `pai_main` permanece como backend de operações, chamado pelo modo `cli`.
 
+
+## Perfis centrais de build (RMR)
+
+A camada externa RMR passou a centralizar perfis de compilação em `rmr/build/profiles.mk`, consumido pelos scripts de `rmr/build/*.sh`.
+
+Perfis suportados:
+
+- `latency`
+- `throughput`
+- `deterministic`
+- `debug`
+
+Os artefatos de benchmark agora registram perfil e flags finais efetivas para auditoria e comparabilidade entre runs.

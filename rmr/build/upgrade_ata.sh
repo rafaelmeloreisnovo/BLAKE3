@@ -7,6 +7,9 @@
 # It does not modify or replace the BLAKE3 core.
 
 set -euo pipefail
+. "$(dirname "$0")/profiles.mk"
+rmr_select_profile "${RMR_BUILD_PROFILE:-throughput}"
+
 
 cat <<'ASM' > ../runtime/kernel_omega.S
 .section .text
@@ -143,9 +146,9 @@ cat <<'BUILD' > build_omega.sh
 #!/data/data/com.termux/files/usr/bin/bash
 set -euo pipefail
 echo "🔨 [OMEGA] Compilando (ARM64 / no-libc) + ATA..."
-clang -c ../runtime/rafaelia_core.c -o core.o -ffreestanding -fno-stack-protector -O2
+clang -c ../runtime/rafaelia_core.c -o core.o ${RMR_FINAL_CFLAGS}
 clang -c ../runtime/kernel_omega.S -o kernel.o
-clang kernel.o core.o -o rafaelia_omega -nostdlib -Wl,-e,_start -pie
+clang kernel.o core.o -o rafaelia_omega ${RMR_FINAL_LDFLAGS}
 echo "🚀 [OMEGA] Executando..."
 ./rafaelia_omega
 echo "📦 ATA:"

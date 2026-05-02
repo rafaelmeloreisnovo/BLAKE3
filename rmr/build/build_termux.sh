@@ -7,6 +7,9 @@
 # It does not modify or replace the BLAKE3 core.
 
 set -eu
+. "$(dirname "$0")/profiles.mk"
+rmr_select_profile "${RMR_BUILD_PROFILE:-throughput}"
+
 cd "$(dirname "$0")/.."
 make clean
 make CC=clang
