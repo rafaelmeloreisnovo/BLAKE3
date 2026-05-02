@@ -10,11 +10,11 @@ set -e
 echo "🔨 Forjando RAFAELIA OMEGA em ARM64..."
 
 # Compilação sem dependências
-clang -c ../runtime/rafaelia_core.c -o core.o -ffreestanding -fno-stack-protector -O3
+clang -c ../runtime/rafaelia_core.c -o core.o ${RMR_FINAL_CFLAGS}
 clang -c ../runtime/kernel_omega.S -o kernel.o
 
 # Linkagem direta com o ponto de entrada _start
-clang kernel.o core.o -o rafaelia_vortex -nostdlib -Wl,-e,_start -pie
+clang kernel.o core.o -o rafaelia_vortex ${RMR_FINAL_LDFLAGS}
 
 echo "🚀 Executando Auto-Identificação e Inflexão..."
 ./rafaelia_vortex

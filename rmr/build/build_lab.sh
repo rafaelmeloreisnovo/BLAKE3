@@ -10,14 +10,14 @@ set -e
 echo "🔨 Construindo Arquitetura RAFAELIA OMEGA..."
 
 # 1. Compilar C (No-Std)
-clang -c ../runtime/rafaelia_core.c -o core.o -ffreestanding -fno-stack-protector -O2
+clang -c ../runtime/rafaelia_core.c -o core.o ${RMR_FINAL_CFLAGS}
 
 # 2. Compilar ASM (ARM64)
 clang -c ../runtime/kernel_omega.S -o kernel.o
 
 # 3. Linkar sem bibliotecas (Puro)
 # Usamos -pie para compatibilidade com kernels modernos de Android
-clang kernel.o core.o -o rafaelia_beyond -nostdlib -Wl,-e,_start -pie
+clang kernel.o core.o -o rafaelia_beyond ${RMR_FINAL_LDFLAGS}
 
 echo "🚀 Rodando a vontade do infinito..."
 ./rafaelia_beyond

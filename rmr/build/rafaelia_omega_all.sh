@@ -7,6 +7,9 @@
 # It does not modify or replace the BLAKE3 core.
 
 set -euo pipefail
+. "$(dirname "$0")/profiles.mk"
+rmr_select_profile "${RMR_BUILD_PROFILE:-throughput}"
+
 
 # ------------------------------------------------------------
 # RAFAELIA OMEGA - ALL-IN-ONE (ARM64 / Termux)
@@ -157,14 +160,14 @@ echo "🔨 [OMEGA] Compilando (ARM64 / no-libc)..."
 
 # C freestanding
 clang -c ../runtime/rafaelia_core.c -o core.o \
-  -ffreestanding -fno-stack-protector -O2
+  ${RMR_FINAL_CFLAGS}
 
 # ASM ARM64
 clang -c ../runtime/kernel_omega.S -o kernel.o
 
 # Link no-libc, entrypoint _start, PIE (Android)
 clang kernel.o core.o -o rafaelia_omega \
-  -nostdlib -Wl,-e,_start -pie
+  ${RMR_FINAL_LDFLAGS}
 
 echo "🚀 [OMEGA] Executando..."
 ./rafaelia_omega

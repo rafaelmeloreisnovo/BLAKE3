@@ -7,4 +7,7 @@
 # It does not modify or replace the BLAKE3 core.
 
 set -euo pipefail
+. "$(dirname "$0")/profiles.mk"
+rmr_select_profile "${RMR_BUILD_PROFILE:-throughput}"
+
 ./build_omega.sh

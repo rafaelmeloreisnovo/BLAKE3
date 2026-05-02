@@ -7,6 +7,9 @@
 # It does not modify or replace the BLAKE3 core.
 
 set -eu
+. "$(dirname "$0")/profiles.mk"
+rmr_select_profile "${RMR_BUILD_PROFILE:-throughput}"
+
 
 # ===== config =====
 BIN="${1:-./pai}"
@@ -18,6 +21,14 @@ NV="${NV:-128}"
 
 mkdir -p "$OUTDIR"
 OUT="$OUTDIR/bench.tsv"
+META="$OUTDIR/bench.meta"
+
+{
+  echo "profile=${RMR_BUILD_PROFILE:-throughput}"
+  echo "effective_cflags=${RMR_FINAL_CFLAGS}"
+  echo "effective_ldflags=${RMR_FINAL_LDFLAGS}"
+  echo "timestamp_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+} > "$META"
 
 echo "op\trep\tms\tok" > "$OUT"
 
