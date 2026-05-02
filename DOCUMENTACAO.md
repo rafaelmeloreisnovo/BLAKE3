@@ -63,7 +63,8 @@ separados:
 - `reference_impl/`: implementação de referência (Rust).
 - `test_vectors/`: vetores e utilitários oficiais.
 - `benches/`, `tools/`, `media/`: conteúdo upstream.
-- `rmr/`: camada externa isolada (ver `rmr/ARCHITECTURE.md`).
+- `rmr/`: camada externa isolada (ver `rmr/docs/ARCHITECTURE.md`).
+- `rmr/build/manifest.sh` e `rmr/build/manifest.mk`: manifesto central de caminhos para orquestração de build no-libc.
 - `rmr/benchmark_framework/`: blueprint do framework de benchmark (RMR).
 
 
@@ -198,7 +199,7 @@ Esse recorte de fronteira/licença deve permanecer idêntico ao descrito em
 
 As regras para exceções de cabeçalho de licença inline (critérios,
 registro obrigatório e fallback documental) estão definidas em
-`rmr/ARCHITECTURE.md`, na seção **"Exceções explícitas de cabeçalho inline"**.
+`rmr/docs/ARCHITECTURE.md`, na seção **"Exceções explícitas de cabeçalho inline"**.
 
 ## Política de artefatos de build (RMR)
 
@@ -319,7 +320,7 @@ qualquer violação. As categorias de violação são:
 
 - Adicionado `rmr/include/rmr_governance.h` como contrato de governança
   externo ao core.
-- Atualizações de documentação em `DOCUMENTACAO.md`, `rmr/ARCHITECTURE.md` e
+- Atualizações de documentação em `DOCUMENTACAO.md`, `rmr/docs/ARCHITECTURE.md` e
   material não jurídico segregado em `rmr/MANIFESTO_RAFAELIA.md`.
 - Limpeza organizacional no módulo externo `rmr/`: remoção de artefatos de
   build/backup do versionamento e reforço das regras de ignore.
@@ -362,7 +363,7 @@ Checklist de revisão:
 - [ ] Revalidar linhas afetadas de arquitetura/SO na matriz (detector, backend, fallback).
 - [ ] Marcar cada campo de validação como `evidenciado por código`, `evidenciado por teste` ou `não evidenciado`.
 - [ ] Consolidar novas limitações na seção única **Limitações atuais consolidadas (detector/dispatch)**.
-- [ ] Atualizar `rmr/ARCHITECTURE.md` e `rmr/PROVENIENCE.md` se houver impacto de organização/autoria.
+- [ ] Atualizar `rmr/docs/ARCHITECTURE.md` e `rmr/PROVENIENCE.md` se houver impacto de organização/autoria.
 
 ## Observação final
 

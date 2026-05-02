@@ -11,7 +11,7 @@ set -euo pipefail
 # -----------------------------
 # 1) ASM (syscalls + regs)
 # -----------------------------
-cat <<'EOK' > sync_fast.S
+cat <<'EOK' > ../runtime/sync_fast.S
 .section .text
 .global _start
 .global sys_write
@@ -41,7 +41,7 @@ EOK
 # -----------------------------
 # 2) C (buffer + ATA + 3-6-9)
 # -----------------------------
-cat <<'EOC' > sync_fast.c
+cat <<'EOC' > ../runtime/sync_fast.c
 typedef unsigned long  u64;
 typedef long           s64;
 
@@ -192,13 +192,13 @@ cat <<'EOB' > build_sync_fast.sh
 #!/data/data/com.termux/files/usr/bin/bash
 set -euo pipefail
 echo "🔨 [SYNC_FAST] Compilando (ARM64 / no-libc)..."
-clang -c sync_fast.c -o sync_fast.o -ffreestanding -O2 -fno-stack-protector -fno-builtin
-clang -c sync_fast.S -o sync_fast_asm.o
+clang -c ../runtime/sync_fast.c -o sync_fast.o -ffreestanding -O2 -fno-stack-protector -fno-builtin
+clang -c ../runtime/sync_fast.S -o sync_fast_asm.o
 clang sync_fast_asm.o sync_fast.o -o rafaelia_sync_omega_fast -nostdlib -Wl,-e,_start -pie
 echo "🚀 [SYNC_FAST] Executando..."
 ./rafaelia_sync_omega_fast
 EOB
 
 chmod +x build_sync_fast.sh
-echo "✅ Gerado: sync_fast.S sync_fast.c build_sync_fast.sh"
+echo "✅ Gerado: ../runtime/sync_fast.S ../runtime/sync_fast.c build_sync_fast.sh"
 echo "➡️ Rode agora: ./build_sync_fast.sh"
