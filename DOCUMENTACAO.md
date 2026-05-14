@@ -453,7 +453,8 @@ fornecido externamente.
 Para responder objetivamente a diferença de benchmark entre este fork e o
 `BLAKE3-team/BLAKE3`, use:
 
-- `tools/benchmark_compare_official.sh --runs 3`
+- `tools/benchmark_compare_official.sh --runs 3 --tbb BOTH`
+  - também suporta `--tbb ON` e `--tbb OFF` para comparar o que acontece com TBB habilitado/desabilitado.
 
 O script:
 - clona o upstream oficial em pasta separada (`/tmp/BLAKE3-official-bench`);
