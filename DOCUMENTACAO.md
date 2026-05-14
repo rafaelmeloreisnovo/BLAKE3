@@ -426,3 +426,37 @@ Os artefatos de benchmark agora registram perfil e flags finais efetivas para au
 - Não há dependências externas adicionais; o módulo usa apenas C/POSIX e infraestrutura já existente no repositório.
 - Auditoria estática dedicada: `rmr/tools/audit_pathcutter_static.py` valida includes proibidos, heap em loops quentes e uso indevido de símbolos fora do contrato do módulo.
 - Classificação de autoria: trilha explicitamente marcada como **código autoral externo ao upstream BLAKE3**.
+
+### 12) Reprodutor local do job `cmake_c_tests`
+
+Para validar o diretório `c/` com CMake e comparar com a matriz declarada em
+`.github/workflows/ci.yml`, foi adicionado o helper `tools/cmake_ci_compare.sh`.
+
+- Execução rápida (início): `tools/cmake_ci_compare.sh`
+  - roda a trilha mínima (`SIMD=x86-intrinsics`, `TBB=OFF`) com as mesmas flags
+    de fallback de SIMD usadas no CI.
+- Execução completa: `tools/cmake_ci_compare.sh --full`
+  - percorre toda a matriz de `SIMD` e `TBB` do job `cmake_c_tests`.
+- Comparação com upstream oficial em pasta separada:
+  - `tools/cmake_ci_compare.sh --official-dir /caminho/para/BLAKE3-oficial`
+  - executa auditoria de diff no escopo `c/` antes dos testes (via `git diff --no-index`).
+- Clone automático do oficial (`https://github.com/BLAKE3-team/BLAKE3`):
+  - `tools/cmake_ci_compare.sh --clone-official /tmp/BLAKE3-official`
+  - opcional: `--official-ref <tag|branch|commit>` para fixar referência específica.
+
+Esse fluxo não altera o núcleo criptográfico; apenas automatiza validação e
+comparação estrutural com a fonte de verdade do CI e com um checkout oficial
+fornecido externamente.
+
+### 13) Benchmark comparativo local vs upstream oficial (pasta)
+
+Para responder objetivamente a diferença de benchmark entre este fork e o
+`BLAKE3-team/BLAKE3`, use:
+
+- `tools/benchmark_compare_official.sh --runs 3`
+
+O script:
+- clona o upstream oficial em pasta separada (`/tmp/BLAKE3-official-bench`);
+- executa cada repositório com **seu próprio CMakeLists** (`local/c` vs `official/c`);
+- cobre múltiplos perfis de processador/SIMD: `x86-intrinsics`, `x86 sem SSE2`, `x86 sem SSE2/SSE4.1`, `amd64-asm` e `amd64-asm sem AVX2`;
+- reporta tempo médio/mediano e delta percentual local vs oficial por perfil.
