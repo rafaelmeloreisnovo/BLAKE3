@@ -20,7 +20,9 @@ runs=int(${RUNS})
 repos={'local':'$ROOT_DIR/c','official':'$OFFICIAL_DIR/c'}
 base_cfg=[
  ('x86-intrinsics baseline', ['-DBLAKE3_SIMD_TYPE=x86-intrinsics']),
+ ('x86-intrinsics avx512-off', ['-DBLAKE3_SIMD_TYPE=x86-intrinsics','-DBLAKE3_NO_AVX512=1']),
  ('amd64-asm baseline', ['-DBLAKE3_SIMD_TYPE=amd64-asm']),
+ ('amd64-asm avx512-off', ['-DBLAKE3_SIMD_TYPE=amd64-asm','-DBLAKE3_NO_AVX512=1']),
 ]
 tbb_mode='${TBB_MODE}'.upper()
 tbb_values=['OFF','ON'] if tbb_mode=='BOTH' else [tbb_mode]

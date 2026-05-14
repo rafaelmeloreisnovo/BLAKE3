@@ -459,5 +459,5 @@ Para responder objetivamente a diferença de benchmark entre este fork e o
 O script:
 - clona o upstream oficial em pasta separada (`/tmp/BLAKE3-official-bench`);
 - executa cada repositório com **seu próprio CMakeLists** (`local/c` vs `official/c`);
-- cobre múltiplos perfis de processador/SIMD: `x86-intrinsics`, `x86 sem SSE2`, `x86 sem SSE2/SSE4.1`, `amd64-asm` e `amd64-asm sem AVX2`;
+- cobre múltiplos perfis de processador/SIMD: `x86-intrinsics`, `x86 avx512-off`, `amd64-asm` e `amd64-asm avx512-off` (além do modo TBB ON/OFF/BOTH);
 - reporta tempo médio/mediano e delta percentual local vs oficial por perfil.
