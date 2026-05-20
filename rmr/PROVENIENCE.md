@@ -105,3 +105,7 @@ Também foi adicionado o script de auditoria estática `rmr/tools/audit_pathcutt
 ### Atualização 2026-05-20 (BugOrAdd)
 
 Criado `rmr/docs/BugOrAdd/README.md` como diretório conceitual remodelável para organização de conhecimento (modelagem toroidal, semântica multi-idioma e critérios de estudo), sem qualquer alteração no núcleo criptográfico upstream.
+
+### Atualização 2026-05-20 (BugOrAdd reestruturado)
+
+Reorganizada a trilha `rmr/docs/BugOrAdd/` em subpastas temáticas (`models/`, `lexicon/`, `experiments/`, `notes/`) para governança documental; mudança permanece externa/autoral (RMR) e sem impacto no core upstream.

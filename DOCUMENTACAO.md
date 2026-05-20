@@ -466,3 +466,7 @@ O script:
 ### Atualização 2026-05-20 (BugOrAdd conceitual)
 
 Foi criada a base documental `rmr/docs/BugOrAdd/README.md` para consolidar mecanismos de estudo e remodelagem conceitual (mapeamento toroidal, coerência/entropia e tradução multi-idioma), mantendo o escopo estritamente externo ao núcleo BLAKE3 upstream.
+
+### Atualização 2026-05-20 (BugOrAdd estruturado)
+
+A base `rmr/docs/BugOrAdd/` foi reorganizada em subpastas (`models/`, `lexicon/`, `experiments/`, `notes/`) para eliminar documentação solta e padronizar o fluxo de estudo/reinterpretação sem tocar no núcleo BLAKE3 upstream.
