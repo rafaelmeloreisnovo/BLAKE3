@@ -13,6 +13,16 @@ autoria entre o upstream **BLAKE3** e a camada externa **RMR**.
 - **Upstream BLAKE3** permanece com autoria e licenças originais.
 - **RMR autoral** permanece isolado em `rmr/`.
 - Integrações entre blocos devem ser **mínimas, documentadas e explícitas**.
+- O **resultado do hash BLAKE3** e sua semântica criptográfica são atribuídos ao
+  upstream; extensões RMR não reivindicam autoria sobre o algoritmo.
+
+## Declaração curta para uso em PR/relatório
+
+Use o texto abaixo quando precisar explicitar copyright/fronteira:
+
+> “Esta mudança é autoral apenas na camada RMR (`rmr/` e docs externos
+> catalogados). O resultado criptográfico BLAKE3, vetores e semântica do hash
+> permanecem do upstream oficial, sem modificação do núcleo.”
 
 ## Mapa de proveniência (por arquivo/pasta)
 
@@ -102,10 +112,14 @@ Criada trilha autoral externa `rmr/pathcutter/` para utilidades experimentais de
 
 Também foi adicionado o script de auditoria estática `rmr/tools/audit_pathcutter_static.py`, restrito ao módulo externo `rmr/pathcutter/`.
 
-### Atualização 2026-05-20 (BugOrAdd)
+### Atualização 2026-05-24 (freestanding `nomalloc`)
 
-Criado `rmr/docs/BugOrAdd/README.md` como diretório conceitual remodelável para organização de conhecimento (modelagem toroidal, semântica multi-idioma e critérios de estudo), sem qualquer alteração no núcleo criptográfico upstream.
+Adicionado modo autoral externo de alocação estática para ambientes
+`RMR_NO_LIBC` com `RMR_FREESTANDING_NOMALLOC`, implementado em
+`rmr/include/rmr_lowlevel.h` via arena linear configurável por
+`RMR_FREESTANDING_ARENA_SIZE` e reset explícito por
+`rmr_ll_freestanding_reset_allocator()`.
 
-### Atualização 2026-05-20 (BugOrAdd reestruturado)
-
-Reorganizada a trilha `rmr/docs/BugOrAdd/` em subpastas temáticas (`models/`, `lexicon/`, `experiments/`, `notes/`) para governança documental; mudança permanece externa/autoral (RMR) e sem impacto no core upstream.
+A mudança é estritamente de infraestrutura externa em `rmr/` e não altera
+qualquer lógica criptográfica do núcleo BLAKE3 upstream (`src/`, `c/`,
+`reference_impl/`).
