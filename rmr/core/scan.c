@@ -55,7 +55,6 @@ static const char* rel_path(const char *base, const char *full) {
 }
 
 static int path_eq_or_prefix(const char *p, const char *q) {
-    // true se q == p OU q começa com p + "/"
     size_t lp = strlen(p);
     if(strcmp(p, q)==0) return 1;
     if(strncmp(p, q, lp)==0 && q[lp]=='/') return 1;
@@ -69,7 +68,6 @@ static int is_excluded(const pai_scan_opts *opt, const char *base, const char *f
         const char *ex = opt->excludes[i];
         if(!ex || !*ex) continue;
 
-        // ex pode ser relativo (ao base) ou absoluto
         if(ex[0]=='/') {
             if(path_eq_or_prefix(ex, full)) return 1;
         } else {
@@ -83,6 +81,14 @@ static void sha256_line_update(pai_sha256_ctx *mctx, const char *rel, long long 
     char buf[PAI_MAX_PATH + 128];
     int n = snprintf(buf, sizeof(buf), "%s\t%lld\t%s\n", rel, size, hex);
     if(n > 0) pai_sha256_update(mctx, (const uint8_t*)buf, (size_t)n);
+}
+
+static int write_root_file(const char *path, const char hex[65]) {
+    FILE *f = fopen(path, "wb");
+    if(!f) return -1;
+    fprintf(f, "%s\n", hex);
+    fclose(f);
+    return 0;
 }
 
 static int scan_dir_rec(
@@ -143,7 +149,6 @@ static int scan_dir_rec(
         char full[PAI_MAX_PATH];
         join_path(full, sizeof(full), dirpath, name);
 
-        // excluir já na leitura
         if(is_excluded(opt, base, full)) {
             free(entries[n].name);
             continue;
@@ -223,7 +228,6 @@ fail:
 int pai_scan_run(const pai_scan_opts *opt) {
     if(!opt || !opt->base_dir || !opt->out_dir) return 1;
 
-    // fail-fast: base precisa existir e abrir
     DIR *test = opendir(opt->base_dir);
     if(!test) {
         fprintf(stderr, "[scan] base invalida: %s (%s)\n", opt->base_dir, strerror(errno));
@@ -237,8 +241,10 @@ int pai_scan_run(const pai_scan_opts *opt) {
     }
 
     char manifest_path[PAI_MAX_PATH];
+    char linear_root_path[PAI_MAX_PATH];
     char merkle_path[PAI_MAX_PATH];
     join_path(manifest_path, sizeof(manifest_path), opt->out_dir, "manifest.tsv");
+    join_path(linear_root_path, sizeof(linear_root_path), opt->out_dir, "linear_manifest_root.txt");
     join_path(merkle_path, sizeof(merkle_path), opt->out_dir, "merkle_root.txt");
 
     FILE *mf = fopen(manifest_path, "wb");
@@ -255,13 +261,12 @@ int pai_scan_run(const pai_scan_opts *opt) {
     pai_sha256_final(&mctx, root);
     pai_sha256_hex(root, hex);
 
-    FILE *rf = fopen(merkle_path, "wb");
-    if(!rf) { perror("merkle_root"); return 1; }
-    fprintf(rf, "%s\n", hex);
-    fclose(rf);
+    if(write_root_file(linear_root_path, hex) != 0) { perror("linear_manifest_root"); return 1; }
+    if(write_root_file(merkle_path, hex) != 0) { perror("merkle_root"); return 1; }
 
     printf("[OK] manifest: %s\n", manifest_path);
-    printf("[OK] merkle_root: %s\n", merkle_path);
+    printf("[OK] linear_manifest_root: %s\n", linear_root_path);
+    printf("[OK] merkle_root_legacy: %s\n", merkle_path);
     printf("[OK] root=%s\n", hex);
 
     return (rc==0)? 0 : 2;
@@ -296,7 +301,6 @@ int pai_cmd_scan(int argc, char **argv) {
         return 1;
     }
 
-    // por padrão: exclui o próprio out_dir (se estiver dentro do base)
     ex_list[ex_n++] = opt.out_dir;
 
     opt.excludes = ex_list;
