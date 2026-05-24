@@ -202,6 +202,11 @@ RMR agora suporta um perfil de alocação estática:
   estática (default: 64 KiB).
 - `rmr_ll_free` vira no-op por design nesse perfil; reciclagem total ocorre por
   `rmr_ll_freestanding_reset_allocator()`.
+- A arena é única por imagem/binário (estado em
+  `rmr/core/lowlevel_freestanding.c`), evitando cópias por unidade de
+  compilação.
+- Helpers adicionais sem dependência de libc: `rmr_ll_calloc` (zero-fill via
+  `rmr_memset`) e `rmr_ll_freestanding_available`.
 
 Essa estratégia permanece isolada em `rmr/include/rmr_lowlevel.h` e não altera
 qualquer lógica do núcleo BLAKE3 upstream.
