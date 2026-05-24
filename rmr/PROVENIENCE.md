@@ -39,6 +39,7 @@ Use o texto abaixo quando precisar explicitar copyright/fronteira:
 | `README.md`, `CONTRIBUTING.md`, `LICENSE_*`, `Cargo.toml`, `Cargo.lock`, `build.rs` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
 | `rmr/` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/benchmark_framework/` | RMR autoral (blueprint) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/docs/BugOrAdd/` | RMR autoral (base conceitual remodelável) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/ui/` | RMR autoral (front controller de modos) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/include/rmr_governance.h` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/hwif/include/rmr_hwif.h`, `rmr/hwif/include/rmr_detect.h`, `rmr/hwif/rmr_hwif.c`, `rmr/hwif/asm/aarch64/`, `rmr/hwif/asm/x86_64/`, `rmr/hwif/detect/detect_x86.c`, `rmr/hwif/detect/detect_aarch64.c`, `rmr/hwif/detect/detect_fallback.c` | RMR autoral (interface HW, detecção runtime e backends ASM) | RMR Module License (`rmr/LICENSE_RMR`) |
