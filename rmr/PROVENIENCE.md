@@ -29,6 +29,7 @@ autoria entre o upstream **BLAKE3** e a camada externa **RMR**.
 | `README.md`, `CONTRIBUTING.md`, `LICENSE_*`, `Cargo.toml`, `Cargo.lock`, `build.rs` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
 | `rmr/` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/benchmark_framework/` | RMR autoral (blueprint) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/docs/BugOrAdd/` | RMR autoral (base conceitual remodelável) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/ui/` | RMR autoral (front controller de modos) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/include/rmr_governance.h` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/hwif/include/rmr_hwif.h`, `rmr/hwif/include/rmr_detect.h`, `rmr/hwif/rmr_hwif.c`, `rmr/hwif/asm/aarch64/`, `rmr/hwif/asm/x86_64/`, `rmr/hwif/detect/detect_x86.c`, `rmr/hwif/detect/detect_aarch64.c`, `rmr/hwif/detect/detect_fallback.c` | RMR autoral (interface HW, detecção runtime e backends ASM) | RMR Module License (`rmr/LICENSE_RMR`) |
@@ -100,3 +101,11 @@ Adicionado comando `pai validate` (arquivos `rmr/core/validate.c` e `rmr/core/pa
 Criada trilha autoral externa `rmr/pathcutter/` para utilidades experimentais de redução de fricção operacional (mkdir recursivo, alocação segura e fail-fast), com interface estável consumida por `rmr/core/util.c` e sem qualquer alteração no núcleo BLAKE3 upstream (`src/`, `c/`, `reference_impl/`).
 
 Também foi adicionado o script de auditoria estática `rmr/tools/audit_pathcutter_static.py`, restrito ao módulo externo `rmr/pathcutter/`.
+
+### Atualização 2026-05-20 (BugOrAdd)
+
+Criado `rmr/docs/BugOrAdd/README.md` como diretório conceitual remodelável para organização de conhecimento (modelagem toroidal, semântica multi-idioma e critérios de estudo), sem qualquer alteração no núcleo criptográfico upstream.
+
+### Atualização 2026-05-20 (BugOrAdd reestruturado)
+
+Reorganizada a trilha `rmr/docs/BugOrAdd/` em subpastas temáticas (`models/`, `lexicon/`, `experiments/`, `notes/`) para governança documental; mudança permanece externa/autoral (RMR) e sem impacto no core upstream.
