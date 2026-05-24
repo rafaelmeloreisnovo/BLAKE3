@@ -220,6 +220,26 @@ origem, licença e finalidade. Itens autorais fora de `rmr/` também são
 permitidos quando explicitamente catalogados na seção
 "Itens fora de `rmr/` sob autoria externa".
 
+## Guia objetivo de copyright (o que é deles vs o que é meu)
+
+Para evitar ambiguidade de autoria, use este checklist direto:
+
+1. **Se está em `src/`, `c/`, `reference_impl/`, `b3sum/`, `test_vectors/`,
+   `tools/`, `benches/`, `media/`**: tratar como **upstream BLAKE3**
+   (resultado criptográfico e compatibilidade pertencem ao upstream).
+2. **Se está em `rmr/`**: tratar como **camada autoral externa RMR**.
+3. **Se está em documentos autorais fora de `rmr/`** (ex.: este arquivo):
+   tratar como **externo autoral**, sob licença RMR.
+4. **Toda mudança autoral** deve manter declaração explícita de fronteira:
+   “não altera o núcleo criptográfico upstream”.
+
+### Onde isso está apontado formalmente
+
+- Mapa de proveniência por pasta/arquivo: `rmr/PROVENIENCE.md`.
+- Licença da camada autoral externa: `rmr/LICENSE_RMR`.
+- Licenças do upstream: `LICENSE_*`.
+- Regra operacional para agentes/revisão: `AGENTS.md`.
+
 
 ### Licenças por fronteira
 

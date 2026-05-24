@@ -13,6 +13,16 @@ autoria entre o upstream **BLAKE3** e a camada externa **RMR**.
 - **Upstream BLAKE3** permanece com autoria e licenças originais.
 - **RMR autoral** permanece isolado em `rmr/`.
 - Integrações entre blocos devem ser **mínimas, documentadas e explícitas**.
+- O **resultado do hash BLAKE3** e sua semântica criptográfica são atribuídos ao
+  upstream; extensões RMR não reivindicam autoria sobre o algoritmo.
+
+## Declaração curta para uso em PR/relatório
+
+Use o texto abaixo quando precisar explicitar copyright/fronteira:
+
+> “Esta mudança é autoral apenas na camada RMR (`rmr/` e docs externos
+> catalogados). O resultado criptográfico BLAKE3, vetores e semântica do hash
+> permanecem do upstream oficial, sem modificação do núcleo.”
 
 ## Mapa de proveniência (por arquivo/pasta)
 
