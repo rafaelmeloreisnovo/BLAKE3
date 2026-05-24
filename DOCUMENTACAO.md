@@ -190,6 +190,21 @@ Na camada externa RMR, a fronteira de responsabilidades é explícita:
 Essa divisão preserva a compatibilidade operacional sem alterar o núcleo
 criptográfico upstream.
 
+### Perfil freestanding `nomalloc` (camada externa RMR)
+
+Para cenários bare-metal/no-libc com restrição total de heap, o módulo externo
+RMR agora suporta um perfil de alocação estática:
+
+- Macro `RMR_FREESTANDING_NOMALLOC`: redireciona `rmr_ll_malloc` para arena
+  estática linear (bump allocator) sem chamadas de `malloc/free`.
+- Macro `RMR_FREESTANDING_ARENA_SIZE`: permite ajustar o tamanho da arena
+  estática (default: 64 KiB).
+- `rmr_ll_free` vira no-op por design nesse perfil; reciclagem total ocorre por
+  `rmr_ll_freestanding_reset_allocator()`.
+
+Essa estratégia permanece isolada em `rmr/include/rmr_lowlevel.h` e não altera
+qualquer lógica do núcleo BLAKE3 upstream.
+
 ## Política de licença no módulo RMR
 
 No módulo `rmr/`, o arquivo `rmr/LICENSE_RMR` contém **somente** o texto legal

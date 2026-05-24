@@ -100,3 +100,15 @@ Adicionado comando `pai validate` (arquivos `rmr/core/validate.c` e `rmr/core/pa
 Criada trilha autoral externa `rmr/pathcutter/` para utilidades experimentais de redução de fricção operacional (mkdir recursivo, alocação segura e fail-fast), com interface estável consumida por `rmr/core/util.c` e sem qualquer alteração no núcleo BLAKE3 upstream (`src/`, `c/`, `reference_impl/`).
 
 Também foi adicionado o script de auditoria estática `rmr/tools/audit_pathcutter_static.py`, restrito ao módulo externo `rmr/pathcutter/`.
+
+### Atualização 2026-05-24 (freestanding `nomalloc`)
+
+Adicionado modo autoral externo de alocação estática para ambientes
+`RMR_NO_LIBC` com `RMR_FREESTANDING_NOMALLOC`, implementado em
+`rmr/include/rmr_lowlevel.h` via arena linear configurável por
+`RMR_FREESTANDING_ARENA_SIZE` e reset explícito por
+`rmr_ll_freestanding_reset_allocator()`.
+
+A mudança é estritamente de infraestrutura externa em `rmr/` e não altera
+qualquer lógica criptográfica do núcleo BLAKE3 upstream (`src/`, `c/`,
+`reference_impl/`).
