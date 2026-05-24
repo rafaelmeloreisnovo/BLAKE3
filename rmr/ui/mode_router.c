@@ -140,7 +140,12 @@ int rmr_mode_router_main(int argc, char **argv) {
     }
 
     if(strcmp(mode, "cli") == 0) {
-        return run_cli_mode(argc - 2, argv + 2);
+        int start = 3;
+        if(argc < start + 2) {
+            fprintf(stderr, "[erro] faltam argumentos para modo cli\n");
+            return 1;
+        }
+        return run_cli_mode(argc - start, argv + start);
     }
     if(strcmp(mode, "helper") == 0) {
         return run_helper_mode();

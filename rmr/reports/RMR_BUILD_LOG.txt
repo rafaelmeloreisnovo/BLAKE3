@@ -1,0 +1,261 @@
+[STEP] build
+rmr/core/toroid.c: In function ‘load_pgm’:
+rmr/core/toroid.c:31:5: warning: ignoring return value of ‘fscanf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   31 |     fscanf(f,"%2s",magic);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+rmr/core/toroid.c:35:5: warning: ignoring return value of ‘fscanf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   35 |     fscanf(f,"%d %d %d",w,h,&maxv);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+rmr/core/toroid.c:41:11: warning: ignoring return value of ‘fread’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   41 |     (void)fread(buf, 1, tw * th, f);
+      |           ^~~~~~~~~~~~~~~~~~~~~~~~~
+rmr/core/scan.c: In function ‘join_path’:
+rmr/core/scan.c:40:39: warning: zero-length gnu_printf format string [-Wformat-zero-length]
+   40 |     if(!a || !b) { snprintf(dst, cap, ""); return; }
+      |                                       ^~
+In file included from rmr/pathcutter/pathcutter.c:5:
+rmr/pathcutter/../include/rmr_lowlevel.h: In function ‘rmr_memset’:
+rmr/pathcutter/../include/rmr_lowlevel.h:134:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  134 |       case 16: out[15] = value;
+      |                ~~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:135:7: note: here
+  135 |       case 15: out[14] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:135:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  135 |       case 15: out[14] = value;
+      |                ~~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:136:7: note: here
+  136 |       case 14: out[13] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:136:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  136 |       case 14: out[13] = value;
+      |                ~~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:137:7: note: here
+  137 |       case 13: out[12] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:137:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  137 |       case 13: out[12] = value;
+      |                ~~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:138:7: note: here
+  138 |       case 12: out[11] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:138:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  138 |       case 12: out[11] = value;
+      |                ~~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:139:7: note: here
+  139 |       case 11: out[10] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:139:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  139 |       case 11: out[10] = value;
+      |                ~~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:140:7: note: here
+  140 |       case 10: out[9] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:140:23: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  140 |       case 10: out[9] = value;
+      |                ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:141:7: note: here
+  141 |       case 9: out[8] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:141:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  141 |       case 9: out[8] = value;
+      |               ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:142:7: note: here
+  142 |       case 8: out[7] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:142:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  142 |       case 8: out[7] = value;
+      |               ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:143:7: note: here
+  143 |       case 7: out[6] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:143:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  143 |       case 7: out[6] = value;
+      |               ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:144:7: note: here
+  144 |       case 6: out[5] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:144:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  144 |       case 6: out[5] = value;
+      |               ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:145:7: note: here
+  145 |       case 5: out[4] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:145:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  145 |       case 5: out[4] = value;
+      |               ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:146:7: note: here
+  146 |       case 4: out[3] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:146:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  146 |       case 4: out[3] = value;
+      |               ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:147:7: note: here
+  147 |       case 3: out[2] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:147:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  147 |       case 3: out[2] = value;
+      |               ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:148:7: note: here
+  148 |       case 2: out[1] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:148:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  148 |       case 2: out[1] = value;
+      |               ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:149:7: note: here
+  149 |       case 1: out[0] = value;
+      |       ^~~~
+[OK] build: ./pai
+[STEP] pipeline test
+[rmr.validate] alpha=0.250000 expected=0.25
+[rmr.validate] attractors=42 expected=42
+[rmr.validate] capacity=100 bits_geom=6.643856
+[rmr.validate] gcd(dr,rows)=1 gcd(dc,cols)=1
+[rmr.validate] entropy_milli=1992.249
+[rmr.validate] OK: invariantes aceitos
+[OK] manifest: out_rmr_pipeline/scan/manifest.tsv
+[OK] linear_manifest_root: out_rmr_pipeline/scan/linear_manifest_root.txt
+[OK] merkle_root_legacy: out_rmr_pipeline/scan/merkle_root.txt
+[OK] root=5b202384877a6fb5082beed00f4886e2b616a116e079cdc71cf6d85a9803266c
+[OK] assinatura gerada: out_rmr_pipeline/scan/SIGNATURE.txt
+4b9df5a6353b20c16e72792b16456dfe529a6f4a55c3fb4a5d274c89a021a608  README.md
+4b9df5a6353b20c16e72792b16456dfe529a6f4a55c3fb4a5d274c89a021a608  README.md
+4b9df5a6353b20c16e72792b16456dfe529a6f4a55c3fb4a5d274c89a021a608  README.md
+[OK] bench.tsv: out_rmr_pipeline/bench_a/bench.tsv
+[OK] bench_report.txt: out_rmr_pipeline/bench_a/bench_report.txt
+[OK] run_manifest.json: out_rmr_pipeline/metrics/run_manifest.json
+[OK] metrics.jsonl: out_rmr_pipeline/metrics/metrics.jsonl
+[OK] summary.json: out_rmr_pipeline/metrics/summary.json
+[OK] benchdiff_report.txt: out_rmr_pipeline/diff/benchdiff_report.txt
+[OK] benchdiff_report.json: out_rmr_pipeline/diff/benchdiff_report.json
+[OK] RMR pipeline canonical smoke test passed
+[STEP] scan/sign/bench/benchdiff
+[OK] manifest: out_rmr_audit/scan/manifest.tsv
+[OK] linear_manifest_root: out_rmr_audit/scan/linear_manifest_root.txt
+[OK] merkle_root_legacy: out_rmr_audit/scan/merkle_root.txt
+[OK] root=34c08c1c0c02f3488495b9516cc0d697cb8703a01c26ae0ab1c5ae54ba0e4697
+[OK] assinatura gerada: out_rmr_audit/scan/SIGNATURE.txt
+4b9df5a6353b20c16e72792b16456dfe529a6f4a55c3fb4a5d274c89a021a608  README.md
+4b9df5a6353b20c16e72792b16456dfe529a6f4a55c3fb4a5d274c89a021a608  README.md
+4b9df5a6353b20c16e72792b16456dfe529a6f4a55c3fb4a5d274c89a021a608  README.md
+[OK] bench.tsv: out_rmr_audit/bench_a/bench.tsv
+[OK] bench_report.txt: out_rmr_audit/bench_a/bench_report.txt
+[OK] run_manifest.json: out_rmr_audit/metrics/run_manifest.json
+[OK] metrics.jsonl: out_rmr_audit/metrics/metrics.jsonl
+[OK] summary.json: out_rmr_audit/metrics/summary.json
+[OK] benchdiff_report.txt: out_rmr_audit/diff/benchdiff_report.txt
+[OK] benchdiff_report.json: out_rmr_audit/diff/benchdiff_report.json
+./rmr/tools/run_full_audit.sh: line 33: pai: command not found
+rmr/core/toroid.c: In function ‘load_pgm’:
+rmr/core/toroid.c:31:5: warning: ignoring return value of ‘fscanf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   31 |     fscanf(f,"%2s",magic);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+rmr/core/toroid.c:35:5: warning: ignoring return value of ‘fscanf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   35 |     fscanf(f,"%d %d %d",w,h,&maxv);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+rmr/core/toroid.c:41:11: warning: ignoring return value of ‘fread’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   41 |     (void)fread(buf, 1, tw * th, f);
+      |           ^~~~~~~~~~~~~~~~~~~~~~~~~
+rmr/core/scan.c: In function ‘join_path’:
+rmr/core/scan.c:40:39: warning: zero-length gnu_printf format string [-Wformat-zero-length]
+   40 |     if(!a || !b) { snprintf(dst, cap, ""); return; }
+      |                                       ^~
+In file included from rmr/pathcutter/pathcutter.c:5:
+rmr/pathcutter/../include/rmr_lowlevel.h: In function ‘rmr_memset’:
+rmr/pathcutter/../include/rmr_lowlevel.h:134:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  134 |       case 16: out[15] = value;
+      |                ~~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:135:7: note: here
+  135 |       case 15: out[14] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:135:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  135 |       case 15: out[14] = value;
+      |                ~~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:136:7: note: here
+  136 |       case 14: out[13] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:136:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  136 |       case 14: out[13] = value;
+      |                ~~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:137:7: note: here
+  137 |       case 13: out[12] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:137:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  137 |       case 13: out[12] = value;
+      |                ~~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:138:7: note: here
+  138 |       case 12: out[11] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:138:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  138 |       case 12: out[11] = value;
+      |                ~~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:139:7: note: here
+  139 |       case 11: out[10] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:139:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  139 |       case 11: out[10] = value;
+      |                ~~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:140:7: note: here
+  140 |       case 10: out[9] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:140:23: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  140 |       case 10: out[9] = value;
+      |                ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:141:7: note: here
+  141 |       case 9: out[8] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:141:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  141 |       case 9: out[8] = value;
+      |               ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:142:7: note: here
+  142 |       case 8: out[7] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:142:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  142 |       case 8: out[7] = value;
+      |               ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:143:7: note: here
+  143 |       case 7: out[6] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:143:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  143 |       case 7: out[6] = value;
+      |               ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:144:7: note: here
+  144 |       case 6: out[5] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:144:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  144 |       case 6: out[5] = value;
+      |               ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:145:7: note: here
+  145 |       case 5: out[4] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:145:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  145 |       case 5: out[4] = value;
+      |               ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:146:7: note: here
+  146 |       case 4: out[3] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:146:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  146 |       case 4: out[3] = value;
+      |               ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:147:7: note: here
+  147 |       case 3: out[2] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:147:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  147 |       case 3: out[2] = value;
+      |               ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:148:7: note: here
+  148 |       case 2: out[1] = value;
+      |       ^~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:148:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  148 |       case 2: out[1] = value;
+      |               ~~~~~~~^~~~~~~
+rmr/pathcutter/../include/rmr_lowlevel.h:149:7: note: here
+  149 |       case 1: out[0] = value;
+      |       ^~~~
+./rmr/tools/run_full_audit.sh: line 33: scan: command not found
+./rmr/tools/run_full_audit.sh: line 33: sign: command not found
+./rmr/tools/run_full_audit.sh: line 33: bench: command not found
+./rmr/tools/run_full_audit.sh: line 33: benchdiff: command not found
+./rmr/tools/run_full_audit.sh: line 33: rmr/reports/: Is a directory
+./rmr/tools/run_full_audit.sh: line 33: RMR_ARTIFACTS_SHA256.txt: command not found
+[OK] full audit complete
