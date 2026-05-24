@@ -51,3 +51,11 @@ Geram artefatos visuais simples: PGM e OBJ/MTL. São materializações geométri
 ## Fronteira ética/técnica
 
 A camada RMR não modifica nem substitui o BLAKE3 upstream. Qualquer integração BLAKE3 futura deve ser opção explícita de hash, preservando SHA-256 atual para compatibilidade.
+
+## Update 2026-05-24 (code-first)
+- `linear_manifest_root.txt` é a raiz linear canônica do manifesto.
+- `merkle_root.txt` permanece como compatibilidade legado.
+- `SIGNATURE.txt` permanece em `PAI SIGNATURE v2` e prioriza `linear_manifest_root.txt` na assinatura.
+- `scan` registra algoritmo de hash no manifesto via comentário (`# hash=sha256`).
+- `bench` produz `bench.tsv`, `metrics.jsonl`, `summary.json`, `run_manifest.json` e mantém compatibilidade com hashchain FNV-1a.
+- `benchdiff` usa média/mediana/p95/variância + contagem de válidos e ok/fail, com status `ALERT` se delta absoluto em média **ou** p95 exceder threshold.
