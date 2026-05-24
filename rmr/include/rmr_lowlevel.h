@@ -174,8 +174,10 @@ RMR_INLINE void rmr_memset(void *RMR_RESTRICT dst, uint8_t value, size_t len) {
 size_t rmr_ll_strlen(const char *value);
 int rmr_ll_strcmp(const char *left, const char *right);
 const char *rmr_ll_strerror(int errnum);
+#if !defined(RMR_FREESTANDING_NOMALLOC)
 void *rmr_ll_malloc(size_t size);
 void rmr_ll_free(void *ptr);
+#endif
 unsigned long long rmr_ll_strtoull(const char *text, char **end, int base);
 #else
 RMR_INLINE size_t rmr_ll_strlen(const char *value) { return strlen(value); }
@@ -191,6 +193,45 @@ RMR_INLINE const char *rmr_ll_strerror(int errnum) {
 RMR_INLINE void *rmr_ll_malloc(size_t size) { return malloc(size); }
 
 RMR_INLINE void rmr_ll_free(void *ptr) { free(ptr); }
+#endif
+
+#if defined(RMR_NO_LIBC) && defined(RMR_FREESTANDING_NOMALLOC)
+#ifndef RMR_FREESTANDING_ARENA_SIZE
+#define RMR_FREESTANDING_ARENA_SIZE (64u * 1024u)
+#endif
+extern uint8_t rmr_freestanding_arena[RMR_FREESTANDING_ARENA_SIZE];
+extern size_t rmr_freestanding_arena_head;
+RMR_INLINE size_t rmr_ll_freestanding_available(void) {
+  return RMR_FREESTANDING_ARENA_SIZE - rmr_freestanding_arena_head;
+}
+RMR_INLINE void *rmr_ll_malloc(size_t size) {
+  const size_t aligned = (size + (sizeof(uintptr_t) - 1u)) & ~(sizeof(uintptr_t) - 1u);
+  if (RMR_UNLIKELY(aligned == 0u)) {
+    return (void *)0;
+  }
+  if (RMR_UNLIKELY(aligned > rmr_ll_freestanding_available())) {
+    return (void *)0;
+  }
+  void *ptr = (void *)(rmr_freestanding_arena + rmr_freestanding_arena_head);
+  rmr_freestanding_arena_head += aligned;
+  return ptr;
+}
+RMR_INLINE void rmr_ll_free(void *ptr) { (void)ptr; }
+RMR_INLINE void rmr_ll_freestanding_reset_allocator(void) { rmr_freestanding_arena_head = 0; }
+RMR_INLINE void *rmr_ll_calloc(size_t count, size_t size) {
+  if (RMR_UNLIKELY(count == 0u || size == 0u)) {
+    return (void *)0;
+  }
+  if (RMR_UNLIKELY(count > (SIZE_MAX / size))) {
+    return (void *)0;
+  }
+  void *ptr = rmr_ll_malloc(count * size);
+  if (RMR_UNLIKELY(ptr == (void *)0)) {
+    return (void *)0;
+  }
+  rmr_memset(ptr, 0u, count * size);
+  return ptr;
+}
 #endif
 
 RMR_INLINE bool rmr_ll_parse_size(const char *text, size_t *out) {
