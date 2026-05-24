@@ -21,7 +21,7 @@ FORBIDDEN_INCLUDES = {
 
 HEAP_CALLS = ("malloc(", "calloc(", "realloc(", "free(")
 ALLOWED_EXPORTS = {"rmr_pc_die", "rmr_pc_mkdir_p", "rmr_pc_xmalloc", "rmr_pc_xfree"}
-ALLOWED_CALL_PREFIXES = ("rmr_ll_", "perror", "fprintf", "mem", "str", "exit", "mkdir")
+ALLOWED_CALL_PREFIXES = ("rmr_ll_", "rmr_mem", "perror", "fprintf", "mem", "str", "exit", "mkdir")
 
 
 def module_files() -> list[Path]:

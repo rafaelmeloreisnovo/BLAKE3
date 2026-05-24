@@ -64,6 +64,7 @@ organizacional. Eles devem manter rastreabilidade de licença e finalidade:
 | `AGENTS.md` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Governança operacional para agentes |
 | `tools/check_rmr_headers.py` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Verificação de cabeçalho `LICENSE_RMR`, shebang e escopo de alterações |
 | `tools/check_rmr_headers.sh` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Wrapper para execução do verificador Python |
+| `rmr/tools/audit_freestanding_nomalloc.py` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Auditoria estática de coerência do perfil bare-metal `RMR_FREESTANDING_NOMALLOC` |
 ## Observações sobre integração
 
 - O RMR é **externo** e não integra o núcleo BLAKE3 por padrão.
