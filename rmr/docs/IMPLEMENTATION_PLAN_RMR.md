@@ -28,5 +28,3 @@ Toda mudança deve ficar na camada `rmr/` e preservar a semântica do BLAKE3 ups
 - Scripts canônicos:
   - `rmr/tools/build_pai.sh`
   - `rmr/tools/run_full_audit.sh`
-
-- relatórios em `rmr/reports/` são artefatos locais gerados por script e não devem ser versionados; usar `.gitignore`.
