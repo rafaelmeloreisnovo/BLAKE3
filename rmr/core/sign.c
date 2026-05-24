@@ -42,10 +42,9 @@ static void signature_timestamp(struct tm *out_tm) {
 
 static void usage(void) {
     puts("uso:");
-    puts("  pai sign --base DIR --scan SCANDIR --out DIR");
+    puts("  pai sign --base DIR --scan SCANDIR --out DIR [--self ./pai]");
 }
 
-/* le arquivo texto pequeno (ex: merkle_root.txt) */
 static int read_text(const char *path, char *buf, size_t max) {
     FILE *f = fopen(path, "r");
     if(!f) return -1;
@@ -68,11 +67,17 @@ int pai_cmd_sign(int argc, char **argv) {
     const char *base = NULL;
     const char *scan = NULL;
     const char *out  = NULL;
+    const char *self_path = "./pai";
 
     for(int i=2;i<argc;i++) {
         if(!strcmp(argv[i], "--base") && i+1<argc) base = argv[++i];
         else if(!strcmp(argv[i], "--scan") && i+1<argc) scan = argv[++i];
         else if(!strcmp(argv[i], "--out") && i+1<argc) out = argv[++i];
+        else if(!strcmp(argv[i], "--self") && i+1<argc) self_path = argv[++i];
+        else if(!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h")) {
+            usage();
+            return 0;
+        }
     }
 
     if(!base || !scan || !out) {
@@ -80,22 +85,25 @@ int pai_cmd_sign(int argc, char **argv) {
         return 1;
     }
 
-    (void)base; /* reservado p/ v2: incluir hash do base/manifest no signature */
+    (void)base;
 
-    /* ler merkle_root do scan */
-    char merkle[256];
-    char path_merkle[512];
-    snprintf(path_merkle, sizeof(path_merkle), "%s/merkle_root.txt", scan);
+    char root[256];
+    char path_root[512];
+    const char *root_name = "linear_manifest_root";
 
-    if(read_text(path_merkle, merkle, sizeof(merkle)) != 0) {
-        fprintf(stderr, "[sign] falhou lendo: %s\n", path_merkle);
-        return 2;
+    snprintf(path_root, sizeof(path_root), "%s/linear_manifest_root.txt", scan);
+    if(read_text(path_root, root, sizeof(root)) != 0) {
+        root_name = "merkle_root_legacy";
+        snprintf(path_root, sizeof(path_root), "%s/merkle_root.txt", scan);
+        if(read_text(path_root, root, sizeof(root)) != 0) {
+            fprintf(stderr, "[sign] falhou lendo raiz do scan em: %s\n", scan);
+            return 2;
+        }
     }
 
-    /* hash do binario ./pai usando API existente */
     uint8_t hbin[32];
-    if(pai_sha256_file("./pai", hbin) != 0) {
-        fprintf(stderr, "[sign] falhou hash binario: ./pai\n");
+    if(pai_sha256_file(self_path, hbin) != 0) {
+        fprintf(stderr, "[sign] falhou hash binario: %s\n", self_path);
         return 3;
     }
 
@@ -114,13 +122,15 @@ int pai_cmd_sign(int argc, char **argv) {
         return 4;
     }
 
-    fprintf(f, "PAI SIGNATURE v1\n");
+    fprintf(f, "PAI SIGNATURE v2\n");
     fprintf(f, "timestamp=%04d-%02d-%02dT%02d:%02d:%02dZ\n",
         tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
         tm.tm_hour, tm.tm_min, tm.tm_sec);
 
+    fprintf(f, "binary_path=%s\n", self_path);
     fprintf(f, "binary_sha256=%s\n", self_hex);
-    fprintf(f, "merkle_root=%s", merkle);
+    fprintf(f, "scan_root_name=%s\n", root_name);
+    fprintf(f, "scan_root=%s", root);
 
     fclose(f);
 
