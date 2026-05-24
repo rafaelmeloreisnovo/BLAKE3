@@ -1,0 +1,4 @@
+# Generated audit artifacts (local only)
+*.txt
+*.md
+!.gitignore

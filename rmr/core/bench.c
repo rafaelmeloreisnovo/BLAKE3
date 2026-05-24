@@ -7,6 +7,7 @@
  */
 
 #include "pai.h"
+#include "pai_hash.h"
 #include "../hwif/include/rmr_detect.h"
 
 #include <errno.h>
@@ -39,6 +40,12 @@ static void report_timestamp(struct tm *tm_out){
     memset(tm_out,0,sizeof(*tm_out)); tm_out->tm_year=70; tm_out->tm_mon=0; tm_out->tm_mday=1;
 }
 static int mkdir_p(const char *p){ if(mkdir(p,0700)==0) return 0; return errno==EEXIST?0:-1; }
+static int sha256_file_hex_or_na(const char *path, char out[65]){
+    uint8_t h[32];
+    if(!path || pai_sha256_file(path,h)!=0){ strcpy(out, "na"); return -1; }
+    pai_sha256_hex(h,out);
+    return 0;
+}
 static int run_self_cmd(int quiet, char *const argv_exec[]){
     pid_t pid=fork(); if(pid<0) return -1;
     if(pid==0){ if(quiet){ int fd=open("/dev/null",O_WRONLY); if(fd>=0){ dup2(fd,1); dup2(fd,2); close(fd);} } execv(argv_exec[0],argv_exec); _exit(127);} 
@@ -82,8 +89,22 @@ int pai_cmd_bench(int argc, char **argv){
     fprintf(ft,"cmd\tok\tms\n");
 
     const char *self="./pai"; if(access(self,X_OK)!=0) self=argv[0];
-    char *xv[256]; int sub=argc-(sep+1); if(sub+2>256){ fclose(ft); return 5; }
-    xv[0]=(char*)self; for(int i=0;i<sub;i++) xv[i+1]=argv[sep+1+i]; xv[sub+1]=NULL;
+    char *xv[256]; int sub=argc-(sep+1);
+    int direct_exec = 0;
+    if(sub > 0 && argv[sep+1][0] == '/') direct_exec = 1;
+    if(sub > 0 && argv[sep+1][0] == '.' && access(argv[sep+1], X_OK) == 0) direct_exec = 1;
+    if((direct_exec ? sub+1 : sub+5) > 256){ fclose(ft); return 5; }
+    if(direct_exec){
+        for(int i=0;i<sub;i++) xv[i]=argv[sep+1+i];
+        xv[sub]=NULL;
+    } else {
+        xv[0]=(char*)self;
+        xv[1]=(char*)"run";
+        xv[2]=(char*)"--mode";
+        xv[3]=(char*)"cli";
+        for(int i=0;i<sub;i++) xv[i+4]=argv[sep+1+i];
+        xv[sub+4]=NULL;
+    }
 
     double sample[PAI_BENCH_MAX_REPEAT];
     double sum=0.0, mn=1e300, mx=0.0;
@@ -153,14 +174,19 @@ int pai_cmd_bench(int argc, char **argv){
         fprintf(fman,"  \"config\": {\"repeat\": %d, \"bytes\": %lld, \"quiet\": %d, \"command\": \"%s\"},\n",repeat,bytes,quiet,argv[sep+1]);
         fprintf(fman,"  \"environment\": {\"cpu_arch\": %u, \"simd_detected\": \"%s\", \"rmr_cpu_caps\": {\"register_width\": %u}, \"build_profile\": \"%s\", \"effective_cflags\": \"%s\", \"effective_ldflags\": \"%s\"},\n",c->architecture,simd,c->register_width,getenv("RMR_BUILD_PROFILE")?getenv("RMR_BUILD_PROFILE"):"unknown",getenv("RMR_FINAL_CFLAGS")?getenv("RMR_FINAL_CFLAGS"):(getenv("CFLAGS")?getenv("CFLAGS"):"unknown"),getenv("RMR_FINAL_LDFLAGS")?getenv("RMR_FINAL_LDFLAGS"):"unknown");
         fprintf(fman,"  \"governance\": {\"telemetry\": {\"ntp_enabled\": %d, \"icmp_probe_enabled\": %d, \"jitter_sampling_enabled\": %d, \"offline_deterministic\": %d, \"clock_sync_timeout_ms\": %ld, \"icmp_probe_timeout_ms\": %ld, \"jitter_sample_window_ms\": %ld, \"telemetry_rate_limit_per_minute\": %ld}, \"metadata\": {\"clock_sync_ms\": %ld, \"icmp_rtt_ms\": %ld, \"jitter_ppm\": %ld}},\n",gov_ntp_enabled,gov_icmp_probe_enabled,gov_jitter_sampling_enabled,gov_offline_deterministic,gov_clock_sync_timeout_ms,gov_icmp_probe_timeout_ms,gov_jitter_sample_window_ms,gov_telemetry_rate_limit_per_minute,gov_clock_sync_ms,gov_icmp_rtt_ms,gov_jitter_ppm);
-        fprintf(fman,"  \"fingerprints\": {\"input_set\": \"%016llx\", \"snapshot_hash\": \"%016llx\", \"output_artifacts\": \"%016llx\"}\n",(unsigned long long)inhash,(unsigned long long)(inhash^outhash),(unsigned long long)outhash);
+        char tsv_sha[65], rpt_sha[65], metrics_sha[65], summary_sha[65];
+        (void)sha256_file_hex_or_na(tsv, tsv_sha);
+        (void)sha256_file_hex_or_na(rpt, rpt_sha);
+        (void)sha256_file_hex_or_na(mj, metrics_sha);
+        (void)sha256_file_hex_or_na(sj, summary_sha);
+        fprintf(fman,"  \"fingerprints\": {\"input_set\": \"%016llx\", \"snapshot_hash\": \"%016llx\", \"output_artifacts\": \"%016llx\", \"bench_tsv_sha256\": \"%s\", \"bench_report_sha256\": \"%s\", \"metrics_jsonl_sha256\": \"%s\", \"summary_sha256\": \"%s\"}\n",(unsigned long long)inhash,(unsigned long long)(inhash^outhash),(unsigned long long)outhash,tsv_sha,rpt_sha,metrics_sha,summary_sha);
         fprintf(fman,"}\n");
         fclose(fman);
     }
 
     FILE *fs=fopen(sj,"w");
     if(fs){
-        fprintf(fs,"{\"min_ms\":%.3f,\"max_ms\":%.3f,\"median_ms\":%.3f,\"p95_ms\":%.3f,\"variance\":%.6f,\"history_compare\":{\"session\":\"%s\",\"store\":\"%s\",\"profile\":\"%s\"}}\n",mn,mx,med,sample[p95i],var,new_session?"new":"append",metrics_store,argv[sep+1]);
+        fprintf(fs,"{\"min_ms\":%.3f,\"max_ms\":%.3f,\"median_ms\":%.3f,\"p95_ms\":%.3f,\"variance\":%.6f,\"ok_count\":%d,\"repeat\":%d,\"final_run_hash\":\"%016llx\",\"history_compare\":{\"session\":\"%s\",\"store\":\"%s\",\"profile\":\"%s\"}}\n",mn,mx,med,sample[p95i],var,okc,repeat,(unsigned long long)chain,new_session?"new":"append",metrics_store,argv[sep+1]);
         fclose(fs);
     }
 

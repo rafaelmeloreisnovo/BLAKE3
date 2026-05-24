@@ -240,6 +240,16 @@ int pai_scan_run(const pai_scan_opts *opt) {
         return 4;
     }
 
+    if(!opt->hash_algo || strcmp(opt->hash_algo, "sha256") == 0) {
+        /* sha256 default */
+    } else if(strcmp(opt->hash_algo, "blake3") == 0) {
+        fprintf(stderr, "[scan] --hash blake3 ainda nao disponivel neste backend C externo; use --hash sha256\n");
+        return 5;
+    } else {
+        fprintf(stderr, "[scan] algoritmo de hash invalido: %s (use sha256)\n", opt->hash_algo);
+        return 5;
+    }
+
     char manifest_path[PAI_MAX_PATH];
     char linear_root_path[PAI_MAX_PATH];
     char merkle_path[PAI_MAX_PATH];
@@ -249,6 +259,7 @@ int pai_scan_run(const pai_scan_opts *opt) {
 
     FILE *mf = fopen(manifest_path, "wb");
     if(!mf) { perror("manifest"); return 1; }
+    fprintf(mf, "# hash=%s\n", opt->hash_algo ? opt->hash_algo : "sha256");
 
     pai_sha256_ctx mctx;
     pai_sha256_init(&mctx);
@@ -279,6 +290,7 @@ int pai_cmd_scan(int argc, char **argv) {
     opt.follow_symlinks = 0;
     opt.max_depth = -1;
     opt.max_size = -1;
+    opt.hash_algo = "sha256";
 
     const char *ex_list[64];
     int ex_n = 0;
@@ -290,6 +302,7 @@ int pai_cmd_scan(int argc, char **argv) {
         else if(!strcmp(argv[i],"--follow")) opt.follow_symlinks = 1;
         else if(!strcmp(argv[i],"--max-depth") && i+1<argc) opt.max_depth = atoi(argv[++i]);
         else if(!strcmp(argv[i],"--max-size") && i+1<argc) opt.max_size = atoll(argv[++i]);
+        else if(!strcmp(argv[i],"--hash") && i+1<argc) opt.hash_algo = argv[++i];
         else if(!strcmp(argv[i],"--exclude") && i+1<argc) {
             if(ex_n < 64) ex_list[ex_n++] = argv[++i];
             else i++;
@@ -297,7 +310,7 @@ int pai_cmd_scan(int argc, char **argv) {
     }
 
     if(!opt.base_dir || !opt.out_dir) {
-        fprintf(stderr, "uso: pai scan --base DIR --out OUTDIR [--exclude PATH]... [--hidden] [--follow] [--max-depth N] [--max-size BYTES]\n");
+        fprintf(stderr, "uso: pai scan --base DIR --out OUTDIR [--hash sha256|blake3] [--exclude PATH]... [--hidden] [--follow] [--max-depth N] [--max-size BYTES]\n");
         return 1;
     }
 
