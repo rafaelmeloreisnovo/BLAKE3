@@ -45,7 +45,7 @@ void *rmr_pc_xmalloc(size_t n) {
         perror("malloc");
         exit(2);
     }
-    memset(p, 0, n);
+    rmr_memset(p, 0, n);
     return p;
 }
 

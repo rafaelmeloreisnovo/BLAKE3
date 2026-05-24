@@ -13,6 +13,16 @@ autoria entre o upstream **BLAKE3** e a camada externa **RMR**.
 - **Upstream BLAKE3** permanece com autoria e licenças originais.
 - **RMR autoral** permanece isolado em `rmr/`.
 - Integrações entre blocos devem ser **mínimas, documentadas e explícitas**.
+- O **resultado do hash BLAKE3** e sua semântica criptográfica são atribuídos ao
+  upstream; extensões RMR não reivindicam autoria sobre o algoritmo.
+
+## Declaração curta para uso em PR/relatório
+
+Use o texto abaixo quando precisar explicitar copyright/fronteira:
+
+> “Esta mudança é autoral apenas na camada RMR (`rmr/` e docs externos
+> catalogados). O resultado criptográfico BLAKE3, vetores e semântica do hash
+> permanecem do upstream oficial, sem modificação do núcleo.”
 
 ## Mapa de proveniência (por arquivo/pasta)
 
@@ -33,6 +43,7 @@ autoria entre o upstream **BLAKE3** e a camada externa **RMR**.
 | `rmr/include/rmr_governance.h` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/hwif/include/rmr_hwif.h`, `rmr/hwif/include/rmr_detect.h`, `rmr/hwif/rmr_hwif.c`, `rmr/hwif/asm/aarch64/`, `rmr/hwif/asm/x86_64/`, `rmr/hwif/detect/detect_x86.c`, `rmr/hwif/detect/detect_aarch64.c`, `rmr/hwif/detect/detect_fallback.c` | RMR autoral (interface HW, detecção runtime e backends ASM) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/core/validate.c`, `rmr/core/pai_validate.h` | RMR autoral (validação determinística de invariantes) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/core/lowlevel_freestanding.c` | RMR autoral (estado global da arena nomalloc freestanding) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `DOCUMENTACAO.md`, `MANIFESTO*.md` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/MANIFESTO_RAFAELIA.md` | RMR autoral (texto não jurídico) | RMR Module License (`rmr/LICENSE_RMR`) |
 
@@ -100,3 +111,15 @@ Adicionado comando `pai validate` (arquivos `rmr/core/validate.c` e `rmr/core/pa
 Criada trilha autoral externa `rmr/pathcutter/` para utilidades experimentais de redução de fricção operacional (mkdir recursivo, alocação segura e fail-fast), com interface estável consumida por `rmr/core/util.c` e sem qualquer alteração no núcleo BLAKE3 upstream (`src/`, `c/`, `reference_impl/`).
 
 Também foi adicionado o script de auditoria estática `rmr/tools/audit_pathcutter_static.py`, restrito ao módulo externo `rmr/pathcutter/`.
+
+### Atualização 2026-05-24 (freestanding `nomalloc`)
+
+Adicionado modo autoral externo de alocação estática para ambientes
+`RMR_NO_LIBC` com `RMR_FREESTANDING_NOMALLOC`, implementado em
+`rmr/include/rmr_lowlevel.h` via arena linear configurável por
+`RMR_FREESTANDING_ARENA_SIZE` e reset explícito por
+`rmr_ll_freestanding_reset_allocator()`.
+
+A mudança é estritamente de infraestrutura externa em `rmr/` e não altera
+qualquer lógica criptográfica do núcleo BLAKE3 upstream (`src/`, `c/`,
+`reference_impl/`).
