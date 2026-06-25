@@ -31,6 +31,7 @@ This fork keeps a strict boundary:
 | SIMD dispatch | Keep target-specific routing observable and testable. |
 | Optional TBB | Add a gated parallel subtree path without making TBB mandatory. |
 | RAFAELIA/Bitraf | Use BLAKE3 as an integrity primitive inside a wider custody/hashchain system. |
+| Fiber H | Treat as a separate RMR/RAFAELIA method candidate, not as a BLAKE3 replacement claim. |
 | Claims | Use benchmark and CI evidence; avoid blanket superiority language. |
 
 ## What is technically present
@@ -112,6 +113,18 @@ input/corpus
 
 This keeps the claim clean: BLAKE3 is the hash primitive; RAFAELIA supplies orchestration, custody, metadata, symbolic indexing, and reproducibility context.
 
+## RMR/Fiber H boundary
+
+Fiber H is documented as a separate RMR/RAFAELIA method candidate. Do not describe it as a BLAKE3 replacement unless a target-specific specification, vectors, harness, and benchmark matrix support the claim.
+
+Use this framing:
+
+```text
+BLAKE3 = public hash primitive and compatibility baseline
+Fiber H = separate RMR method candidate for custody/fingerprint/throughput experiments
+RAFAELIA = orchestration, custody, metadata, reproducibility and claim gates
+```
+
 ## Claim gates
 
 Do not use broad language such as “globally superior to upstream” without target-specific evidence.
@@ -126,12 +139,15 @@ Use these gates instead:
 | Optional TBB path exists | Defensible when built with `BLAKE3_USE_TBB`. |
 | CUDA support exists | Do not claim unless implemented and tested. |
 | Fixed percentage speedups | Do not claim without benchmark matrix. |
+| Fiber H performance | Treat as hypothesis until measured against a baseline matrix. |
 | Single average score comparison | Avoid; it hides extremes and target-specific behavior. |
 
 ## Documentation map
 
 - [`c/README.md`](c/README.md): C API, build commands, TBB/NEON notes, and C-specific claim gates.
 - [`docs/RAFAELIA_BLAKE3_BUILD_ORCHESTRATION.md`](docs/RAFAELIA_BLAKE3_BUILD_ORCHESTRATION.md): deeper audit of flags, warnings, include order, build routing, CI, and RAFAELIA custody interpretation.
+- [`docs/rafaelia/RMR_INFRAESTRUTURA_CRITICA_DADOS_IA_CUSTODIA_BLAKE3.md`](docs/rafaelia/RMR_INFRAESTRUTURA_CRITICA_DADOS_IA_CUSTODIA_BLAKE3.md): RMR custody, infrastructure-critical data, algorithmic audit, logs, and proof-of-conformity framing.
+- [`docs/rafaelia/RMR_LICENSE_FIBER_H_BOUNDARY.md`](docs/rafaelia/RMR_LICENSE_FIBER_H_BOUNDARY.md): license boundary, BLAKE3/RAFAELIA separation, and Fiber H claim gates.
 
 ## Termux / Android note
 
@@ -149,8 +165,8 @@ For ARMv7/Android targets, do not assume desktop flags. Document the actual targ
 ## Retrofeedback
 
 `F_ok`: BLAKE3 is preserved as primitive; the fork's real work is build orchestration and custody integration.  
-`F_gap`: target-specific benchmark matrix is still needed for strong performance claims.  
-`F_next`: add reproducible benchmark artifacts before claiming percentage speedups or production superiority.
+`F_gap`: target-specific benchmark matrix is still needed for strong performance claims, including any 10–20x estimate or Fiber H comparison.  
+`F_next`: add reproducible benchmark artifacts before claiming percentage speedups, production superiority, or Fiber H baseline advantage.
 
 [@oconnor663]: https://github.com/oconnor663
 [@sneves]: https://github.com/sneves
