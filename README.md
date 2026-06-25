@@ -4,9 +4,9 @@ This repository is a fork/distribution of the BLAKE3 implementation. It is not a
 
 The correct technical framing is:
 
-> BLAKE3 remains the cryptographic primitive. This fork documents and extends the build, warning, flag, dispatch, optional TBB, and RAFAELIA integrity/custody layers around it.
+> BLAKE3 remains the cryptographic primitive. This fork documents and extends the build, warning, flag, dispatch, optional TBB, dimensional-layout, and RAFAELIA integrity/custody layers around it.
 
-This repository should not be described by a single average score. A single score hides the difference between cryptographic semantics, compiler behavior, build reproducibility, runtime dispatch, optional parallel recursion, and RAFAELIA custody metadata.
+This repository should not be described by a single average score. A single score hides the difference between cryptographic semantics, compiler behavior, build reproducibility, runtime dispatch, optional parallel recursion, binary-size geometry, and RAFAELIA custody metadata.
 
 ## Upstream BLAKE3 summary
 
@@ -28,6 +28,7 @@ This fork keeps a strict boundary:
 |---|---|
 | Cryptographic primitive | Preserve compatibility and validate with test vectors. |
 | C/Rust build pipeline | Make flags, warnings, target selection, and rebuild triggers explicit. |
+| Dimensional execution geometry | Document 32/64/1024-byte units, CV stack size, SIMD degree, lazy merge, and ABI-sensitive state layout. |
 | SIMD dispatch | Keep target-specific routing observable and testable. |
 | Optional TBB | Add a gated parallel subtree path without making TBB mandatory. |
 | RAFAELIA/Bitraf | Use BLAKE3 as an integrity primitive inside a wider custody/hashchain system. |
@@ -51,6 +52,20 @@ The root `build.rs` acts as a precompiler-level router:
 - chooses assembly, intrinsics, NEON, Wasm SIMD, or pure Rust paths according to target and features;
 - checks AVX-512 compiler support before enabling the AVX-512 C path;
 - emits known cfg names to keep newer Rust warning behavior controlled.
+
+### Dimensional execution geometry
+
+The implementation is shaped around binary-friendly units:
+
+```text
+OUT_LEN = 32 bytes
+BLOCK_LEN = 64 bytes
+CHUNK_LEN = 1024 bytes = 16 blocks
+MAX_DEPTH = 54
+cv_stack = (MAX_DEPTH + 1) * OUT_LEN = 1760 bytes
+```
+
+The dimensional audit documents how these values affect stack pressure, subtree splitting, lazy merge behavior, SIMD degree, ABI-sensitive padding, and ARM/Termux measurement requirements.
 
 ### CMake/C pipeline
 
@@ -140,6 +155,8 @@ Use these gates instead:
 | Build orchestration is explicit | Defensible from `build.rs`, CMake, and CI. |
 | Warning discipline exists | Defensible from `BLAKE3_CI` and `RUSTFLAGS=-D warnings`. |
 | Optional TBB path exists | Defensible when built with `BLAKE3_USE_TBB`. |
+| Dimensional geometry exists | Defensible from constants, structs, SIMD degree, CV stack, and subtree logic. |
+| Exact ABI sizes on Android/Termux | Measure with `tools/sizeof_blake3_state.c` before claiming. |
 | CUDA support exists | Do not claim unless implemented and tested. |
 | Fixed percentage speedups | Do not claim without benchmark matrix. |
 | 10–20x same-engine speedup | Treat as local/preliminary until artifacts are attached. |
@@ -167,6 +184,13 @@ cmake --build build-termux
 ```
 
 For ARMv7/Android targets, do not assume desktop flags. Document the actual target triple, compiler, NEON support, ABI, and measured results.
+
+To measure target layout:
+
+```bash
+cc -std=c11 -Ic tools/sizeof_blake3_state.c -o sizeof_blake3_state
+./sizeof_blake3_state
+```
 
 ## Retrofeedback
 
