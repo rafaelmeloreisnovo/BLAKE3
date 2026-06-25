@@ -32,6 +32,8 @@ This fork keeps a strict boundary:
 | SIMD dispatch | Keep target-specific routing observable and testable. |
 | Optional TBB | Add a gated parallel subtree path without making TBB mandatory. |
 | RAFAELIA/Bitraf | Use BLAKE3 as an integrity primitive inside a wider custody/hashchain system. |
+| RMR | Snapshot/cadeia forense de operação: binário, flags, host, target, logs, digest e reprodutibilidade. |
+| FiberHaga | Separate RMR/RAFAELIA hashing core; not a BLAKE3 layer and not included as a BLAKE3 claim. |
 | Claims | Use benchmark and CI evidence; avoid blanket superiority language. |
 
 ## What is technically present
@@ -127,6 +129,20 @@ input/corpus
 
 This keeps the claim clean: BLAKE3 is the hash primitive; RAFAELIA supplies orchestration, custody, metadata, symbolic indexing, and reproducibility context.
 
+## RMR / BLAKE3 / FiberHaga boundary
+
+RMR is not BLAKE3. BLAKE3 is a digest primitive inside an RMR custody chain. FiberHaga is not BLAKE3 and is not a “perfumaria” layer on top of BLAKE3; it is a separate RMR/RAFAELIA core to be specified and benchmarked separately.
+
+Use this framing:
+
+```text
+BLAKE3 = public hash primitive and compatibility baseline
+BLAKE3 fork = binary/build/flags/dispatch/custody orchestration without changing the core
+RMR = machine-operation snapshot and forensic custody chain
+FiberHaga = separate RMR/RAFAELIA hashing core
+RAFAELIA = orchestration, custody, metadata, reproducibility and claim gates
+```
+
 ## Claim gates
 
 Do not use broad language such as “globally superior to upstream” without target-specific evidence.
@@ -143,14 +159,18 @@ Use these gates instead:
 | Exact ABI sizes on Android/Termux | Measure with `tools/sizeof_blake3_state.c` before claiming. |
 | CUDA support exists | Do not claim unless implemented and tested. |
 | Fixed percentage speedups | Do not claim without benchmark matrix. |
+| 10–20x same-engine speedup | Treat as local/preliminary until artifacts are attached. |
+| RMR custody chain | Defensible as architecture when manifest/log/digest are present. |
+| FiberHaga performance | Not a BLAKE3 claim; requires separate spec and benchmark. |
 | Single average score comparison | Avoid; it hides extremes and target-specific behavior. |
 
 ## Documentation map
 
 - [`c/README.md`](c/README.md): C API, build commands, TBB/NEON notes, and C-specific claim gates.
 - [`docs/RAFAELIA_BLAKE3_BUILD_ORCHESTRATION.md`](docs/RAFAELIA_BLAKE3_BUILD_ORCHESTRATION.md): deeper audit of flags, warnings, include order, build routing, CI, and RAFAELIA custody interpretation.
-- [`docs/RAFAELIA_BLAKE3_DIMENSIONAL_AUDIT.md`](docs/RAFAELIA_BLAKE3_DIMENSIONAL_AUDIT.md): dimensional audit of sizes, binary layout, stack arrays, SIMD degree, power-of-two subtree geometry, and ABI-sensitive measurement.
-- [`tools/sizeof_blake3_state.c`](tools/sizeof_blake3_state.c): C probe for exact target sizes and offsets.
+- [`docs/rafaelia/RMR_INFRAESTRUTURA_CRITICA_DADOS_IA_CUSTODIA_BLAKE3.md`](docs/rafaelia/RMR_INFRAESTRUTURA_CRITICA_DADOS_IA_CUSTODIA_BLAKE3.md): RMR custody, infrastructure-critical data, algorithmic audit, logs, and proof-of-conformity framing.
+- [`docs/rafaelia/RMR_LICENSE_FIBER_H_BOUNDARY.md`](docs/rafaelia/RMR_LICENSE_FIBER_H_BOUNDARY.md): license boundary, BLAKE3/RAFAELIA separation, and FiberHaga claim gates.
+- [`docs/rafaelia/RMR_BLAKE3_BINARY_ORCHESTRATION_VS_FIBERHAGA.md`](docs/rafaelia/RMR_BLAKE3_BINARY_ORCHESTRATION_VS_FIBERHAGA.md): explicit split between same-engine BLAKE3 binary orchestration, RMR forensic custody, and FiberHaga as separate core.
 
 ## Termux / Android note
 
@@ -174,9 +194,9 @@ cc -std=c11 -Ic tools/sizeof_blake3_state.c -o sizeof_blake3_state
 
 ## Retrofeedback
 
-`F_ok`: BLAKE3 is preserved as primitive; the fork's real work is build orchestration, dimensional awareness, and custody integration.  
-`F_gap`: target-specific benchmark and ABI matrix are still needed for strong performance claims.  
-`F_next`: run the size probe and add measured x86-64/AArch64/ARMv7 rows before claiming exact Android layout.
+`F_ok`: BLAKE3 is preserved as primitive; the fork's real work is build orchestration and custody integration.  
+`F_gap`: target-specific benchmark matrix is still needed for strong performance claims, including any 10–20x estimate or FiberHaga comparison.  
+`F_next`: add reproducible benchmark artifacts before claiming percentage speedups, production superiority, or FiberHaga baseline advantage.
 
 [@oconnor663]: https://github.com/oconnor663
 [@sneves]: https://github.com/sneves
