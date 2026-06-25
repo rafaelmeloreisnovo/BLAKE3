@@ -1,6 +1,6 @@
-# RMR — licenças, fronteira BLAKE3 e limite Fiber H
+# RMR — licenças, fronteira BLAKE3 e limite FiberHaga
 
-> Documento complementar para separar a licença/base upstream BLAKE3, a camada de build/custódia RAFAELIA e o Fiber H como método autoral distinto.
+> Documento complementar para separar a licença/base upstream BLAKE3, a camada de build/custódia RAFAELIA e o FiberHaga como núcleo autoral distinto.
 
 ## 1. Diagnóstico do repositório
 
@@ -41,12 +41,15 @@ O README do fork já define a fronteira adequada:
 ```text
 BLAKE3 = primitivo de hash
 RAFAELIA = build orchestration + custody + metadata + symbolic indexing + reproducibility context
+RMR = snapshot/cadeia forense de operação
+FiberHaga = outro núcleo autoral, fora da semântica BLAKE3
 ```
 
 Não usar:
 
 ```text
 "BLAKE3 foi substituído por RAFAELIA"
+"FiberHaga é perfumaria do BLAKE3"
 "este fork é globalmente superior ao upstream"
 "a licença prova superioridade técnica"
 ```
@@ -54,40 +57,43 @@ Não usar:
 Usar:
 
 ```text
-"BLAKE3 permanece como primitivo de hash; o fork adiciona/documenta camadas de build, flags, dispatch, warning discipline, TBB opcional e custódia RAFAELIA."
+"BLAKE3 permanece como primitivo de hash; o fork adiciona/documenta camadas de build, flags, dispatch, warning discipline, TBB opcional e custódia RAFAELIA/RMR. FiberHaga é outro núcleo autoral e deve ser especificado em documento próprio."
 ```
 
-## 5. Fiber H não é perfumaria do BLAKE3
+## 5. FiberHaga não é perfumaria do BLAKE3
 
-Fiber H deve ser tratado como método autoral separado.
+FiberHaga deve ser tratado como núcleo autoral separado.
 
 ```text
 BLAKE3 = primitivo público, permissivo, com especificação e vetores conhecidos
-Fiber H = método autoral RMR/RAFAELIA a ser especificado, testado e comparado por harness próprio
+BLAKE3 fork = mesma semântica de hash, com orquestração binária/build/flags/dispatch/custódia
+RMR = cadeia forense de operação de máquina/processo/ciclo
+FiberHaga = núcleo autoral RMR/RAFAELIA a ser especificado, testado e comparado por harness próprio
 ```
 
-Não declarar Fiber H como “BLAKE3 melhorado” sem especificação formal. Declarar como camada/método separado:
+Não declarar FiberHaga como “BLAKE3 melhorado”. Declarar como núcleo separado:
 
 ```text
-Fiber H é um candidato autoral de hashing/fingerprint/custódia que deve ser avaliado contra BLAKE3 e outros métodos por matriz de benchmarks, vetores, throughput, latência, streaming, memória, ABI e reprodutibilidade.
+FiberHaga é outro núcleo de hashing/fingerprint/custódia autoral. A comparação com BLAKE3 deve ocorrer por matriz de benchmarks, vetores, throughput, latência, streaming, memória, ABI e reprodutibilidade.
 ```
 
-## 6. Estimativa 10–20x
+## 6. Estimativa 10–20x no BLAKE3 fork
 
-A estimativa de 10–20x pode existir como hipótese operacional, mas não como claim final.
+A estimativa de 10–20x se refere ao mesmo motor BLAKE3 sob orquestração binária/build/flags/dispatch, sem mudança do núcleo. Ela pode existir como relato local/preliminar, mas não como claim final sem artefatos.
 
 Linguagem segura:
 
 ```text
-Hipótese de performance: em certos alvos, flags e pipelines de build/orquestração, ganhos de ordem 10–20x podem ser investigados como estimativa preliminar. Essa estimativa não é claim de produção até existir benchmark reproduzível.
+Há relato local de ganhos da ordem de 10–20x em certos alvos/pipelines, sem alteração do motor BLAKE3. Para virar claim público final, é necessário anexar matriz reproduzível de benchmark com commit, flags, target, backend, dataset e estatística.
 ```
 
 Linguagem proibida sem matriz:
 
 ```text
-"10–20x comprovado"
+"10–20x comprovado universalmente"
 "superior ao BLAKE3 upstream em todos os cenários"
-"melhor que BLAKE3 em termos universais"
+"FiberHaga está dentro do BLAKE3"
+"FiberHaga é claim deste fork"
 ```
 
 ## 7. Benchmark matrix mínima
@@ -108,31 +114,33 @@ Para transformar estimativa em evidência, registrar:
 | BLAKE3 digest | hash do relatório/artefatos com BLAKE3 |
 | SHA256 | hash secundário para interoperabilidade |
 
-## 8. Fiber H claim gate
+## 8. FiberHaga claim gate
 
 | Claim | Status correto |
 |---|---|
-| Fiber H é autoral | Defensável se houver spec própria e autoria documentada |
-| Fiber H é mais rápido em alvo X | Só após benchmark reproduzível em alvo X |
-| Fiber H é melhor para RAFAELIA custody | Defensável como hipótese se o uso for fingerprint/custódia e houver medição |
-| Fiber H substitui BLAKE3 universalmente | Não declarar sem prova muito forte |
+| FiberHaga é autoral | Defensável se houver spec própria e autoria documentada |
+| FiberHaga é outro núcleo | Defensável como fronteira conceitual/autoral |
+| FiberHaga é mais rápido em alvo X | Só após benchmark reproduzível em alvo X |
+| FiberHaga é melhor para RAFAELIA custody | Defensável como hipótese se o uso for fingerprint/custódia e houver medição |
+| FiberHaga substitui BLAKE3 universalmente | Não declarar sem prova muito forte |
 
 ## 9. Modelo de relação
 
 ```text
 BLAKE3 upstream
   -> primitivo permissivo e auditável
-  -> fork RAFAELIA documenta build/custody/orchestration
-  -> Fiber H permanece método autoral paralelo
+  -> fork RAFAELIA documenta build/custody/orchestration sem mudar o núcleo
+  -> RMR registra operação de máquina/processo/ciclo com digest e hashchain
+  -> FiberHaga permanece núcleo autoral paralelo
   -> benchmarks e hashchains conectam as evidências
 ```
 
 ## 10. Frase recomendada
 
-> Este fork não reivindica que a camada RAFAELIA altere a semântica do BLAKE3. O fork preserva BLAKE3 como primitivo e adiciona documentação/infraestrutura de build, custódia, metadados, reprodutibilidade e auditoria. Fiber H é tratado como método autoral separado, a ser especificado e comparado por matriz de benchmark própria.
+> Este fork não reivindica que a camada RAFAELIA altere a semântica do BLAKE3. O fork preserva BLAKE3 como primitivo e adiciona documentação/infraestrutura de build, flagamento, dispatch, custódia, metadados, reprodutibilidade e auditoria. RMR é a cadeia forense de operação. FiberHaga é outro núcleo autoral, fora do BLAKE3, a ser especificado e comparado por matriz de benchmark própria.
 
 ## 11. Retrofeedback
 
-**F_ok:** duas licenças identificadas; fronteira BLAKE3/RAFAELIA/Fiber H documentada.  
-**F_gap:** Fiber H precisa de spec, vetores e benchmark matrix antes de claims fortes.  
-**F_next:** criar `docs/rafaelia/FIBER_H_SPEC_AND_BENCHMARK_PLAN.md` e harness comparativo BLAKE3 x baseline x Fiber H.
+**F_ok:** duas licenças identificadas; fronteira BLAKE3/RAFAELIA/RMR/FiberHaga documentada.  
+**F_gap:** FiberHaga precisa de spec, vetores e benchmark matrix antes de claims fortes.  
+**F_next:** criar `docs/rafaelia/FIBERHAGA_SPEC_AND_BENCHMARK_PLAN.md` e harness comparativo BLAKE3 x baseline x FiberHaga.
