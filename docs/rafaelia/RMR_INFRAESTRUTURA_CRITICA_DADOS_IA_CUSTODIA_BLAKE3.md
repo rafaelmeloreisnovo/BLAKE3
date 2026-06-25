@@ -11,7 +11,10 @@ O papel correto desta camada é:
 ```text
 BLAKE3 = primitivo de integridade
 RMR/RAFAELIA = cadeia de custódia + metadados + hashchain + auditoria + contexto de prova
+Fiber H = método autoral separado, dependente de spec e benchmark próprios
 ```
+
+Ver também: [`RMR_LICENSE_FIBER_H_BOUNDARY.md`](./RMR_LICENSE_FIBER_H_BOUNDARY.md).
 
 ## 2. Tese central
 
@@ -242,5 +245,5 @@ Essa cadeia preserva a fronteira correta:
 ## 16. Retroalimentação RAFAELIA
 
 **F_ok:** fragmentação como blindagem operacional é forte e documentável como problema de governança.  
-**F_gap:** extorsão, conspiração, ilegalidade total, dolo algorítmico e blindagem intencional exigem prova interna ou regulatória.  
-**F_next:** gerar artefatos BLAKE3 para documentos, capturas de metadados, protocolos e logs auditáveis.
+**F_gap:** extorsão, conspiração, ilegalidade total, dolo algorítmico, blindagem intencional e claims Fiber H exigem prova interna, regulatória ou benchmark próprio.  
+**F_next:** gerar artefatos BLAKE3 para documentos, capturas de metadados, protocolos, logs auditáveis e matriz Fiber H.
