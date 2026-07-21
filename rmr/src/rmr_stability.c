@@ -1,321 +1,96 @@
 // SPDX-License-Identifier: Apache-2.0 OR CC0-1.0
 #include "rmr_stability.h"
-
 #include <limits.h>
 
 #if defined(RMR_HAS_STABILITY_ARMV7) && RMR_HAS_STABILITY_ARMV7
-extern uint32_t rmr_stability_step_armv7(uint32_t state_words[4],
-                                         const uint8_t *events,
-                                         uint32_t count);
+extern uint32_t rmr_stability_step_armv7(uint32_t state_words[4], const uint8_t *events, uint32_t count);
 #endif
 
-static uint32_t rmr_rotl32(uint32_t x, uint32_t n) {
-    return (x << n) | (x >> (32u - n));
-}
+static uint32_t rotl32(uint32_t x,uint32_t n){return(x<<n)|(x>>(32u-n));}
+static uint32_t rotr32(uint32_t x,uint32_t n){return(x>>n)|(x<<(32u-n));}
+static uint32_t absdiff32(uint32_t a,uint32_t b){return a>=b?a-b:b-a;}
+static uint32_t satadd32(uint32_t a,uint32_t b,uint32_t *st){if(UINT32_MAX-a<b){if(st)*st|=RMR_STABILITY_STATUS_COUNTER_SATURATED;return UINT32_MAX;}return a+b;}
+static uint32_t ratio_q30(uint32_t n,uint32_t d){return d?(uint32_t)(((uint64_t)n<<30u)/d):0u;}
+static uint32_t ratio_q16(uint32_t n,uint32_t d){return d?(uint32_t)(((uint64_t)n<<16u)/d):0u;}
 
-static uint32_t rmr_rotr32(uint32_t x, uint32_t n) {
-    return (x >> n) | (x << (32u - n));
-}
-
-static uint32_t rmr_sat_add_u32(uint32_t a, uint32_t b, uint32_t *status) {
-    if (UINT32_MAX - a < b) {
-        if (status) *status |= RMR_STABILITY_STATUS_COUNTER_SATURATED;
-        return UINT32_MAX;
-    }
-    return a + b;
-}
-
-static uint32_t rmr_ratio_q30(uint32_t numerator, uint32_t denominator) {
-    if (denominator == 0u) return 0u;
-    return (uint32_t)(((uint64_t)numerator << 30u) / denominator);
-}
-
-static uint32_t rmr_ratio_q16(uint32_t numerator, uint32_t denominator) {
-    if (denominator == 0u) return 0u;
-    return (uint32_t)(((uint64_t)numerator << 16u) / denominator);
-}
-
-static uint32_t rmr_absdiff_u32(uint32_t a, uint32_t b) {
-    return (a >= b) ? (a - b) : (b - a);
-}
-
-static uint32_t rmr_crc32c_update(uint32_t crc, const uint8_t *p, size_t n) {
-    while (n--) {
-        crc ^= *p++;
-        for (uint32_t i = 0; i < 8u; ++i) {
-            const uint32_t mask = (uint32_t)-(int32_t)(crc & 1u);
-            crc = (crc >> 1u) ^ (0x82F63B78u & mask);
-        }
-    }
+static uint32_t crc32c_update(uint32_t crc,const uint8_t *p,size_t n){
+    while(n--){crc^=*p++;for(uint32_t i=0;i<8u;i++){uint32_t m=(uint32_t)-(int32_t)(crc&1u);crc=(crc>>1u)^(0x82F63B78u&m);}}
     return crc;
 }
+uint32_t RmR_Stability_CRC32C(const void *data,size_t size){if(!data&&size)return 0u;return crc32c_update(0xFFFFFFFFu,(const uint8_t*)data,size)^0xFFFFFFFFu;}
 
-uint32_t RmR_Stability_CRC32C(const void *data, size_t size) {
-    if (!data && size != 0u) return 0u;
-    uint32_t crc = 0xFFFFFFFFu;
-    crc = rmr_crc32c_update(crc, (const uint8_t *)data, size);
-    return crc ^ 0xFFFFFFFFu;
+void RmR_StabilityState_Init(RmR_StabilityState *s,uint32_t seed){
+    if(!s)return;uint32_t x=seed?seed:0x963u;s->s0=x^0x243F6A88u;s->s1=rotl32(x,7u)^0x85A308D3u;s->s2=rotl32(x,13u)^0x13198A2Eu;s->s3=rotl32(x,21u)^0x03707344u;
 }
-
-void RmR_StabilityState_Init(RmR_StabilityState *state, uint32_t seed) {
-    if (!state) return;
-    const uint32_t x = seed ? seed : 0x00000963u;
-    state->s0 = x ^ 0x243F6A88u;
-    state->s1 = rmr_rotl32(x, 7u) ^ 0x85A308D3u;
-    state->s2 = rmr_rotl32(x, 13u) ^ 0x13198A2Eu;
-    state->s3 = rmr_rotl32(x, 21u) ^ 0x03707344u;
+uint32_t RmR_StabilityStepPortable(RmR_StabilityState *s,const uint8_t *e,size_t n){
+    if(!s||(!e&&n))return 0u;uint32_t a=s->s0,b=s->s1,c=s->s2,d=s->s3;
+    for(size_t i=0;i<n;i++){a^=b;b+=e[i];c=rotr32(c,5u);c+=a;d^=c;a+=d;}
+    s->s0=a;s->s1=b;s->s2=c;s->s3=d;return(((a^b)+c)^d)&0x7FFFFFFFu;
 }
-
-uint32_t RmR_StabilityStepPortable(RmR_StabilityState *state,
-                                   const uint8_t *events,
-                                   size_t count) {
-    if (!state || (!events && count != 0u)) return 0u;
-    uint32_t s0 = state->s0;
-    uint32_t s1 = state->s1;
-    uint32_t s2 = state->s2;
-    uint32_t s3 = state->s3;
-    for (size_t i = 0; i < count; ++i) {
-        s0 ^= s1;
-        s1 += events[i];
-        s2 = rmr_rotr32(s2, 5u);
-        s2 += s0;
-        s3 ^= s2;
-        s0 += s3;
-    }
-    state->s0 = s0;
-    state->s1 = s1;
-    state->s2 = s2;
-    state->s3 = s3;
-    return ((((s0 ^ s1) + s2) ^ s3) & 0x7FFFFFFFu);
-}
-
-uint32_t RmR_StabilityStep(RmR_StabilityState *state,
-                           const uint8_t *events,
-                           size_t count) {
-    if (!state || (!events && count != 0u)) return 0u;
+uint32_t RmR_StabilityStep(RmR_StabilityState *s,const uint8_t *e,size_t n){
+    if(!s||(!e&&n))return 0u;
 #if defined(RMR_HAS_STABILITY_ARMV7) && RMR_HAS_STABILITY_ARMV7
-    if (count <= UINT32_MAX) {
-        return rmr_stability_step_armv7(&state->s0, events, (uint32_t)count);
-    }
+    if(n<=UINT32_MAX)return rmr_stability_step_armv7(&s->s0,e,(uint32_t)n);
 #endif
-    return RmR_StabilityStepPortable(state, events, count);
+    return RmR_StabilityStepPortable(s,e,n);
 }
 
-void RmR_StabilityTrace_Init(RmR_StabilityTrace *trace) {
-    if (!trace) return;
-    *trace = (RmR_StabilityTrace){0};
-    trace->status = RMR_STABILITY_STATUS_NO_SAMPLES |
-                    RMR_STABILITY_STATUS_NO_PEAK_SAMPLES |
-                    RMR_STABILITY_STATUS_NO_NONPEAK_SAMPLES;
+void RmR_StabilityTrace_Init(RmR_StabilityTrace *t){if(!t)return;*t=(RmR_StabilityTrace){0};t->status=RMR_STABILITY_STATUS_NO_SAMPLES|RMR_STABILITY_STATUS_NO_PEAK_SAMPLES|RMR_STABILITY_STATUS_NO_NONPEAK_SAMPLES;}
+void RmR_StabilityTrace_Add(RmR_StabilityTrace *t,uint32_t gate,uint8_t stable,uint8_t peak_flag){
+    if(!t)return;uint32_t peak=peak_flag||gate==3u||gate==4u||gate==8u;t->rows=satadd32(t->rows,1u,&t->status);
+    if(peak){t->peak_total=satadd32(t->peak_total,1u,&t->status);if(stable)t->peak_stable=satadd32(t->peak_stable,1u,&t->status);}
+    else{t->nonpeak_total=satadd32(t->nonpeak_total,1u,&t->status);if(stable)t->nonpeak_stable=satadd32(t->nonpeak_stable,1u,&t->status);}
+}
+uint32_t RmR_StabilityTrace_Finalize(RmR_StabilityTrace *t){
+    if(!t)return RMR_STABILITY_STATUS_BAD_ARGUMENT;t->status&=RMR_STABILITY_STATUS_COUNTER_SATURATED;
+    if(!t->rows)t->status|=RMR_STABILITY_STATUS_NO_SAMPLES;if(!t->peak_total)t->status|=RMR_STABILITY_STATUS_NO_PEAK_SAMPLES;if(!t->nonpeak_total)t->status|=RMR_STABILITY_STATUS_NO_NONPEAK_SAMPLES;
+    t->peak_rate_q30=ratio_q30(t->peak_stable,t->peak_total);t->nonpeak_rate_q30=ratio_q30(t->nonpeak_stable,t->nonpeak_total);t->delta_p_q30=(int32_t)t->peak_rate_q30-(int32_t)t->nonpeak_rate_q30;return t->status;
 }
 
-void RmR_StabilityTrace_Add(RmR_StabilityTrace *trace,
-                            uint32_t gate,
-                            uint8_t stable_any,
-                            uint8_t gate_in_peaks) {
-    if (!trace) return;
-    const uint32_t is_peak = (gate_in_peaks != 0u) || gate == 3u || gate == 4u || gate == 8u;
-    trace->rows = rmr_sat_add_u32(trace->rows, 1u, &trace->status);
-    if (is_peak) {
-        trace->peak_total = rmr_sat_add_u32(trace->peak_total, 1u, &trace->status);
-        if (stable_any) trace->peak_stable = rmr_sat_add_u32(trace->peak_stable, 1u, &trace->status);
-    } else {
-        trace->nonpeak_total = rmr_sat_add_u32(trace->nonpeak_total, 1u, &trace->status);
-        if (stable_any) trace->nonpeak_stable = rmr_sat_add_u32(trace->nonpeak_stable, 1u, &trace->status);
+uint8_t RmR_Vision_OtsuThreshold(const uint8_t *g,uint32_t w,uint32_t h,uint32_t stride,uint32_t *status){
+    if(status)*status=0u;if(!g||!w||!h||stride<w){if(status)*status|=RMR_STABILITY_STATUS_BAD_ARGUMENT;return 0u;}
+    uint64_t total=(uint64_t)w*h;if(total>UINT32_MAX){if(status)*status|=RMR_STABILITY_STATUS_COUNTER_SATURATED;return 0u;}
+    uint32_t hist[256]={0};uint64_t sum=0;
+    for(uint32_t y=0;y<h;y++){const uint8_t *r=g+(size_t)y*stride;for(uint32_t x=0;x<w;x++){hist[r[x]]++;sum+=r[x];}}
+    uint32_t shift=0;while((total>>shift)>65535u)shift++;
+    uint64_t wb=0,sb=0,best=0;uint8_t threshold=0;
+    for(uint32_t i=0;i<256;i++){
+        wb+=hist[i];if(!wb)continue;uint64_t wf=total-wb;if(!wf)break;sb+=(uint64_t)i*hist[i];
+        uint64_t mb=(sb<<16u)/wb,mf=((sum-sb)<<16u)/wf,d=(mb>=mf?mb-mf:mf-mb)>>8u;
+        uint64_t swb=wb>>shift,swf=wf>>shift;if(!swb)swb=1;if(!swf)swf=1;uint64_t score=(d*d)*swb*swf;
+        if(score>best){best=score;threshold=(uint8_t)i;}
     }
+    return threshold;
 }
 
-uint32_t RmR_StabilityTrace_Finalize(RmR_StabilityTrace *trace) {
-    if (!trace) return RMR_STABILITY_STATUS_BAD_ARGUMENT;
-    trace->status &= RMR_STABILITY_STATUS_COUNTER_SATURATED;
-    if (trace->rows == 0u) trace->status |= RMR_STABILITY_STATUS_NO_SAMPLES;
-    if (trace->peak_total == 0u) trace->status |= RMR_STABILITY_STATUS_NO_PEAK_SAMPLES;
-    if (trace->nonpeak_total == 0u) trace->status |= RMR_STABILITY_STATUS_NO_NONPEAK_SAMPLES;
-    trace->peak_rate_q30 = rmr_ratio_q30(trace->peak_stable, trace->peak_total);
-    trace->nonpeak_rate_q30 = rmr_ratio_q30(trace->nonpeak_stable, trace->nonpeak_total);
-    trace->delta_p_q30 = (int32_t)trace->peak_rate_q30 - (int32_t)trace->nonpeak_rate_q30;
-    return trace->status;
+static uint32_t angle_bin(int16_t deg){int32_t a=deg;while(a<0)a+=360;while(a>=360)a-=360;return(uint32_t)((a+22)/45)&7u;}
+static uint32_t angular_chi2_q16(const uint32_t hist[8],uint32_t n,uint32_t *status){
+    if(!n)return 0u;if(n>1000000u){if(status)*status|=RMR_STABILITY_STATUS_ANGLE_SATURATED;n=1000000u;}
+    uint64_t num=0;for(uint32_t i=0;i<8;i++){int64_t d=(int64_t)(8u*hist[i])-(int64_t)n;num+=(uint64_t)(d*d);}uint64_t den=(uint64_t)8u*n,whole=num/den,rem=num%den;
+    if(whole>(UINT32_MAX>>16u))return UINT32_MAX;uint64_t q=(whole<<16u)+((rem<<16u)/den);return(uint32_t)(q>UINT32_MAX?UINT32_MAX:q);
+}
+static uint32_t angular_concentration_q16(const uint32_t hist[8],uint32_t n){
+    if(!n)return 0u;uint32_t m=hist[0];for(uint32_t i=1;i<8;i++)if(hist[i]>m)m=hist[i];uint64_t s=(uint64_t)m*8u;if(s<=n)return 0u;return(uint32_t)(((s-n)<<16u)/((uint64_t)7u*n));
+}
+static void crc_u32(uint32_t *crc,uint32_t v){uint8_t b[4]={(uint8_t)v,(uint8_t)(v>>8u),(uint8_t)(v>>16u),(uint8_t)(v>>24u)};*crc=crc32c_update(*crc,b,4u);}
+
+uint32_t RmR_Vision_BuildDescriptor(const uint8_t *g,uint32_t w,uint32_t h,uint32_t stride,const int16_t *angles,uint32_t angle_count,RmR_VisionDescriptor *o){
+    if(!o)return RMR_STABILITY_STATUS_BAD_ARGUMENT;*o=(RmR_VisionDescriptor){0};o->width=w;o->height=h;
+    if(!g||!w||!h||stride<w||(!angles&&angle_count)){o->status=RMR_STABILITY_STATUS_BAD_ARGUMENT;return o->status;}
+    uint64_t pc=(uint64_t)w*h;if(pc>UINT32_MAX){o->status=RMR_STABILITY_STATUS_COUNTER_SATURATED;return o->status;}o->pixel_count=(uint32_t)pc;o->otsu_threshold=RmR_Vision_OtsuThreshold(g,w,h,stride,&o->status);
+    uint32_t gray_crc=0xFFFFFFFFu;for(uint32_t y=0;y<h;y++){const uint8_t *r=g+(size_t)y*stride;gray_crc=crc32c_update(gray_crc,r,w);for(uint32_t x=0;x<w;x++)if(r[x]<=o->otsu_threshold)o->foreground_count++;}
+    o->gray_crc32c=gray_crc^0xFFFFFFFFu;o->foreground_q16=ratio_q16(o->foreground_count,o->pixel_count);
+    uint32_t used=angle_count>1000000u?1000000u:angle_count;if(used!=angle_count)o->status|=RMR_STABILITY_STATUS_ANGLE_SATURATED;o->angle_count=used;
+    for(uint32_t i=0;i<used;i++){uint32_t b=angle_bin(angles[i]);o->angle_hist[b]=satadd32(o->angle_hist[b],1u,&o->status);}o->angular_chi2_q16=angular_chi2_q16(o->angle_hist,used,&o->status);o->angular_concentration_q16=angular_concentration_q16(o->angle_hist,used);
+    uint32_t crc=0xFFFFFFFFu;crc_u32(&crc,o->width);crc_u32(&crc,o->height);crc_u32(&crc,o->pixel_count);crc_u32(&crc,o->foreground_count);crc_u32(&crc,o->foreground_q16);crc_u32(&crc,o->angle_count);for(uint32_t i=0;i<8;i++)crc_u32(&crc,o->angle_hist[i]);crc_u32(&crc,o->angular_chi2_q16);crc_u32(&crc,o->angular_concentration_q16);crc_u32(&crc,o->gray_crc32c);crc=crc32c_update(crc,&o->otsu_threshold,1u);o->descriptor_crc32c=crc^0xFFFFFFFFu;return o->status;
 }
 
-uint8_t RmR_Vision_OtsuThreshold(const uint8_t *gray,
-                                 uint32_t width,
-                                 uint32_t height,
-                                 uint32_t stride,
-                                 uint32_t *status) {
-    if (status) *status = RMR_STABILITY_STATUS_OK;
-    if (!gray || width == 0u || height == 0u || stride < width) {
-        if (status) *status |= RMR_STABILITY_STATUS_BAD_ARGUMENT;
-        return 0u;
-    }
-    uint32_t hist[256] = {0u};
-    const uint64_t total = (uint64_t)width * height;
-    if (total > UINT32_MAX) {
-        if (status) *status |= RMR_STABILITY_STATUS_COUNTER_SATURATED;
-        return 0u;
-    }
-    uint64_t sum = 0u;
-    for (uint32_t y = 0u; y < height; ++y) {
-        const uint8_t *row = gray + (size_t)y * stride;
-        for (uint32_t x = 0u; x < width; ++x) {
-            const uint8_t v = row[x];
-            hist[v]++;
-            sum += v;
-        }
-    }
-    uint64_t background_weight = 0u;
-    uint64_t background_sum = 0u;
-    uint64_t best_score = 0u;
-    uint8_t best_threshold = 0u;
-    for (uint32_t i = 0u; i < 256u; ++i) {
-        background_weight += hist[i];
-        if (background_weight == 0u) continue;
-        const uint64_t foreground_weight = total - background_weight;
-        if (foreground_weight == 0u) break;
-        background_sum += (uint64_t)i * hist[i];
-        const uint64_t mean_b_q16 = (background_sum << 16u) / background_weight;
-        const uint64_t mean_f_q16 = ((sum - background_sum) << 16u) / foreground_weight;
-        const uint64_t diff = (mean_b_q16 >= mean_f_q16) ? mean_b_q16 - mean_f_q16 : mean_f_q16 - mean_b_q16;
-        const uint64_t d = diff >> 8u;
-        const uint64_t wb = background_weight >> 4u;
-        const uint64_t wf = foreground_weight >> 4u;
-        const uint64_t score = ((d * d) >> 8u) * wb * wf;
-        if (score > best_score) {
-            best_score = score;
-            best_threshold = (uint8_t)i;
-        }
-    }
-    return best_threshold;
+uint32_t RmR_Vision_DifferenceQ16(const RmR_VisionDescriptor *a,const RmR_VisionDescriptor *b){
+    if(!a||!b)return UINT32_MAX;uint32_t th=(absdiff32(a->otsu_threshold,b->otsu_threshold)<<16u)/255u,fg=absdiff32(a->foreground_q16,b->foreground_q16);uint64_t tv=0;
+    if(a->angle_count||b->angle_count){for(uint32_t i=0;i<8;i++)tv+=absdiff32(ratio_q16(a->angle_hist[i],a->angle_count),ratio_q16(b->angle_hist[i],b->angle_count));tv>>=1u;if(tv>RMR_STABILITY_Q16_ONE)tv=RMR_STABILITY_Q16_ONE;}
+    return(uint32_t)(((uint64_t)th+fg+tv)/3u);
 }
-
-static uint32_t rmr_normalize_angle_bin(int16_t angle_deg) {
-    int32_t a = angle_deg;
-    while (a < 0) a += 360;
-    while (a >= 360) a -= 360;
-    return (uint32_t)((a + 22) / 45) & 7u;
-}
-
-static uint32_t rmr_angular_chi2_q16(const uint32_t hist[8], uint32_t count, uint32_t *status) {
-    if (count == 0u) return 0u;
-    if (count > 1000000u) {
-        if (status) *status |= RMR_STABILITY_STATUS_ANGLE_SATURATED;
-        count = 1000000u;
-    }
-    uint64_t numerator_sum = 0u;
-    for (uint32_t i = 0u; i < 8u; ++i) {
-        const int64_t d = (int64_t)(8u * hist[i]) - (int64_t)count;
-        numerator_sum += (uint64_t)(d * d);
-    }
-    const uint64_t denominator = (uint64_t)8u * count;
-    uint64_t q = (numerator_sum << 16u) / denominator;
-    if (q > UINT32_MAX) q = UINT32_MAX;
-    return (uint32_t)q;
-}
-
-static uint32_t rmr_angular_concentration_q16(const uint32_t hist[8], uint32_t count) {
-    if (count == 0u) return 0u;
-    uint32_t max_bin = hist[0];
-    for (uint32_t i = 1u; i < 8u; ++i) if (hist[i] > max_bin) max_bin = hist[i];
-    const uint64_t scaled = (uint64_t)max_bin * 8u;
-    if (scaled <= count) return 0u;
-    return (uint32_t)(((scaled - count) << 16u) / ((uint64_t)7u * count));
-}
-
-static void rmr_crc_u32(uint32_t *crc, uint32_t value) {
-    const uint8_t b[4] = {
-        (uint8_t)value,
-        (uint8_t)(value >> 8u),
-        (uint8_t)(value >> 16u),
-        (uint8_t)(value >> 24u)
-    };
-    *crc = rmr_crc32c_update(*crc, b, sizeof(b));
-}
-
-uint32_t RmR_Vision_BuildDescriptor(const uint8_t *gray,
-                                    uint32_t width,
-                                    uint32_t height,
-                                    uint32_t stride,
-                                    const int16_t *angles_deg,
-                                    uint32_t angle_count,
-                                    RmR_VisionDescriptor *out) {
-    if (!out) return RMR_STABILITY_STATUS_BAD_ARGUMENT;
-    *out = (RmR_VisionDescriptor){0};
-    out->width = width;
-    out->height = height;
-    if (!gray || width == 0u || height == 0u || stride < width || (!angles_deg && angle_count != 0u)) {
-        out->status = RMR_STABILITY_STATUS_BAD_ARGUMENT;
-        return out->status;
-    }
-    const uint64_t pixel_count64 = (uint64_t)width * height;
-    if (pixel_count64 > UINT32_MAX) {
-        out->status = RMR_STABILITY_STATUS_COUNTER_SATURATED;
-        return out->status;
-    }
-    out->pixel_count = (uint32_t)pixel_count64;
-    out->otsu_threshold = RmR_Vision_OtsuThreshold(gray, width, height, stride, &out->status);
-    uint32_t gray_crc = 0xFFFFFFFFu;
-    for (uint32_t y = 0u; y < height; ++y) {
-        const uint8_t *row = gray + (size_t)y * stride;
-        gray_crc = rmr_crc32c_update(gray_crc, row, width);
-        for (uint32_t x = 0u; x < width; ++x) {
-            if (row[x] < out->otsu_threshold) out->foreground_count++;
-        }
-    }
-    out->gray_crc32c = gray_crc ^ 0xFFFFFFFFu;
-    out->foreground_q16 = rmr_ratio_q16(out->foreground_count, out->pixel_count);
-    out->angle_count = angle_count;
-    for (uint32_t i = 0u; i < angle_count; ++i) {
-        const uint32_t bin = rmr_normalize_angle_bin(angles_deg[i]);
-        out->angle_hist[bin] = rmr_sat_add_u32(out->angle_hist[bin], 1u, &out->status);
-    }
-    out->angular_chi2_q16 = rmr_angular_chi2_q16(out->angle_hist, angle_count, &out->status);
-    out->angular_concentration_q16 = rmr_angular_concentration_q16(out->angle_hist, angle_count);
-    uint32_t crc = 0xFFFFFFFFu;
-    rmr_crc_u32(&crc, out->width);
-    rmr_crc_u32(&crc, out->height);
-    rmr_crc_u32(&crc, out->pixel_count);
-    rmr_crc_u32(&crc, out->foreground_count);
-    rmr_crc_u32(&crc, out->foreground_q16);
-    rmr_crc_u32(&crc, out->angle_count);
-    for (uint32_t i = 0u; i < 8u; ++i) rmr_crc_u32(&crc, out->angle_hist[i]);
-    rmr_crc_u32(&crc, out->angular_chi2_q16);
-    rmr_crc_u32(&crc, out->angular_concentration_q16);
-    rmr_crc_u32(&crc, out->gray_crc32c);
-    crc = rmr_crc32c_update(crc, &out->otsu_threshold, 1u);
-    out->descriptor_crc32c = crc ^ 0xFFFFFFFFu;
-    return out->status;
-}
-
-uint32_t RmR_Vision_DifferenceQ16(const RmR_VisionDescriptor *a,
-                                  const RmR_VisionDescriptor *b) {
-    if (!a || !b) return UINT32_MAX;
-    const uint32_t threshold_q16 = (rmr_absdiff_u32(a->otsu_threshold, b->otsu_threshold) << 16u) / 255u;
-    const uint32_t foreground_q16 = rmr_absdiff_u32(a->foreground_q16, b->foreground_q16);
-    uint64_t hist_l1_q16 = 0u;
-    if (a->angle_count != 0u || b->angle_count != 0u) {
-        for (uint32_t i = 0u; i < 8u; ++i) {
-            const uint32_t pa = rmr_ratio_q16(a->angle_hist[i], a->angle_count);
-            const uint32_t pb = rmr_ratio_q16(b->angle_hist[i], b->angle_count);
-            hist_l1_q16 += rmr_absdiff_u32(pa, pb);
-        }
-        hist_l1_q16 >>= 1u;
-        if (hist_l1_q16 > RMR_STABILITY_Q16_ONE) hist_l1_q16 = RMR_STABILITY_Q16_ONE;
-    }
-    return (uint32_t)(((uint64_t)threshold_q16 + foreground_q16 + hist_l1_q16) / 3u);
-}
-
-uint32_t RmR_Stability_DifferenceHash(const RmR_VisionDescriptor *a,
-                                      const RmR_VisionDescriptor *b) {
-    if (!a || !b) return 0u;
-    uint32_t crc = 0xFFFFFFFFu;
-    const uint32_t values[] = {
-        a->descriptor_crc32c ^ b->descriptor_crc32c,
-        a->gray_crc32c ^ b->gray_crc32c,
-        rmr_absdiff_u32(a->foreground_q16, b->foreground_q16),
-        rmr_absdiff_u32(a->angular_chi2_q16, b->angular_chi2_q16),
-        rmr_absdiff_u32(a->angular_concentration_q16, b->angular_concentration_q16),
-        RmR_Vision_DifferenceQ16(a, b)
-    };
-    for (size_t i = 0u; i < sizeof(values) / sizeof(values[0]); ++i) rmr_crc_u32(&crc, values[i]);
-    for (uint32_t i = 0u; i < 8u; ++i) rmr_crc_u32(&crc, a->angle_hist[i] ^ b->angle_hist[i]);
-    return crc ^ 0xFFFFFFFFu;
+uint32_t RmR_Stability_DifferenceHash(const RmR_VisionDescriptor *a,const RmR_VisionDescriptor *b){
+    if(!a||!b)return 0u;uint32_t crc=0xFFFFFFFFu,v[]={a->descriptor_crc32c^b->descriptor_crc32c,a->gray_crc32c^b->gray_crc32c,absdiff32(a->foreground_q16,b->foreground_q16),absdiff32(a->angular_chi2_q16,b->angular_chi2_q16),absdiff32(a->angular_concentration_q16,b->angular_concentration_q16),RmR_Vision_DifferenceQ16(a,b)};
+    for(size_t i=0;i<sizeof(v)/sizeof(v[0]);i++)crc_u32(&crc,v[i]);for(uint32_t i=0;i<8;i++)crc_u32(&crc,a->angle_hist[i]^b->angle_hist[i]);return crc^0xFFFFFFFFu;
 }
