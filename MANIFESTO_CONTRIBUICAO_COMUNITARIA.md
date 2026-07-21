@@ -248,7 +248,7 @@ Artefatos:
 - `rack_complete_analysis.txt`
 - SHA-256: `f3687b71b2381545a53f52b7a806b0c1ce084fcb1e59d5b1a00e7179bdba4023`
 
-## 11. AVX-512, TBB e 64 núcleos
+## 11. AVX-512, TBB e execução assíncrona
 
 Um ensaio em máquina de 64 núcleos, com afinidade fixa, NUMA controlado,
 AVX-512 e TBB, é um próximo experimento válido. Entretanto:
@@ -259,7 +259,37 @@ AVX-512 e TBB, é um próximo experimento válido. Entretanto:
   threads podem limitar o ganho;
 - extrapolar os resultados atuais para esse hardware seria especulação.
 
-Resultado em 64 núcleos/TBB/AVX-512: `TOKEN_VAZIO` até execução reproduzível.
+AVX-512 é paralelismo SIMD em lockstep; não representa tarefas independentes
+terminando em momentos diferentes. O comportamento descrito pelo autor — um
+worker que termina cedo continua executando outra tarefa pronta — corresponde
+a um escalonador multicore orientado por dependências, normalmente apoiado por
+work stealing.
+
+O modelo RMR formalizado evita barreira global por nível da árvore. Cada pai
+aguarda somente os dois filhos que formam aquele pai; enquanto um irmão ainda
+não chegou, o worker liberado executa outra tarefa pronta. A ordem lógica
+`left || right` permanece fixa, preservando determinismo criptográfico.
+
+Artefatos autorais e auditáveis:
+
+- `rmr/docs/ASYNC_PARALLEL_EXECUTION_MODEL.md`;
+- `rmr/docs/ASYNC_PARALLEL_BENCHMARK_PROTOCOL.md`;
+- registro de autoria e isolamento em `rmr/PROVENIENCE.md`.
+
+Estados atuais:
+
+| Alegação | Estado |
+| --- | --- |
+| Arquitetura DAG sem barreira global por nível | `ARQUITETURA_ESPECIFICADA` |
+| Joins locais esquerdo/direito preservam a árvore | `INVARIANTE_LOGICA` |
+| Implementação integral do DAG no caminho de produção | `TOKEN_VAZIO` |
+| Resultado em 64 núcleos/TBB/AVX-512 | `TOKEN_VAZIO` |
+| Ganho automático por binário monolítico | `TOKEN_VAZIO` |
+
+Um binário único pode favorecer LTO, inlining, internalização e eliminação de
+símbolos, mas também pode aumentar pressão de instruction cache e reduzir
+portabilidade. Deve ser tratado como hipótese de otimização e medido contra o
+mesmo baseline, nunca assumido como superior.
 
 ## 12. Compromisso comunitário
 
@@ -271,7 +301,8 @@ Este fork permanece aberto a:
 4. revisão de mudanças pequenas e isoladas;
 5. comparação cronológica arquivo a arquivo;
 6. atribuição adequada quando houver integração ou reaproveitamento;
-7. correção pública de qualquer erro metodológico.
+7. correção pública de qualquer erro metodológico;
+8. reprodução do protocolo assíncrono em hardware multicore adequado.
 
 O pedido não é aceitação automática. É revisão tecnicamente proporcional:
 
