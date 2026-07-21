@@ -51,6 +51,8 @@ static int test_vision(void) {
     CHECK(RmR_Vision_BuildDescriptor(gray, 4, 4, 4, uniform_angles, 8, &uniform_a) == 0u);
     CHECK(RmR_Vision_BuildDescriptor(gray, 4, 4, 4, concentrated_angles, 4, &concentrated) == 0u);
     CHECK(RmR_Vision_BuildDescriptor(gray, 4, 4, 4, uniform_angles, 8, &uniform_b) == 0u);
+    CHECK(uniform_a.otsu_threshold == 0u);
+    CHECK(uniform_a.foreground_count == 8u);
     CHECK(uniform_a.angular_chi2_q16 == 0u);
     CHECK(uniform_a.angular_concentration_q16 == 0u);
     CHECK(concentrated.angular_chi2_q16 > 0u);
