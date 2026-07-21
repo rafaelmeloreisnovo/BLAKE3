@@ -40,6 +40,8 @@ Use o texto abaixo quando precisar explicitar copyright/fronteira:
 | `rmr/` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/benchmark_framework/` | RMR autoral (blueprint) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/docs/BugOrAdd/` | RMR autoral (base conceitual remodelável) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/docs/ASYNC_PARALLEL_EXECUTION_MODEL.md` | RMR autoral (arquitetura de escalonamento assíncrono por dependências) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/docs/ASYNC_PARALLEL_BENCHMARK_PROTOCOL.md` | RMR autoral (protocolo reproduzível de benchmark e cadeia de evidência) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/ui/` | RMR autoral (front controller de modos) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/include/rmr_governance.h` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/hwif/include/rmr_hwif.h`, `rmr/hwif/include/rmr_detect.h`, `rmr/hwif/rmr_hwif.c`, `rmr/hwif/asm/aarch64/`, `rmr/hwif/asm/x86_64/`, `rmr/hwif/detect/detect_x86.c`, `rmr/hwif/detect/detect_aarch64.c`, `rmr/hwif/detect/detect_fallback.c` | RMR autoral (interface HW, detecção runtime e backends ASM) | RMR Module License (`rmr/LICENSE_RMR`) |
@@ -65,6 +67,7 @@ organizacional. Eles devem manter rastreabilidade de licença e finalidade:
 | `tools/check_rmr_headers.py` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Verificação de cabeçalho `LICENSE_RMR`, shebang e escopo de alterações |
 | `tools/check_rmr_headers.sh` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Wrapper para execução do verificador Python |
 | `rmr/tools/audit_freestanding_nomalloc.py` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Auditoria estática de coerência do perfil bare-metal `RMR_FREESTANDING_NOMALLOC` |
+
 ## Observações sobre integração
 
 - O RMR é **externo** e não integra o núcleo BLAKE3 por padrão.
@@ -73,6 +76,7 @@ organizacional. Eles devem manter rastreabilidade de licença e finalidade:
   2. Incluir cabeçalho de copyright/licença no próprio arquivo.
   3. Ser registrado neste documento.
   4. Ser isolado do core (sem modificar `src/` ou `c/`).
+
 Compliance Notice
 
 All licensing and provenance decisions in this repository
@@ -88,7 +92,6 @@ code on behalf of the author.
 - Conteúdos técnicos/conceituais não jurídicos ficam em
   `rmr/MANIFESTO_RAFAELIA.md`.
 
-
 ## Nota de auditoria (benchmark telemetry store)
 
 Mudanças de telemetria/armazenamento de benchmark permanecem restritas a `rmr/` (ex.: `rmr/core/bench.c`, `rmr/benchmark_framework/README.md`, `rmr/ui/mode_router.c`) e não alteram o núcleo criptográfico upstream (`src/`, `c/`, `reference_impl/`).
@@ -100,7 +103,6 @@ Extensões de governança/telemetria foram aplicadas apenas em `rmr/include/rmr_
 ### Atualização 2026-05-02 (validação RMR)
 
 Adicionado comando `pai validate` (arquivos `rmr/core/validate.c` e `rmr/core/pai_validate.h`) para validar invariantes matemáticos/operacionais do módulo RMR em runtime, mantendo isolamento da camada externa e sem alterar o núcleo criptográfico upstream.
-
 
 ### Fronteira explícita (auditoria): upstream vs externo
 
@@ -125,3 +127,15 @@ Adicionado modo autoral externo de alocação estática para ambientes
 A mudança é estritamente de infraestrutura externa em `rmr/` e não altera
 qualquer lógica criptográfica do núcleo BLAKE3 upstream (`src/`, `c/`,
 `reference_impl/`).
+
+### Atualização 2026-07-21 (paralelismo assíncrono orientado por dependências)
+
+Registrados os documentos autorais externos:
+
+- `rmr/docs/ASYNC_PARALLEL_EXECUTION_MODEL.md`;
+- `rmr/docs/ASYNC_PARALLEL_BENCHMARK_PROTOCOL.md`.
+
+Os documentos distinguem AVX-512, multicore e TBB; especificam um DAG sem
+barreira global por nível, com joins locais determinísticos; e definem o
+protocolo de medição necessário para promover resultados de `TOKEN_VAZIO` para
+evidência reproduzível. Nenhum arquivo do núcleo BLAKE3 foi alterado.
