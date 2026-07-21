@@ -84,7 +84,7 @@ are manually reviewed by the author.
 
 No automated tool or AI system is authorized to alter
 licensing terms, introduce legal assumptions, or publish
-code on behalf of the author.
+code without an explicit, current instruction from the author.
 
 ## Separação entre conteúdo jurídico e não jurídico
 
@@ -138,4 +138,5 @@ Registrados os documentos autorais externos:
 Os documentos distinguem AVX-512, multicore e TBB; especificam um DAG sem
 barreira global por nível, com joins locais determinísticos; e definem o
 protocolo de medição necessário para promover resultados de `TOKEN_VAZIO` para
-evidência reproduzível. Nenhum arquivo do núcleo BLAKE3 foi alterado.
+evidência reproduzível. Nenhum arquivo do núcleo BLAKE3 foi alterado. Esta
+publicação documental foi realizada sob instrução explícita e atual do autor.
