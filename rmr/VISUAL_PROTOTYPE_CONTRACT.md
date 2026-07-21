@@ -36,6 +36,8 @@ The serialized capsule contains:
 
 The payload is suitable for `dog-0001.rvp` inside `dog-0001.zipraf` using method `STORE`. ZIP packaging is deliberately kept outside the BLAKE3 primitive. RMR owns the capsule and custody metadata; BLAKE3 may hash the resulting artifact.
 
+Structural verification rejects a recomputed-but-invalid capsule when the label/class id disagree, the view mask is inconsistent, a view is duplicated or a view id is outside `0..15`.
+
 ## Selection rule
 
 Each query is compared to all eligible views. Lower descriptor distance wins. The exposed score is:
@@ -58,4 +60,10 @@ cc -O2 -std=c11 -Wall -Wextra -Werror -pedantic \
 ./rmr_visual_prototype_selftest
 ```
 
-Expected fixture result: the lighter front-view query selects `cachorro` over `carro` and `arvore`; serialization round-trips; a one-byte mutation is rejected by capsule CRC32C.
+Verified fixture result:
+
+```text
+rmr_visual_prototype_selftest: OK dog=63395 car=47011 margin=16384 capsule=232
+```
+
+A one-view `cachorro` capsule was also materialized as 140 RVC1 bytes, packaged in a 272-byte classic ZIP using method `STORE`, reopened and compared byte-for-byte. The ZIP CRC-32 was `2d8bd598`; the payload SHA-256 was `3438ca62d78667862f86fe809463ce328fc025e763fdd7a8ec1693344726dfed`.
