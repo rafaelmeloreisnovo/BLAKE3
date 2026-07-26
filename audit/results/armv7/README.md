@@ -71,7 +71,11 @@ The runner also records, for both builds:
 - full static-library disassembly;
 - SHA-256 for the evidence and binaries.
 
-The runner does **not** modify either BLAKE3 cryptographic core. The repetition loop exists only inside the shared benchmark harness and is linked identically against both libraries.
+### Source-integrity boundary
+
+The runner does **not** edit `blake3.c`, `blake3_dispatch.c`, `blake3_portable.c`, `blake3_neon.c` or the upstream cryptographic core. It therefore does not restore removed symbols, branches or algorithmic loops.
+
+The loops in `c/bench_rmr.c` are deliberately outside the BLAKE3 library. They initialize a deterministic 1 MiB input, perform warm-up and repeat the same public hash call to accumulate enough elapsed time for measurement. The identical harness is linked against both libraries, so its cost is symmetric and its source is preserved in the evidence chain.
 
 ## Run fork versus official upstream
 
