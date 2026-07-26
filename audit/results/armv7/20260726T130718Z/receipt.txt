@@ -1,0 +1,22 @@
+status=PASS
+observed_at_utc=2026-07-26T13:07:18Z
+repository=https://github.com/rafaelmeloreisnovo/BLAKE3.git
+commit=31419ed18928a9a25adc892c5eba9eef584d59f4
+architecture=armv7l
+compiler=clang version 21.1.8
+cmake=cmake version 4.4.0
+kat_abc=PASS
+backend_equivalence=PASS
+portable_median_MiB_s=132.313
+neon_median_MiB_s=163.450
+neon_ratio=1.235x
+neon_gain_median_percent=23.53
+neon_gain_paired_mean_percent=24.70
+performance_scope=ARMv7_Termux_Clang21_single_device
+comparison_with_official_upstream=TOKEN_VAZIO
+
+Interpretation:
+- The fork's portable and NEON backends produced identical cryptographic outputs.
+- NEON exceeded portable throughput in all five alternating rounds.
+- The 23.53 percent figure is a measured median gain for this exact device, compiler, flags, workload, and run.
+- No fork-versus-official superiority claim is allowed until the dedicated upstream comparison runner is executed.

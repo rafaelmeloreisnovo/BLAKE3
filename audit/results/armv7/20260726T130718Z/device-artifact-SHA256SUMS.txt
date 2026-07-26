@@ -1,0 +1,6 @@
+# Hashes emitted on the ARMv7 Termux device at 2026-07-26T13:07:18Z.
+# These identify the original local artifacts; they are not hashes of the normalized Git evidence files in this directory.
+c4e30189fa05ab3c34c3bd95a8390cda675e29cf82cc9ef7228d14fcf24a7ea3  BLAKE3_ARMV7_NEON_RECEIPT.txt
+6f21e16cf24ead047c7339e56f997772a9fe98d90f71d620cd86a61dc1a6ecff  blake3-armv7-results.csv
+048b4574d48906e480788c15c3265086a9c3ae13bd779b2666ebc8774d2aa97b  c/build-armv7-neon/libblake3.a
+a05bd8e261041e12cae98f9083e0a9fc2820f5a2c1b26e0c20d4106a3a3f7cda  c/build-armv7-portable/libblake3.a

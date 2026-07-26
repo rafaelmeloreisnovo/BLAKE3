@@ -1,0 +1,212 @@
+schema_version: 1.0
+ledger_id: BLAKE3-DOCUMENTARY-PASS-01-20260726
+created_at_utc: 2026-07-26T00:00:00Z
+subject:
+  author: Rafael Melo Reis
+  fork: rafaelmeloreisnovo/BLAKE3
+  upstream: BLAKE3-team/BLAKE3
+principles:
+  metadata_over_memory: true
+  hardware_measurement_has_uncertainty: true
+  token_vazio_is_valid: true
+  thematic_overlap_is_not_causation: true
+x86_executor:
+  architecture: x86_64
+  cpu: AMD EPYC 9V74
+  hypervisor: KVM
+  visible_vcpus: 5
+  avx2: true
+  avx512f: true
+  avx512vl: true
+  clang: 17.0.0
+  gcc: 14.2.0
+  cmake: 3.31.6
+  ninja: 1.12.1
+  bare_metal: false
+  network_dns_at_clone_attempt: unavailable
+  benchmark_status: NOT_EXECUTED
+old_lineage:
+  period_start: 2025-02-01
+  period_end: 2025-04-30
+  statement: O autor manteve fork ou trabalho BLAKE3 anterior.
+  state: DECLARED_BY_AUTHOR
+  public_blake3_artifact_found: false
+  current_public_repo_search:
+    repositories_matching_blake_or_hash:
+      - rafaelmeloreisnovo/BLAKE3
+  verified_period_activity:
+    - repository: rafaelmeloreisnovo/CientiEspiritual-tiEs-
+      commit: e6285308f2c76eeee41fb80e117bc3ec847bee3a
+      created_at: 2025-03-11T03:23:37-03:00
+      message: Create build_minimal_apk.sh
+    - repository: rafaelmeloreisnovo/CientiEspiritual-tiEs-
+      commit: c11d521d7caa57c00b947da21c93d0d045b2c23f
+      created_at: 2025-03-11T03:34:04-03:00
+      message: Create build_mae_filho.sh
+    - repository: rafaelmeloreisnovo/templo-vivo-arcs
+      commit: 679979abda3476b1b5902d8777f9e5fad462c3f1
+      created_at: 2025-04-03T04:15:52-03:00
+      message: Add files via upload
+  repository_url: TOKEN_VAZIO
+  commit_sha: TOKEN_VAZIO
+  archive_hash: TOKEN_VAZIO
+  next_action: recover_git_zip_bundle_patch_drive_reflog
+pr_533:
+  url: https://github.com/BLAKE3-team/BLAKE3/pull/533
+  title: A little bit of helping
+  opened_at: 2025-11-25T00:42:22Z
+  copilot_comments_at: 2025-11-25T00:47:16Z
+  head_commit_time: 2025-11-25T02:42:32Z
+  closed_at: 2025-11-25T03:29:05Z
+  elapsed_open_to_close_seconds: 10003
+  merged: false
+  mergeable_snapshot: true
+  commits: 24
+  changed_files: 10
+  additions: 1566
+  deletions: 195
+  base_sha: 308b95dfa15d5a0aa8cb3c5534ffd90d76122c46
+  head_sha: 15829f851e45d1327b017be67a7b88d7725bc653
+  files:
+    - .gitignore
+    - benches/README_CN.md
+    - benches/bench.rs
+    - c/blake3.h
+    - c/blake3_impl.h
+    - c/blake3_portable.c
+    - src/guts.rs
+    - src/hazmat.rs
+    - src/lib.rs
+    - src/platform.rs
+  verified_mechanisms:
+    - benchmark_preallocation
+    - explicit_warmup
+    - test_black_box
+    - page_offset_precomputation
+    - timed_region_separation
+    - simd_and_cache_variance_documentation
+    - platform_offset_expression_cleanup
+  files_not_changed:
+    - c/CMakeLists.txt
+    - c/blake3_dispatch.c
+    - c/Makefile.testing
+    - AVX512_assembly_files
+    - LTO_build_configuration
+  retrieved_review:
+    total_comments: 3
+    author: Copilot
+    topics:
+      - comment_style
+      - verbose_inline_comments
+      - maintainability
+    human_cryptographic_error_comment_found: false
+later_events:
+  - id: UPSTREAM-2025-12-09-AVX512-CYGWIN
+    type: commit
+    sha: 890050cb9b89448a25e067349aed9734a3b03d5e
+    created_at: 2025-12-09T20:38:21+01:00
+    title: Fix Cygwin build by skipping blake3_xof_many_avx512
+    temporal_proximity_days: 14
+    overlap: thematic_build_simd
+    same_file_as_pr533: false
+    causal_derivation: TOKEN_VAZIO
+  - id: UPSTREAM-2026-01-08-RELEASE-183
+    type: commit
+    sha: 8b829b697fa4cfe35de35e9aa8c20b56266cb091
+    created_at: 2026-01-08T09:17:29-08:00
+    title: version 1.8.3
+    stated_changes:
+      - C_build_fixes_macos_cygwin
+      - CMake_improvements
+    overlap: thematic_build
+    causal_derivation: TOKEN_VAZIO
+  - id: UPSTREAM-PR-539
+    type: pull_request
+    number: 539
+    created_at: 2026-01-09T09:52:06Z
+    state: open
+    mergeable: true
+    title: Fix building the test application on non-x86 machines
+    symbols:
+      - g_cpu_features
+      - get_cpu_features
+    overlap: thematic_linker_symbols
+    pr533_same_files: false
+    causal_derivation: TOKEN_VAZIO
+  - id: UPSTREAM-PR-541
+    type: pull_request
+    number: 541
+    created_at: 2026-02-04T09:39:30Z
+    state: open
+    title: c fix cmake force c++20 only when c++ is used
+    overlap: thematic_cmake_tbb
+    pr533_changed_cmake: false
+    causal_derivation: TOKEN_VAZIO
+  - id: UPSTREAM-PR-544
+    type: pull_request
+    number: 544
+    created_at: 2026-02-20T20:12:55Z
+    merged_at: 2026-02-20T20:59:12Z
+    title: c use SIZE_MAX instead of -1 for size_t sentinels add stdint
+    warning: MSVC_C4245
+    strict_gate: /WX
+    overlap: thematic_warning_cleanliness
+    pr533_same_file: false
+    causal_derivation: TOKEN_VAZIO
+  - id: UPSTREAM-PR-552
+    type: pull_request
+    number: 552
+    created_at: 2026-04-24T21:34:48Z
+    merged_at: 2026-04-24T23:33:58Z
+    title: fix LTO builds by disabling LTO
+    overlap: thematic_codegen_build
+    pr533_changed_lto_configuration: false
+    causal_derivation: TOKEN_VAZIO
+  - id: UPSTREAM-PR-564
+    type: pull_request
+    number: 564
+    created_at: 2026-07-24T12:06:14Z
+    state: open
+    title: Avoid enabling C++20 when not using TBB
+    overlap: thematic_cmake_tbb
+    pr533_changed_cmake: false
+    causal_derivation: TOKEN_VAZIO
+direct_text_search:
+  period_start: 2025-11-25
+  period_end: 2026-07-26
+  terms:
+    black_box: NOT_FOUND
+    warmup: NOT_FOUND
+    warm-up: NOT_FOUND
+    preallocation: NOT_FOUND
+    pre-allocation: NOT_FOUND
+    erasing_op: NOT_FOUND
+  state: NO_DIRECT_TEXTUAL_HIT_IN_PASS_01
+  limitation: renamed_rewritten_squashed_or_nonindexed_code_remains_possible
+claims:
+  pr533_prior_art:
+    state: VERIFIED_PRIMARY
+    public_claim_allowed: true
+  later_thematic_overlap:
+    state: VERIFIED_PRIMARY
+    public_claim_allowed: true
+  old_fork_2025:
+    state: DECLARED_BY_AUTHOR
+    public_claim_as_verified: false
+  direct_copy:
+    state: TOKEN_VAZIO
+    public_claim_allowed: false
+  structural_derivation:
+    state: TOKEN_VAZIO
+    public_claim_allowed: false
+  automated_monitoring_beyond_visible_copilot:
+    state: TOKEN_VAZIO
+    public_claim_allowed: false
+next_actions:
+  - recover_old_fork_artifacts
+  - export_and_atomize_24_pr533_commits
+  - freeze_relevant_upstream_commits
+  - compare_same_functions_only
+  - normalize_comments_and_formatting
+  - run_AST_CFG_git_blame_analysis
+  - run_x86_benchmark_when_source_trees_available
