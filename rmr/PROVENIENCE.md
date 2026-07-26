@@ -1,6 +1,6 @@
 <!--
-Copyright (c) 2025 Rafael
-License: RMR Module License (see LICENSE_RMR)
+Copyright (c) 2024–2026 Rafael Melo Reis
+Licensed under LICENSE_RMR.
 -->
 
 # Proveniência do repositório (BLAKE3 vs RMR)
@@ -34,9 +34,9 @@ Use o texto abaixo quando precisar explicitar copyright/fronteira:
 | `reference_impl/` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
 | `test_vectors/` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
 | `benches/` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
-| `tools/` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
+| `tools/` | Upstream BLAKE3, salvo itens externos nominalmente listados abaixo | Licença upstream ou `rmr/LICENSE_RMR`, conforme classificação nominal |
 | `media/` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
-| `README.md`, `CONTRIBUTING.md`, `LICENSE_*`, `Cargo.toml`, `Cargo.lock`, `build.rs` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
+| `README.md`, `CONTRIBUTING.md`, `LICENSE_*`, `Cargo.toml`, `Cargo.lock`, `build.rs` | Upstream BLAKE3 ou derivação documental explicitamente delimitada | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions e notices aplicáveis; material externo deve ser identificado |
 | `rmr/` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/benchmark_framework/` | RMR autoral (blueprint) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/docs/BugOrAdd/` | RMR autoral (base conceitual remodelável) | RMR Module License (`rmr/LICENSE_RMR`) |
@@ -47,6 +47,11 @@ Use o texto abaixo quando precisar explicitar copyright/fronteira:
 | `rmr/hwif/include/rmr_hwif.h`, `rmr/hwif/include/rmr_detect.h`, `rmr/hwif/rmr_hwif.c`, `rmr/hwif/asm/aarch64/`, `rmr/hwif/asm/x86_64/`, `rmr/hwif/detect/detect_x86.c`, `rmr/hwif/detect/detect_aarch64.c`, `rmr/hwif/detect/detect_fallback.c` | RMR autoral (interface HW, detecção runtime e backends ASM) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/core/validate.c`, `rmr/core/pai_validate.h` | RMR autoral (validação determinística de invariantes) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/core/lowlevel_freestanding.c` | RMR autoral (estado global da arena nomalloc freestanding) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/crypto/` | RMR autoral (registro criptográfico, perfil SHA-256, governança, custódia e testes) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/crypto/registry/architectures.json` | RMR autoral (snapshot de referências públicas; nenhum código de terceiro incorporado) | RMR Module License (`rmr/LICENSE_RMR`) para a seleção/organização autoral; nomes e direitos de terceiros permanecem de seus titulares |
+| `rmr/crypto/schemas/architecture-registry.schema.json` | RMR autoral (schema de dados) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/crypto/claims/claims.jsonl` | RMR autoral (ledger epistemológico) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/crypto/tools/`, `rmr/crypto/tests/` | RMR autoral (auditoria offline e testes de contrato) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `DOCUMENTACAO.md`, `MANIFESTO*.md` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/MANIFESTO_RAFAELIA.md` | RMR autoral (texto não jurídico) | RMR Module License (`rmr/LICENSE_RMR`) |
 
@@ -73,9 +78,19 @@ organizacional. Eles devem manter rastreabilidade de licença e finalidade:
 - O RMR é **externo** e não integra o núcleo BLAKE3 por padrão.
 - Qualquer novo arquivo autoral do RMR **deve**:
   1. Ficar dentro de `rmr/`.
-  2. Incluir cabeçalho de copyright/licença no próprio arquivo.
+  2. Incluir cabeçalho de copyright/licença no próprio arquivo ou exceção formal.
   3. Ser registrado neste documento.
   4. Ser isolado do core (sem modificar `src/` ou `c/`).
+
+## Exceções formais de cabeçalho — formatos JSON/JSONL
+
+Os seguintes arquivos não aceitam comentários de topo sem invalidar seu formato:
+
+- `rmr/crypto/registry/architectures.json`;
+- `rmr/crypto/schemas/architecture-registry.schema.json`;
+- `rmr/crypto/claims/claims.jsonl`.
+
+Justificativa técnica: JSON e JSONL estritos não possuem sintaxe de comentário. A autoria e a licença são codificadas como dados (`_meta`, `$comment` ou primeiro registro `meta`) e esta exceção é registrada em 2026-07-26 conforme os critérios de `rmr/docs/ARCHITECTURE.md`.
 
 Compliance Notice
 
@@ -90,7 +105,7 @@ code on behalf of the author.
 
 - `rmr/LICENSE_RMR` deve conter apenas o texto legal da licença RMR.
 - Conteúdos técnicos/conceituais não jurídicos ficam em
-  `rmr/MANIFESTO_RAFAELIA.md`.
+  `rmr/MANIFESTO_RAFAELIA.md` ou em documentação técnica nominal.
 
 ## Nota de auditoria (benchmark telemetry store)
 
@@ -102,11 +117,11 @@ Extensões de governança/telemetria foram aplicadas apenas em `rmr/include/rmr_
 
 ### Atualização 2026-05-02 (validação RMR)
 
-Adicionado comando `pai validate` (arquivos `rmr/core/validate.c` e `rmr/core/pai_validate.h`) para validar invariantes matemáticos/operacionais do módulo RMR em runtime, mantendo isolamento da camada externa e sem alterar o núcleo criptográfico upstream.
+Adicionado comando `pai validate` (arquivos `rmr/core/validate.c` e `rmr/core/pai_validate.h`) para validar invariantes matemáticos/operacionais do módulo RMR em runtime, mantendo isolamento da camada externa e sem alterar o núcleo BLAKE3 upstream.
 
 ### Fronteira explícita (auditoria): upstream vs externo
 
-- **Upstream (imutável no núcleo criptográfico)**: `src/`, `c/`, `reference_impl/`, `b3sum/`, `test_vectors/`, `tools/`, `benches/`, `media/` e metadados oficiais.
+- **Upstream (imutável no núcleo criptográfico)**: `src/`, `c/`, `reference_impl/`, `b3sum/`, `test_vectors/`, `tools/`, `benches/`, `media/` e metadados oficiais, ressalvadas derivações documentais e ferramentas externas nominalmente registradas.
 - **Externo autoral (isolado)**: `rmr/` e documentos autorais fora de `rmr/` listados neste arquivo.
 - **Regra operacional**: mudanças em detecção/dispatch do RMR devem permanecer no domínio externo (`rmr/*`) e nunca alterar a lógica criptográfica upstream.
 
@@ -139,3 +154,9 @@ Os documentos distinguem AVX-512, multicore e TBB; especificam um DAG sem
 barreira global por nível, com joins locais determinísticos; e definem o
 protocolo de medição necessário para promover resultados de `TOKEN_VAZIO` para
 evidência reproduzível. Nenhum arquivo do núcleo BLAKE3 foi alterado.
+
+### Atualização 2026-07-26 (RMR Crypto Registry)
+
+Criado `rmr/crypto/` como módulo autoral externo para catalogar dez famílias de implementações criptográficas e trinta candidatos relacionados, documentar o perfil SHA-256 já exposto pelo RMR e fornecer auditoria offline de estrutura, claims e vetores conhecidos.
+
+A inclusão no catálogo é somente referência. Não houve importação de código de terceiro. Licença e parentesco de fork permanecem `TOKEN_VAZIO` quando não foram verificados em commit fixado. O texto de `rmr/LICENSE_RMR` não foi alterado. A branch/PR deve permanecer sujeita a revisão humana antes de publicação ou merge.
