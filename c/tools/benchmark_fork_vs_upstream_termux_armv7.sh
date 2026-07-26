@@ -13,14 +13,25 @@ RESULT_ROOT="${RESULT_ROOT:-$FORK_ROOT/audit/results/armv7}"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 RUN_DIR="$RESULT_ROOT/$STAMP"
 OFFICIAL_ROOT="$WORK_ROOT/official"
-FORK_BUILD="$WORK_ROOT/build-fork-neon"
-OFFICIAL_BUILD="$WORK_ROOT/build-official-neon"
+FORK_BUILD="$WORK_ROOT/build-fork-neon-strict"
+OFFICIAL_BUILD="$WORK_ROOT/build-official-neon-strict"
 RESULTS="$RUN_DIR/results.csv"
 SUMMARY="$RUN_DIR/summary.txt"
 RECEIPT="$RUN_DIR/receipt.txt"
 EXPECTED_ABC="6437b3ac38465133ffb63b75273a8db548c558465d79db03fd359c6cd5bd9d85"
-COMMON_FLAGS="-O3 -DNDEBUG -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=softfp"
+
+# Diagnostics are a mandatory gate. They do not directly remove symbols, but
+# -Werror prevents warning-bearing code from entering the measured build.
+DIAGNOSTIC_FLAGS="-Wall -Wextra -Wpedantic -Werror"
+
+# Code-generation contract shared by fork and official upstream.
+CODEGEN_FLAGS="-O3 -DNDEBUG -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=softfp -fvisibility=hidden -ffunction-sections -fdata-sections -fno-asynchronous-unwind-tables -fno-unwind-tables"
 NEON_FLAGS="-march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=softfp"
+
+# Linker contract: discard unreachable sections, omit build-id metadata and
+# prevent archive members from being promoted into the dynamic export surface.
+LINK_FLAGS="-Wl,--gc-sections -Wl,--build-id=none -Wl,--exclude-libs,ALL"
+STRICT_C_FLAGS="$DIAGNOSTIC_FLAGS $CODEGEN_FLAGS"
 
 require() {
   command -v "$1" >/dev/null 2>&1 || {
@@ -29,9 +40,18 @@ require() {
   }
 }
 
-for tool in git cmake ninja clang awk sort sha256sum uname date tee; do
+for tool in git cmake ninja clang awk sort sha256sum uname date tee nm readelf size; do
   require "$tool"
 done
+
+OBJDUMP=""
+for candidate in llvm-objdump objdump; do
+  if command -v "$candidate" >/dev/null 2>&1; then
+    OBJDUMP="$candidate"
+    break
+  fi
+done
+[ -n "$OBJDUMP" ] || { echo "missing_command=llvm-objdump_or_objdump" >&2; exit 127; }
 
 case "$(uname -m)" in
   armv7l|armv8l) ;;
@@ -47,25 +67,47 @@ fi
 git -C "$OFFICIAL_ROOT" fetch --prune origin "$OFFICIAL_REF"
 git -C "$OFFICIAL_ROOT" checkout --detach FETCH_HEAD
 
-build_neon() {
-  local source_root="$1"
-  local build_root="$2"
+build_neon_strict() {
+  local label="$1"
+  local source_root="$2"
+  local build_root="$3"
+  local configure_log="$RUN_DIR/${label}-configure.log"
+  local build_log="$RUN_DIR/${label}-build.log"
 
   rm -rf "$build_root"
+
+  # Do not suppress CMake author/deprecation warnings. Compiler diagnostics are
+  # elevated to errors through both flags and CMAKE_COMPILE_WARNING_AS_ERROR.
   cmake -S "$source_root/c" -B "$build_root" -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_C_COMPILER=clang \
-    -DCMAKE_C_FLAGS_RELEASE="$COMMON_FLAGS" \
+    -DCMAKE_C_FLAGS_RELEASE="$STRICT_C_FLAGS" \
+    -DCMAKE_EXE_LINKER_FLAGS="$LINK_FLAGS" \
+    -DCMAKE_SHARED_LINKER_FLAGS="$LINK_FLAGS" \
+    -DCMAKE_COMPILE_WARNING_AS_ERROR=ON \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
     -DBUILD_SHARED_LIBS=OFF \
     -DBLAKE3_USE_TBB=OFF \
     -DBLAKE3_EXAMPLES=ON \
     -DBLAKE3_SIMD_TYPE=neon-intrinsics \
-    -DBLAKE3_CFLAGS_NEON="$NEON_FLAGS"
-  cmake --build "$build_root" --parallel "$JOBS"
+    -DBLAKE3_CFLAGS_NEON="$NEON_FLAGS" \
+    2>&1 | tee "$configure_log"
+
+  cmake --build "$build_root" --parallel "$JOBS" --verbose \
+    2>&1 | tee "$build_log"
+
+  grep -F -- "-Wall" "$build_root/compile_commands.json" >/dev/null
+  grep -F -- "-Wextra" "$build_root/compile_commands.json" >/dev/null
+  grep -F -- "-Wpedantic" "$build_root/compile_commands.json" >/dev/null
+  grep -F -- "-Werror" "$build_root/compile_commands.json" >/dev/null
+  grep -F -- "-O3" "$build_root/compile_commands.json" >/dev/null
+  grep -F -- "-ffunction-sections" "$build_root/compile_commands.json" >/dev/null
+  grep -F -- "-fdata-sections" "$build_root/compile_commands.json" >/dev/null
+  grep -F -- "-fvisibility=hidden" "$build_root/compile_commands.json" >/dev/null
 }
 
-build_neon "$FORK_ROOT" "$FORK_BUILD"
-build_neon "$OFFICIAL_ROOT" "$OFFICIAL_BUILD"
+build_neon_strict fork "$FORK_ROOT" "$FORK_BUILD"
+build_neon_strict official "$OFFICIAL_ROOT" "$OFFICIAL_BUILD"
 
 FORK_ABC="$(printf abc | "$FORK_BUILD/blake3-example")"
 OFFICIAL_ABC="$(printf abc | "$OFFICIAL_BUILD/blake3-example")"
@@ -79,15 +121,48 @@ OFFICIAL_ABC="$(printf abc | "$OFFICIAL_BUILD/blake3-example")"
   exit 1
 }
 
-clang $COMMON_FLAGS -fvisibility=hidden \
+# The same benchmark source is linked against each static library. The loop is
+# benchmark harness work only; it is not added to either BLAKE3 implementation.
+clang $STRICT_C_FLAGS \
   -I "$FORK_ROOT/c" \
   "$FORK_ROOT/c/bench_rmr.c" "$FORK_BUILD/libblake3.a" \
+  $LINK_FLAGS \
   -o "$FORK_BUILD/bench-rmr"
 
-clang $COMMON_FLAGS -fvisibility=hidden \
+clang $STRICT_C_FLAGS \
   -I "$OFFICIAL_ROOT/c" \
   "$FORK_ROOT/c/bench_rmr.c" "$OFFICIAL_BUILD/libblake3.a" \
+  $LINK_FLAGS \
   -o "$OFFICIAL_BUILD/bench-rmr"
+
+# Preserve symbol tables and disassembly as evidence. No source is modified.
+for label in fork official; do
+  if [ "$label" = fork ]; then
+    build="$FORK_BUILD"
+  else
+    build="$OFFICIAL_BUILD"
+  fi
+
+  nm -A -g --defined-only "$build/libblake3.a" \
+    > "$RUN_DIR/${label}-archive-defined-global-symbols.txt"
+  nm -D -g --defined-only "$build/bench-rmr" \
+    > "$RUN_DIR/${label}-dynamic-defined-symbols.txt" 2>/dev/null || true
+  nm -u "$build/bench-rmr" \
+    > "$RUN_DIR/${label}-executable-undefined-symbols.txt" || true
+  readelf -Ws "$build/bench-rmr" \
+    > "$RUN_DIR/${label}-executable-symbol-table.txt"
+  readelf -SW "$build/bench-rmr" \
+    > "$RUN_DIR/${label}-executable-sections.txt"
+  size -A "$build/bench-rmr" \
+    > "$RUN_DIR/${label}-executable-size.txt"
+  "$OBJDUMP" -d "$build/libblake3.a" \
+    > "$RUN_DIR/${label}-archive-disassembly.txt"
+done
+
+FORK_GLOBAL_SYMBOLS="$(awk 'NF {count++} END {print count+0}' "$RUN_DIR/fork-archive-defined-global-symbols.txt")"
+OFFICIAL_GLOBAL_SYMBOLS="$(awk 'NF {count++} END {print count+0}' "$RUN_DIR/official-archive-defined-global-symbols.txt")"
+FORK_DYNAMIC_EXPORTS="$(awk 'NF {count++} END {print count+0}' "$RUN_DIR/fork-dynamic-defined-symbols.txt")"
+OFFICIAL_DYNAMIC_EXPORTS="$(awk 'NF {count++} END {print count+0}' "$RUN_DIR/official-dynamic-defined-symbols.txt")"
 
 {
   echo "device_arch=$(uname -m)"
@@ -102,7 +177,14 @@ clang $COMMON_FLAGS -fvisibility=hidden \
   echo "official_commit=$(git -C "$OFFICIAL_ROOT" rev-parse HEAD)"
   echo "compiler=$(clang --version | head -n 1)"
   echo "cmake=$(cmake --version | head -n 1)"
-  echo "flags=$COMMON_FLAGS"
+  echo "diagnostic_flags=$DIAGNOSTIC_FLAGS"
+  echo "codegen_flags=$CODEGEN_FLAGS"
+  echo "link_flags=$LINK_FLAGS"
+  echo "strict_warning_gate=PASS"
+  echo "fork_archive_defined_global_symbols=$FORK_GLOBAL_SYMBOLS"
+  echo "official_archive_defined_global_symbols=$OFFICIAL_GLOBAL_SYMBOLS"
+  echo "fork_dynamic_defined_symbols=$FORK_DYNAMIC_EXPORTS"
+  echo "official_dynamic_defined_symbols=$OFFICIAL_DYNAMIC_EXPORTS"
   echo "rounds=$ROUNDS"
   echo "iterations_mib=$ITERATIONS_MIB"
   echo "kat_abc=PASS"
@@ -142,12 +224,22 @@ DIGEST_COUNT="$(awk -F, '$1 == "RESULT" {print $6}' "$RESULTS" | sort -u | awk '
 
 {
   echo "status=PASS"
-  echo "comparison=fork_vs_official_same_device_same_compiler_same_flags"
+  echo "comparison=fork_vs_official_same_device_same_compiler_same_strict_contract"
+  echo "strict_warning_gate=PASS"
+  echo "linker_gc_sections=ENABLED"
+  echo "linker_build_id=NONE"
+  echo "linker_exclude_libs=ALL"
   echo "official_median_MiB_s=$OFFICIAL_MEDIAN"
   echo "fork_median_MiB_s=$FORK_MEDIAN"
   echo "fork_over_official_ratio=${RATIO}x"
   echo "fork_gain_percent=${GAIN}%"
+  echo "fork_archive_defined_global_symbols=$FORK_GLOBAL_SYMBOLS"
+  echo "official_archive_defined_global_symbols=$OFFICIAL_GLOBAL_SYMBOLS"
+  echo "fork_dynamic_defined_symbols=$FORK_DYNAMIC_EXPORTS"
+  echo "official_dynamic_defined_symbols=$OFFICIAL_DYNAMIC_EXPORTS"
   echo "digest_equivalence=PASS"
+  echo "source_core_modified_by_runner=NO"
+  echo "benchmark_loop_scope=HARNESS_ONLY"
   echo "claim_scope=ARMv7_Termux_single_device_single_run_matrix"
 } | tee "$SUMMARY"
 
@@ -165,8 +257,17 @@ sha256sum \
   "$RESULTS" \
   "$SUMMARY" \
   "$RECEIPT" \
+  "$RUN_DIR"/*.log \
+  "$RUN_DIR"/*symbols*.txt \
+  "$RUN_DIR"/*sections.txt \
+  "$RUN_DIR"/*size.txt \
+  "$RUN_DIR"/*disassembly.txt \
+  "$FORK_BUILD/compile_commands.json" \
+  "$OFFICIAL_BUILD/compile_commands.json" \
   "$FORK_BUILD/libblake3.a" \
   "$OFFICIAL_BUILD/libblake3.a" \
+  "$FORK_BUILD/bench-rmr" \
+  "$OFFICIAL_BUILD/bench-rmr" \
   > "$RUN_DIR/SHA256SUMS"
 
 printf '\nreceipt=%s\n' "$RECEIPT"
