@@ -19,7 +19,61 @@ Cryptographic equivalence: `PASS`.
 
 This supports only the scoped claim that the NEON build was faster than the portable build on the measured ARMv7 Termux device. It does not establish a universal speedup or superiority over the official upstream repository.
 
-## Fork versus official upstream
+## Strict build contract for fork versus official upstream
+
+The comparison runner does not suppress compiler warnings and does not silently relax the fork build. Both sides are compiled under the same strict contract.
+
+### Mandatory diagnostic gate
+
+```text
+-Wall
+-Wextra
+-Wpedantic
+-Werror
+CMAKE_COMPILE_WARNING_AS_ERROR=ON
+```
+
+Warnings are diagnostics; they do not directly remove symbols. Their role here is to stop warning-bearing code from entering the measured binary.
+
+### Code-generation and architecture contract
+
+```text
+-O3
+-DNDEBUG
+-march=armv7-a
+-mfpu=neon-vfpv4
+-mfloat-abi=softfp
+-fvisibility=hidden
+-ffunction-sections
+-fdata-sections
+-fno-asynchronous-unwind-tables
+-fno-unwind-tables
+```
+
+### Linker and symbol-surface contract
+
+```text
+-Wl,--gc-sections
+-Wl,--build-id=none
+-Wl,--exclude-libs,ALL
+```
+
+These linker and visibility options are the part of the contract that removes unreachable sections, avoids build-id metadata and prevents static archive members from being promoted into the dynamic export surface.
+
+The runner also records, for both builds:
+
+- verbose configure and compilation logs;
+- exact `compile_commands.json`;
+- defined global symbols in each static archive;
+- dynamic symbols and unresolved symbols in each executable;
+- ELF section tables;
+- section sizes;
+- full static-library disassembly;
+- SHA-256 for the evidence and binaries.
+
+The runner does **not** modify either BLAKE3 cryptographic core. The repetition loop exists only inside the shared benchmark harness and is linked identically against both libraries.
+
+## Run fork versus official upstream
 
 Run from the fork root:
 
@@ -32,12 +86,12 @@ The runner:
 
 1. checks out the official `BLAKE3-team/BLAKE3` repository;
 2. captures both commit hashes;
-3. builds both implementations with the same Clang, CMake generator, `-O3`, ARMv7, NEON and softfp flags;
+3. builds both implementations with the same strict warning, code-generation, ARMv7, NEON and linker contract;
 4. verifies the `abc` test vector in both builds;
 5. links the same in-memory benchmark source against each static library;
 6. alternates execution order across rounds;
 7. checks digest equivalence;
-8. records medians, ratio, raw CSV, receipt and SHA-256 hashes.
+8. records medians, ratio, raw CSV, logs, symbol tables, disassembly, receipt and SHA-256 hashes.
 
 Environment overrides:
 
@@ -51,4 +105,6 @@ Claim state before that runner completes:
 ```text
 fork_NEON_vs_fork_portable=PASS
 fork_vs_official_upstream=TOKEN_VAZIO
+strict_fork_vs_official_warning_gate=TOKEN_VAZIO
+symbol_surface_comparison=TOKEN_VAZIO
 ```
