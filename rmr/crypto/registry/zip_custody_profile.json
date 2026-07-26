@@ -1,0 +1,122 @@
+{
+  "_meta": {
+    "schema": "rmr.zip_bitstack_custody.v1",
+    "copyright": "Copyright (c) 2024–2026 Rafael Melo Reis",
+    "license": "Licensed under LICENSE_RMR.",
+    "author": "Rafael Melo Reis",
+    "claim_allowed": false,
+    "human_review_required": true
+  },
+  "profile_id": "RMR-ZIPRAF-CUSTODY-V1",
+  "repository": "rafaelmeloreisnovo/BLAKE3",
+  "observed_base_commit": "16cc71a2c7a61516a718f67e52fd1842099ab534",
+  "evidence_anchor": {
+    "merge_commit": "5f4bd920ef77554c95a452d40aa7944871b9ca65",
+    "source_files": [
+      "rmr/VISUAL_PROTOTYPE_CONTRACT.md",
+      "rmr/src/rmr_visual_prototype.c",
+      "rmr/include/rmr_visual_prototype.h",
+      "rmr/tests/rmr_visual_prototype_selftest.c"
+    ]
+  },
+  "layers": [
+    {
+      "id": "L0",
+      "name": "semantic_input",
+      "role": "Public label or domain word supplied to the construction.",
+      "implemented_state": "VERIFIED_CODE",
+      "security_state": "PUBLIC_CONTEXT_NOT_SECRET"
+    },
+    {
+      "id": "L1",
+      "name": "structural_bit_field_stack",
+      "role": "Canonical little-endian stacking of typed fields into the RVC1 byte capsule.",
+      "implemented_state": "VERIFIED_CODE",
+      "security_state": "STRUCTURAL_ENCODING_NOT_ENCRYPTION"
+    },
+    {
+      "id": "L2",
+      "name": "word_bound_structural_identity",
+      "role": "class_id is derived as CRC32C(label); label and class_id must agree during verification.",
+      "implemented_state": "VERIFIED_CODE",
+      "security_state": "PUBLIC_PARAMETER_BINDING_NOT_AUTHENTICATION"
+    },
+    {
+      "id": "L3",
+      "name": "capsule_error_detection",
+      "role": "Prototype and complete capsule CRC32C values detect accidental mutation and structural mismatch.",
+      "implemented_state": "VERIFIED_CODE",
+      "security_state": "ERROR_DETECTION_NOT_MAC"
+    },
+    {
+      "id": "L4",
+      "name": "zip_store_container",
+      "role": "RVC1 payload is stored byte-for-byte in a classic ZIP method-0 STORE entry with ZIP CRC-32.",
+      "implemented_state": "VERIFIED_FIXTURE",
+      "security_state": "PORTABLE_CONTAINER_NOT_CONFIDENTIALITY"
+    },
+    {
+      "id": "L5",
+      "name": "cryptographic_digest",
+      "role": "SHA-256 and/or BLAKE3 bind the exact payload or final archive for adversarial integrity checks.",
+      "implemented_state": "PARTIAL_VERIFIED_SHA256_FIXTURE",
+      "security_state": "CRYPTOGRAPHIC_INTEGRITY_WITH_TRUSTED_REFERENCE"
+    },
+    {
+      "id": "L6",
+      "name": "historical_chain",
+      "role": "Full Git commit SHA and optional parent capsule digest establish immutable-address references and append-only succession.",
+      "implemented_state": "DOCUMENTED",
+      "security_state": "DAG_TRACEABILITY_NOT_CONSENSUS_BLOCKCHAIN"
+    },
+    {
+      "id": "L7",
+      "name": "authenticated_anchor",
+      "role": "Signature, trusted timestamp, immutable release or DOI record prevents an operator from silently rebuilding the whole chain.",
+      "implemented_state": "TOKEN_VAZIO_EXTERNAL_ANCHOR",
+      "security_state": "REQUIRED_FOR_AUTHENTICATED_CUSTODY"
+    }
+  ],
+  "known_fixture": {
+    "payload_name": "cachorro-one-view.rvc1",
+    "payload_size_bytes": 140,
+    "zip_size_bytes": 272,
+    "zip_method": 0,
+    "zip_method_name": "STORE",
+    "zip_crc32": "2d8bd598",
+    "payload_sha256": "3438ca62d78667862f86fe809463ce328fc025e763fdd7a8ec1693344726dfed",
+    "roundtrip_state": "VERIFIED_BYTE_FOR_BYTE"
+  },
+  "word_binding": {
+    "current_mechanism": "CRC32C(label) -> class_id",
+    "word_is_secret": false,
+    "domain_separation_role": "SUPPORTED_AS_PUBLIC_CONTEXT",
+    "key_derivation_role": "FORBIDDEN_WITH_RAW_CRC",
+    "cryptographic_keyed_mode": "TOKEN_VAZIO_NOT_IMPLEMENTED"
+  },
+  "required_manifest_fields": [
+    "capsule_format",
+    "capsule_version",
+    "domain_word_utf8_sha256",
+    "payload_size",
+    "payload_crc32c",
+    "payload_sha256",
+    "archive_method",
+    "archive_crc32",
+    "archive_sha256",
+    "source_commit",
+    "parent_evidence_digest",
+    "created_at_utc",
+    "toolchain",
+    "claim_allowed"
+  ],
+  "prohibited_promotions": [
+    "CRC_MATCH_IMPLIES_AUTHENTICITY",
+    "BIT_STACKING_IMPLIES_CONFIDENTIALITY",
+    "ZIP_CONTAINER_IMPLIES_ENCRYPTION",
+    "PUBLIC_WORD_IMPLIES_SECRET_KEY",
+    "HASHCHAIN_IMPLIES_DISTRIBUTED_CONSENSUS",
+    "LOCAL_FIXTURE_IMPLIES_UNIVERSAL_SECURITY"
+  ],
+  "claim_allowed": false
+}
