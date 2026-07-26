@@ -1,0 +1,159 @@
+schema: rmr.blake3.ci_forensics.v1
+recorded_at_utc: 2026-07-26T00:00:00Z
+subject:
+  author_login: rafaelmeloreisnovo
+  upstream_repository: BLAKE3-team/BLAKE3
+  fork_repository: rafaelmeloreisnovo/BLAKE3
+  year_scope: 2025
+public_activity:
+  upstream_prs_found_for_current_account: 1
+  pr_numbers: [533]
+  other_public_prs_in_scope: NOT_FOUND_IN_PASS
+  deleted_or_inaccessible_activity: TOKEN_VAZIO
+pr_533:
+  title: A little bit of helping
+  opened_at: 2025-11-25T00:42:22Z
+  closed_at: 2025-11-25T03:29:05Z
+  merged: false
+  mergeable_snapshot: true
+  base_sha: 308b95dfa15d5a0aa8cb3c5534ffd90d76122c46
+  head_sha: 15829f851e45d1327b017be67a7b88d7725bc653
+  commits: 24
+  changed_paths:
+    - .gitignore
+    - benches/README_CN.md
+    - benches/bench.rs
+    - c/blake3.h
+    - c/blake3_impl.h
+    - c/blake3_portable.c
+    - src/guts.rs
+    - src/hazmat.rs
+    - src/lib.rs
+    - src/platform.rs
+  direct_action_on_official_files: VERIFIED_PRIMARY
+  central_mechanisms:
+    warmup_iterations: VERIFIED_PRIMARY
+    random_input_warmup: VERIFIED_PRIMARY
+    test_black_box: VERIFIED_PRIMARY
+    preallocation_outside_timed_region: VERIFIED_PRIMARY
+    page_offsets_precomputed: VERIFIED_PRIMARY
+    literal_platform_offsets: VERIFIED_PRIMARY
+ci_run:
+  repository: BLAKE3-team/BLAKE3
+  workflow_name: tests
+  workflow_id: 56286
+  run_id: 19656415853
+  run_number: 1549
+  status: completed
+  conclusion: failure
+  associated_head_sha: 15829f851e45d1327b017be67a7b88d7725bc653
+  trigger_context: pull_request
+  contract:
+    BLAKE3_CI: '1'
+    RUSTFLAGS: -D warnings
+    RUST_BACKTRACE: '1'
+  matrices_observed:
+    operating_systems:
+      - ubuntu-latest
+      - macOS-latest
+      - windows-latest
+    rust_channels:
+      - stable
+      - beta
+      - nightly
+    cross_targets:
+      - i586-unknown-linux-musl
+      - i686-unknown-linux-musl
+      - armv7-unknown-linux-gnueabihf
+      - aarch64-unknown-linux-gnu
+      - powerpc64-unknown-linux-gnu
+      - s390x-unknown-linux-gnu
+    feature_gates:
+      - full_simd
+      - no_avx512
+      - no_avx2
+      - no_sse41
+      - no_sse2
+      - prefer_intrinsics
+      - pure
+      - neon
+      - no_neon
+      - wasm32_simd
+    components:
+      - rust_library
+      - b3sum
+      - C_bindings
+      - CMake_C_tests
+      - test_vectors
+      - WASM
+      - cargo_xwin
+      - MSRV
+  first_page_jobs_all_reported_failure: true
+  exact_failure_line: TOKEN_VAZIO
+  root_cause: TOKEN_VAZIO
+  job_logs:
+    state: HTTP_410_GONE
+  step_summaries:
+    state: EMPTY
+  artifacts:
+    count: 0
+same_file_followup:
+  base_to_current_master_commits: 19
+  pr_paths_modified_later_count: 6
+  pr_paths_modified_later:
+    - benches/bench.rs
+    - c/blake3.h
+    - c/blake3_impl.h
+    - src/hazmat.rs
+    - src/lib.rs
+    - src/platform.rs
+  file_level_overlap: VERIFIED_PRIMARY
+current_master_mechanism_check:
+  warmup_iterations: NOT_FOUND_IN_PASS
+  random_input_warmup: NOT_FOUND_IN_PASS
+  test_black_box_in_verified_benchmark_region: NOT_FOUND_IN_PASS
+  literal_platform_offsets: NOT_FOUND_IN_PASS
+  interpretation: >-
+    Current upstream master still reflects the pre-PR central benchmark and
+    platform-offset structures in the inspected regions. Same-file modifications
+    do not by themselves demonstrate rewrite, copying, or structural derivation.
+  direct_rewrite: TOKEN_VAZIO
+  structural_derivation: TOKEN_VAZIO
+local_2025_evidence:
+  drive_inventory:
+    file_name: lista_total_raiz.txt
+    modified_at: 2025-07-18T21:13:24Z
+    official_cargo_registry_snapshots:
+      - blake3-1.5.4
+      - blake3-1.8.2
+    non_registry_author_clone_found: false
+    interpretation: official_source_presence_not_authorship
+  termux_backup:
+    file_name: termux_backup_20250522_011646.tar.gz
+    size_bytes: 815308800
+    modified_at: 2025-06-19T00:36:59Z
+    forensic_priority: P0
+    download_state: BLOCKED_BY_CONNECTOR_100MB_LIMIT
+    inspection_state: TOKEN_VAZIO
+claims:
+  author_directly_modified_official_paths_in_2025:
+    state: VERIFIED_PRIMARY
+    claim_allowed: true
+  official_ci_executed_pr_head:
+    state: VERIFIED_PRIMARY
+    claim_allowed: true
+  upstream_closed_and_rewrote_central_mechanisms:
+    state: NOT_SUPPORTED_IN_PASS_02
+    claim_allowed: false
+  same_paths_changed_later:
+    state: VERIFIED_PRIMARY
+    claim_allowed: true
+  copying_or_coordinated_misappropriation:
+    state: TOKEN_VAZIO
+    claim_allowed: false
+next_actions:
+  - inspect_termux_backup_without_modifying_original
+  - reconstruct_24_commit_order_and_timestamps
+  - reproduce_head_with_frozen_workflow
+  - compare_normalized_AST_CFG_and_git_blame
+  - recover_expired_CI_failure_from_email_screenshot_or_local_logs
