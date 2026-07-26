@@ -1,0 +1,64 @@
+# Copyright (c) 2024–2026 Rafael Melo Reis
+# Licensed under rmr/LICENSE_RMR.
+
+name: RMR ZIP Custody Gate
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/rmr-zip-custody.yml"
+      - "rmr/PROVENIENCE.md"
+      - "rmr/VISUAL_PROTOTYPE_CONTRACT.md"
+      - "rmr/src/rmr_visual_prototype.c"
+      - "rmr/crypto/**"
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/rmr-zip-custody.yml"
+      - "rmr/PROVENIENCE.md"
+      - "rmr/VISUAL_PROTOTYPE_CONTRACT.md"
+      - "rmr/src/rmr_visual_prototype.c"
+      - "rmr/crypto/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rmr-zip-custody-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate RVC1 ZIP custody contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: "pyproject.toml"
+
+      - name: Compile auditors
+        run: |
+          python -m py_compile \
+            rmr/crypto/tools/validate_zip_custody_profile.py \
+            rmr/crypto/tests/test_zip_custody_profile.py
+
+      - name: Validate ZIP custody profile
+        run: python rmr/crypto/tools/validate_zip_custody_profile.py
+
+      - name: Run adversarial contract tests
+        run: python -m unittest -v rmr/crypto/tests/test_zip_custody_profile.py
+
+      - name: Verify RMR authorship headers
+        run: python tools/check_rmr_headers.py
