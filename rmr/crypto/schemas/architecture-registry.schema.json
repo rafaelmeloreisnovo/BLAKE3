@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rmr.local/schemas/architecture-registry.schema.json",
+  "$comment": "Copyright (c) 2024–2026 Rafael Melo Reis. Licensed under LICENSE_RMR. JSON comments are represented through $comment.",
+  "title": "RMR Crypto Architecture Registry",
+  "type": "object",
+  "required": ["_meta", "families"],
+  "additionalProperties": false,
+  "properties": {
+    "_meta": {
+      "type": "object",
+      "required": [
+        "copyright",
+        "license",
+        "schema",
+        "created_at_utc",
+        "claim_allowed",
+        "reference_only",
+        "third_party_code_vendored",
+        "human_legal_review_required",
+        "local_integration_repository"
+      ],
+      "properties": {
+        "copyright": {"type": "string"},
+        "license": {"const": "Licensed under LICENSE_RMR."},
+        "format_header_exception": {"type": "string"},
+        "schema": {"const": "rmr.crypto.architecture-registry.v1"},
+        "created_at_utc": {"type": "string", "format": "date-time"},
+        "claim_allowed": {"const": false},
+        "reference_only": {"const": true},
+        "third_party_code_vendored": {"const": false},
+        "human_legal_review_required": {"const": true},
+        "local_integration_repository": {"const": "rafaelmeloreisnovo/BLAKE3"}
+      }
+    },
+    "families": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {"$ref": "#/$defs/family"}
+    }
+  },
+  "$defs": {
+    "repository": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+    },
+    "candidateFork": {
+      "type": "object",
+      "required": ["repository", "archived_observed", "relationship_status"],
+      "additionalProperties": false,
+      "properties": {
+        "repository": {"$ref": "#/$defs/repository"},
+        "archived_observed": {"type": "boolean"},
+        "relationship_status": {
+          "enum": [
+            "VERIFIED_DIRECT_PARENT",
+            "VERIFIED_ANCESTOR",
+            "RELATED_DISTRIBUTION",
+            "TOKEN_VAZIO_PARENT_VERIFICATION",
+            "NOT_A_FORK"
+          ]
+        }
+      }
+    },
+    "family": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "category",
+        "upstream_repository",
+        "rmr_role",
+        "license_status",
+        "import_policy",
+        "vendored",
+        "audit_status",
+        "candidate_forks"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+        "name": {"type": "string", "minLength": 1},
+        "category": {"type": "string", "minLength": 1},
+        "upstream_repository": {"$ref": "#/$defs/repository"},
+        "rmr_role": {"type": "string", "minLength": 1},
+        "license_status": {
+          "enum": [
+            "VERIFIED_AT_COMMIT",
+            "DECLARED_BY_REPOSITORY",
+            "DECLARED_BY_REPOSITORY_REQUIRES_COMMIT_AUDIT",
+            "TOKEN_VAZIO_NOT_REVIEWED",
+            "CONFLICT_REQUIRES_HUMAN_REVIEW"
+          ]
+        },
+        "import_policy": {"type": "string", "minLength": 1},
+        "vendored": {"const": false},
+        "audit_status": {"type": "string", "minLength": 1},
+        "candidate_forks": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {"$ref": "#/$defs/candidateFork"}
+        }
+      }
+    }
+  }
+}
