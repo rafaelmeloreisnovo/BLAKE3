@@ -1,0 +1,176 @@
+{
+  "_meta": {
+    "copyright": "Copyright (c) 2024–2026 Rafael Melo Reis",
+    "license": "Licensed under LICENSE_RMR.",
+    "format_header_exception": "JSON does not permit comments; authorship is encoded as data and registered in rmr/PROVENIENCE.md",
+    "schema": "rmr.crypto.architecture-registry.v1",
+    "created_at_utc": "2026-07-26T00:00:00Z",
+    "claim_allowed": false,
+    "reference_only": true,
+    "third_party_code_vendored": false,
+    "human_legal_review_required": true,
+    "local_integration_repository": "rafaelmeloreisnovo/BLAKE3"
+  },
+  "families": [
+    {
+      "id": "openssl",
+      "name": "OpenSSL",
+      "category": "tls_crypto_library",
+      "upstream_repository": "openssl/openssl",
+      "rmr_role": "TLS and general cryptographic implementation reference",
+      "license_status": "TOKEN_VAZIO_NOT_REVIEWED",
+      "import_policy": "reference_only",
+      "vendored": false,
+      "audit_status": "CATALOGUED_NOT_AUDITED",
+      "candidate_forks": [
+        {"repository": "quictls/openssl", "archived_observed": true, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "guardianproject/openssl-android", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "open-quantum-safe/openssl", "archived_observed": true, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"}
+      ]
+    },
+    {
+      "id": "boringssl",
+      "name": "BoringSSL",
+      "category": "tls_crypto_library",
+      "upstream_repository": "google/boringssl",
+      "rmr_role": "Google-oriented TLS and cryptographic implementation reference",
+      "license_status": "TOKEN_VAZIO_NOT_REVIEWED",
+      "import_policy": "reference_only",
+      "vendored": false,
+      "audit_status": "CATALOGUED_NOT_AUDITED",
+      "candidate_forks": [
+        {"repository": "open-quantum-safe/boringssl", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "oven-sh/boringssl", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "firebase/boringssl", "archived_observed": true, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"}
+      ]
+    },
+    {
+      "id": "aws-lc",
+      "name": "AWS-LC",
+      "category": "crypto_library",
+      "upstream_repository": "aws/aws-lc",
+      "rmr_role": "AWS cryptographic library and optimized backend reference",
+      "license_status": "TOKEN_VAZIO_NOT_REVIEWED",
+      "import_policy": "reference_only",
+      "vendored": false,
+      "audit_status": "CATALOGUED_NOT_AUDITED",
+      "candidate_forks": [
+        {"repository": "Adam9911/aws-lc", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "madcitymultimedia/aws-lc", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "nebeid/aws-lc", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"}
+      ]
+    },
+    {
+      "id": "mbedtls",
+      "name": "Mbed TLS",
+      "category": "embedded_tls_crypto_library",
+      "upstream_repository": "Mbed-TLS/mbedtls",
+      "rmr_role": "Embedded TLS, X.509 and constrained-system reference",
+      "license_status": "TOKEN_VAZIO_NOT_REVIEWED",
+      "import_policy": "reference_only",
+      "vendored": false,
+      "audit_status": "CATALOGUED_NOT_AUDITED",
+      "candidate_forks": [
+        {"repository": "espressif/mbedtls", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "ARM-software/CMSIS-mbedTLS", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "hannestschofenig/mbedtls", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"}
+      ]
+    },
+    {
+      "id": "wolfssl",
+      "name": "wolfSSL",
+      "category": "embedded_tls_crypto_library",
+      "upstream_repository": "wolfSSL/wolfssl",
+      "rmr_role": "Portable embedded and IoT TLS implementation reference",
+      "license_status": "TOKEN_VAZIO_NOT_REVIEWED",
+      "import_policy": "reference_only",
+      "vendored": false,
+      "audit_status": "CATALOGUED_NOT_AUDITED",
+      "candidate_forks": [
+        {"repository": "Scottcjn/wolfssl", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "kassane/wolfssl", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "Denyskap1/wolfssl", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"}
+      ]
+    },
+    {
+      "id": "openssh-portable",
+      "name": "OpenSSH Portable",
+      "category": "secure_transport_protocol",
+      "upstream_repository": "openssh/openssh-portable",
+      "rmr_role": "SSH transport, authentication and tooling reference",
+      "license_status": "TOKEN_VAZIO_NOT_REVIEWED",
+      "import_policy": "reference_only",
+      "vendored": false,
+      "audit_status": "CATALOGUED_NOT_AUDITED",
+      "candidate_forks": [
+        {"repository": "PowerShell/openssh-portable", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "dkrahmer/openssh-portable", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "NoMoreFood/openssh-portable", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"}
+      ]
+    },
+    {
+      "id": "libsodium",
+      "name": "libsodium",
+      "category": "high_level_crypto_library",
+      "upstream_repository": "jedisct1/libsodium",
+      "rmr_role": "High-level cryptographic API and misuse-resistance reference",
+      "license_status": "TOKEN_VAZIO_NOT_REVIEWED",
+      "import_policy": "reference_only",
+      "vendored": false,
+      "audit_status": "CATALOGUED_NOT_AUDITED",
+      "candidate_forks": [
+        {"repository": "algorand/libsodium", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "stellar/libsodium", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "shadowsocks/libsodium", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"}
+      ]
+    },
+    {
+      "id": "blake3",
+      "name": "BLAKE3",
+      "category": "cryptographic_hash",
+      "upstream_repository": "BLAKE3-team/BLAKE3",
+      "rmr_role": "Primary upstream hash primitive and compatibility baseline for this fork",
+      "license_status": "DECLARED_BY_REPOSITORY_REQUIRES_COMMIT_AUDIT",
+      "import_policy": "existing_upstream_boundary",
+      "vendored": false,
+      "audit_status": "BOUNDARY_DOCUMENTED",
+      "candidate_forks": [
+        {"repository": "rui314/BLAKE3", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "madMAx43v3r/BLAKE3", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "dalakatt/blake3", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"}
+      ]
+    },
+    {
+      "id": "liboqs",
+      "name": "liboqs",
+      "category": "post_quantum_research_library",
+      "upstream_repository": "open-quantum-safe/liboqs",
+      "rmr_role": "Post-quantum research and prototyping reference",
+      "license_status": "TOKEN_VAZIO_NOT_REVIEWED",
+      "import_policy": "reference_only_research",
+      "vendored": false,
+      "audit_status": "CATALOGUED_NOT_AUDITED",
+      "candidate_forks": [
+        {"repository": "pq-crystals/liboqs", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "beldmit/liboqs", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "tresorit/liboqs", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"}
+      ]
+    },
+    {
+      "id": "cryptopp",
+      "name": "Crypto++",
+      "category": "general_crypto_library",
+      "upstream_repository": "weidai11/cryptopp",
+      "rmr_role": "Broad C++ primitive and algorithm implementation reference",
+      "license_status": "TOKEN_VAZIO_NOT_REVIEWED",
+      "import_policy": "reference_only",
+      "vendored": false,
+      "audit_status": "CATALOGUED_NOT_AUDITED",
+      "candidate_forks": [
+        {"repository": "ethereum/cryptopp", "archived_observed": true, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "igorgamer001/cryptopp", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"},
+        {"repository": "noloader/cryptopp", "archived_observed": false, "relationship_status": "TOKEN_VAZIO_PARENT_VERIFICATION"}
+      ]
+    }
+  ]
+}
