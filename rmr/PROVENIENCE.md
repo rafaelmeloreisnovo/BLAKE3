@@ -48,9 +48,12 @@ Use o texto abaixo quando precisar explicitar copyright/fronteira:
 | `rmr/core/validate.c`, `rmr/core/pai_validate.h` | RMR autoral (validação determinística de invariantes) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/core/lowlevel_freestanding.c` | RMR autoral (estado global da arena nomalloc freestanding) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/crypto/` | RMR autoral (registro criptográfico, perfil SHA-256, governança, custódia e testes) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/crypto/ZIP_BITSTACK_CUSTODY_PROFILE.md` | RMR autoral (perfil de cápsula ZIPRAF/RVC1, palavra, empilhamento estrutural, CRC, digests e âncoras) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/crypto/registry/architectures.json` | RMR autoral (snapshot de referências públicas; nenhum código de terceiro incorporado) | RMR Module License (`rmr/LICENSE_RMR`) para a seleção/organização autoral; nomes e direitos de terceiros permanecem de seus titulares |
+| `rmr/crypto/registry/zip_custody_profile.json` | RMR autoral (snapshot executável das camadas de custódia ZIPRAF/RVC1) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/crypto/schemas/architecture-registry.schema.json` | RMR autoral (schema de dados) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/crypto/claims/claims.jsonl` | RMR autoral (ledger epistemológico) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/crypto/claims/zip_bitstack_claims.jsonl` | RMR autoral (ledger de claims e falsificadores ZIP/CRC/bit-stacking) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/crypto/tools/`, `rmr/crypto/tests/` | RMR autoral (auditoria offline e testes de contrato) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `DOCUMENTACAO.md`, `MANIFESTO*.md` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/MANIFESTO_RAFAELIA.md` | RMR autoral (texto não jurídico) | RMR Module License (`rmr/LICENSE_RMR`) |
@@ -87,8 +90,10 @@ organizacional. Eles devem manter rastreabilidade de licença e finalidade:
 Os seguintes arquivos não aceitam comentários de topo sem invalidar seu formato:
 
 - `rmr/crypto/registry/architectures.json`;
+- `rmr/crypto/registry/zip_custody_profile.json`;
 - `rmr/crypto/schemas/architecture-registry.schema.json`;
-- `rmr/crypto/claims/claims.jsonl`.
+- `rmr/crypto/claims/claims.jsonl`;
+- `rmr/crypto/claims/zip_bitstack_claims.jsonl`.
 
 Justificativa técnica: JSON e JSONL estritos não possuem sintaxe de comentário. A autoria e a licença são codificadas como dados (`_meta`, `$comment` ou primeiro registro `meta`) e esta exceção é registrada em 2026-07-26 conforme os critérios de `rmr/docs/ARCHITECTURE.md`.
 
@@ -160,3 +165,15 @@ evidência reproduzível. Nenhum arquivo do núcleo BLAKE3 foi alterado.
 Criado `rmr/crypto/` como módulo autoral externo para catalogar dez famílias de implementações criptográficas e trinta candidatos relacionados, documentar o perfil SHA-256 já exposto pelo RMR e fornecer auditoria offline de estrutura, claims e vetores conhecidos.
 
 A inclusão no catálogo é somente referência. Não houve importação de código de terceiro. Licença e parentesco de fork permanecem `TOKEN_VAZIO` quando não foram verificados em commit fixado. O texto de `rmr/LICENSE_RMR` não foi alterado. A branch/PR deve permanecer sujeita a revisão humana antes de publicação ou merge.
+
+### Atualização 2026-07-26 (custódia ZIPRAF/RVC1 e empilhamento estrutural)
+
+Registrados os artefatos autorais externos:
+
+- `rmr/crypto/ZIP_BITSTACK_CUSTODY_PROFILE.md`;
+- `rmr/crypto/registry/zip_custody_profile.json`;
+- `rmr/crypto/claims/zip_bitstack_claims.jsonl`;
+- `rmr/crypto/tools/validate_zip_custody_profile.py`;
+- `rmr/crypto/tests/test_zip_custody_profile.py`.
+
+O perfil fixa a evidência já existente de serialização RVC1, vínculo público `CRC32C(label) -> class_id`, cápsula CRC32C, ZIP method 0 `STORE`, roundtrip byte a byte e SHA-256 do payload. Ele separa codificação estrutural, detecção de erro, digest criptográfico, autenticação e confidencialidade; não altera `rmr/LICENSE_RMR`, o núcleo BLAKE3 upstream ou os arquivos `src/`, `c/` e `reference_impl/`. Assinatura, timestamp/DOI externo, BLAKE3 do arquivo e modo com chave permanecem `TOKEN_VAZIO` até evidência própria e revisão humana.
