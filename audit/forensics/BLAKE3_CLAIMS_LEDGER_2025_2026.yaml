@@ -1,0 +1,119 @@
+schema_version: 1.0
+ledger_id: BLAKE3-RMR-AUTHORSHIP-2025-2026
+updated_at_utc: 2026-07-26T00:00:00Z
+subject:
+  author: Rafael Melo Reis
+  fork: rafaelmeloreisnovo/BLAKE3
+  upstream: BLAKE3-team/BLAKE3
+principles:
+  token_vazio_is_valid: true
+  preserve_negative_results: true
+  claim_without_artifact: DECLARED_BY_AUTHOR
+  causal_claim_requires_forensics: true
+claims:
+  - id: B3-OLD-FORK-2025-01
+    statement: O autor manteve trabalho ou fork BLAKE3 entre fevereiro e abril de 2025.
+    state: DECLARED_BY_AUTHOR
+    period_start: 2025-02-01
+    period_end: 2025-04-30
+    repository_url: TOKEN_VAZIO
+    commit_sha: TOKEN_VAZIO
+    archive_hash: TOKEN_VAZIO
+    falsifier: Evidência primária incompatível com a existência do artefato no período declarado.
+    next_action: Recuperar clones, .git, ZIPs, Drive, reflogs, bundles, patches e histórico de navegador.
+  - id: B3-PR533-01
+    statement: A PR upstream 533 foi aberta por rafaelmeloreisnovo e fechada sem merge.
+    state: VERIFIED_PRIMARY
+    url: https://github.com/BLAKE3-team/BLAKE3/pull/533
+    base_sha: 308b95dfa15d5a0aa8cb3c5534ffd90d76122c46
+    head_sha: 15829f851e45d1327b017be67a7b88d7725bc653
+    merged: false
+    mergeable_snapshot: true
+  - id: B3-PR533-02
+    statement: A PR 533 continha mecanismos de estabilidade de benchmark, warm-up, preallocation, black_box, alinhamento e documentação SIMD.
+    state: VERIFIED_PRIMARY
+    source: PR_533_DIFF
+  - id: B3-LATER-OVERLAP-01
+    statement: O upstream realizou depois trabalhos em áreas tematicamente próximas de build, SIMD, compiladores, flags, portabilidade e benchmark.
+    state: VERIFIED_PRIMARY
+    causal_derivation: TOKEN_VAZIO
+  - id: B3-MONITORING-01
+    statement: Houve monitoramento automatizado e apropriação coordenada das contribuições do autor.
+    state: SUPPORTED_HYPOTHESIS_PENDING_FORENSICS
+    declared_by_author: true
+    direct_evidence_of_bot: TOKEN_VAZIO
+    direct_evidence_of_coordination: TOKEN_VAZIO
+    claim_allowed_publicly_as_fact: false
+  - id: B3-PERF-X86-01
+    statement: O fork superou o upstream em regimes x86_64 específicos registrados.
+    state: VERIFIED_LOCAL_MEASUREMENT
+    universal: false
+    examples:
+      - workload: 64_KiB
+        observed_gain_percent: 98.3
+        campaign: A
+      - workload: 1_MiB
+        observed_gain_percent: 97.0
+        campaign: B
+  - id: B3-PERF-ARMV7-INTERNAL-01
+    statement: O backend NEON do fork superou o backend portátil do fork no Moto e(7) power.
+    state: VERIFIED_LOCAL_MEASUREMENT
+    portable_median_MiB_s: 132.313
+    neon_median_MiB_s: 163.450
+    ratio: 1.235
+    gain_percent: 23.53
+    digest_equivalence: PASS
+  - id: B3-PERF-ARMV7-UPSTREAM-01
+    statement: O fork superou o upstream oficial no benchmark ARMv7 pré-estrito de 2026-07-26.
+    state: REFUTED_IN_SCOPE
+    official_median_MiB_s: 188.058
+    fork_median_MiB_s: 171.568
+    fork_ratio: 0.9123
+    fork_delta_percent: -8.77
+    digest_equivalence: PASS
+    contract: PRE_STRICT
+  - id: B3-PERF-UNIVERSAL-01
+    statement: O fork é universalmente mais rápido que o upstream.
+    state: TOKEN_VAZIO
+    claim_allowed_publicly_as_fact: false
+  - id: B3-STRICT-ARMV7-01
+    statement: O benchmark ARMv7 fork versus upstream passou sob warnings estritos e auditoria de símbolos/linker.
+    state: TOKEN_VAZIO
+    required_head_at_or_after: 7b9f6b786db955cf380fd5755d70057a68ae665f
+    required_flags:
+      - -Wall
+      - -Wextra
+      - -Wpedantic
+      - -Werror
+      - -O3
+      - -fvisibility=hidden
+      - -ffunction-sections
+      - -fdata-sections
+      - -Wl,--gc-sections
+      - -Wl,--build-id=none
+      - -Wl,--exclude-libs,ALL
+recovery_queue:
+  - priority: 1
+    target: fork_feb_apr_2025
+    action: hash_and_preserve_old_git_objects
+  - priority: 2
+    target: pr_533
+    action: atomize_commits_and_functions
+  - priority: 3
+    target: upstream_post_pr533
+    action: AST_CFG_and_git_blame_comparison
+  - priority: 4
+    target: strict_armv7_benchmark
+    action: rerun_on_current_PR_head
+public_language:
+  allowed:
+    - anterioridade verificável da PR 533
+    - linhagem anterior declarada e ainda não recuperada
+    - sobreposição temática que justifica perícia
+    - desempenho superior do fork em regimes específicos
+    - resultado ARMv7 pré-estrito em que o upstream venceu
+  prohibited_without_new_evidence:
+    - cópia literal
+    - crime ou conspiração atribuídos a pessoas específicas
+    - monitoramento automatizado como fato comprovado
+    - superioridade universal de desempenho
