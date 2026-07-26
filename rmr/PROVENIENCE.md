@@ -55,6 +55,7 @@ Use o texto abaixo quando precisar explicitar copyright/fronteira:
 | `rmr/crypto/claims/claims.jsonl` | RMR autoral (ledger epistemológico) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/crypto/claims/zip_bitstack_claims.jsonl` | RMR autoral (ledger de claims e falsificadores ZIP/CRC/bit-stacking) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/crypto/tools/`, `rmr/crypto/tests/` | RMR autoral (auditoria offline e testes de contrato) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `.github/workflows/rmr-zip-custody.yml` | Externo autoral RMR (gate CI do perfil ZIPRAF/RVC1) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `DOCUMENTACAO.md`, `MANIFESTO*.md` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/MANIFESTO_RAFAELIA.md` | RMR autoral (texto não jurídico) | RMR Module License (`rmr/LICENSE_RMR`) |
 
@@ -74,13 +75,14 @@ organizacional. Eles devem manter rastreabilidade de licença e finalidade:
 | `AGENTS.md` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Governança operacional para agentes |
 | `tools/check_rmr_headers.py` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Verificação de cabeçalho `LICENSE_RMR`, shebang e escopo de alterações |
 | `tools/check_rmr_headers.sh` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Wrapper para execução do verificador Python |
+| `.github/workflows/rmr-zip-custody.yml` | Externo autoral RMR | RMR Module License (`rmr/LICENSE_RMR`) | Gate CI para KATs, perfil, claims, mutações adversariais e cabeçalhos |
 | `rmr/tools/audit_freestanding_nomalloc.py` | Externo autoral | RMR Module License (`rmr/LICENSE_RMR`) | Auditoria estática de coerência do perfil bare-metal `RMR_FREESTANDING_NOMALLOC` |
 
 ## Observações sobre integração
 
 - O RMR é **externo** e não integra o núcleo BLAKE3 por padrão.
 - Qualquer novo arquivo autoral do RMR **deve**:
-  1. Ficar dentro de `rmr/`.
+  1. Ficar dentro de `rmr/`, ou ser uma integração externa nominalmente registrada nesta tabela.
   2. Incluir cabeçalho de copyright/licença no próprio arquivo ou exceção formal.
   3. Ser registrado neste documento.
   4. Ser isolado do core (sem modificar `src/` ou `c/`).
@@ -174,6 +176,7 @@ Registrados os artefatos autorais externos:
 - `rmr/crypto/registry/zip_custody_profile.json`;
 - `rmr/crypto/claims/zip_bitstack_claims.jsonl`;
 - `rmr/crypto/tools/validate_zip_custody_profile.py`;
-- `rmr/crypto/tests/test_zip_custody_profile.py`.
+- `rmr/crypto/tests/test_zip_custody_profile.py`;
+- `.github/workflows/rmr-zip-custody.yml`.
 
-O perfil fixa a evidência já existente de serialização RVC1, vínculo público `CRC32C(label) -> class_id`, cápsula CRC32C, ZIP method 0 `STORE`, roundtrip byte a byte e SHA-256 do payload. Ele separa codificação estrutural, detecção de erro, digest criptográfico, autenticação e confidencialidade; não altera `rmr/LICENSE_RMR`, o núcleo BLAKE3 upstream ou os arquivos `src/`, `c/` e `reference_impl/`. Assinatura, timestamp/DOI externo, BLAKE3 do arquivo e modo com chave permanecem `TOKEN_VAZIO` até evidência própria e revisão humana.
+O perfil fixa a evidência já existente de serialização RVC1, vínculo público `CRC32C(label) -> class_id`, cápsula CRC32C, ZIP method 0 `STORE`, roundtrip byte a byte e SHA-256 do payload. Ele separa codificação estrutural, detecção de erro, digest criptográfico, autenticação e confidencialidade; não altera `rmr/LICENSE_RMR`, o núcleo BLAKE3 upstream ou os arquivos `src/`, `c/` e `reference_impl/`. Assinatura, timestamp/DOI externo, BLAKE3 do arquivo e modo com chave permanecem `TOKEN_VAZIO` até evidência própria e revisão humana. O workflow executa somente validação de contrato, KATs, testes adversariais e verificação de cabeçalhos.
