@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:rmr:pai42:observation:v1",
+  "title": "RMR PAI42 Observation V1",
+  "description": "Deterministic 42-point geometry derived from ATA OMEGA cycles.",
+  "type": "object",
+  "required": ["contract", "source_format", "hw_sig64_hex", "count", "metrics", "points", "claim_state"],
+  "properties": {
+    "contract": {"const": "RMR_PAI42_V1"},
+    "source_format": {"enum": ["V1_EXTENDED", "LEGACY_COMPACT"]},
+    "hw_sig64_hex": {"type": "string", "pattern": "^0x[0-9a-f]{16}$"},
+    "count": {"const": 42},
+    "metrics": {
+      "type": "object",
+      "required": ["min_cycle", "max_cycle", "mean_radius_q16", "variance_q16", "symmetry_q16", "stability_q16", "prototype_score_q16"]
+    },
+    "points": {
+      "type": "array",
+      "minItems": 42,
+      "maxItems": 42,
+      "items": {
+        "type": "object",
+        "required": ["index", "k", "cycle", "par", "radius_q16", "x_q16", "y_q16"]
+      }
+    },
+    "claim_state": {"type": "object"}
+  },
+  "additionalProperties": false,
+  "x-rmr-meta": {
+    "copyright": "Copyright (c) 2024–2026 Rafael Melo Reis",
+    "license": "Licensed under rmr/LICENSE_RMR.",
+    "format_comment_exception": "JSON does not support comments; metadata is encoded as data."
+  }
+}
