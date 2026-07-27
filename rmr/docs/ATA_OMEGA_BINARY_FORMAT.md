@@ -70,6 +70,7 @@ versão de formato separada, não uma alteração silenciosa do V1.
 - `rmr/runtime/sync_omega.c`: leitor V1 + legado;
 - `rmr/runtime/sync_fast.c`: leitor V1 + legado e limites seguros;
 - `rmr/tools/ata_decode.py`: auditoria offline dos dois formatos;
+- `rmr/tests/ata_omega_format_selftest.c`: contrato C V1 + legado;
 - `rmr/tests/test_ata_omega_format.py`: regressão de offset e truncamento.
 
 ## Validação
@@ -77,6 +78,9 @@ versão de formato separada, não uma alteração silenciosa do V1.
 A partir da raiz do repositório:
 
 ```sh
+cc -std=c11 -Wall -Wextra -Werror \
+  rmr/tests/ata_omega_format_selftest.c -o /tmp/ata_omega_selftest
+/tmp/ata_omega_selftest
 python3 rmr/tests/test_ata_omega_format.py
 ```
 
