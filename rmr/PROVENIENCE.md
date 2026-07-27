@@ -47,6 +47,7 @@ Use o texto abaixo quando precisar explicitar copyright/fronteira:
 | `rmr/hwif/include/rmr_hwif.h`, `rmr/hwif/include/rmr_detect.h`, `rmr/hwif/rmr_hwif.c`, `rmr/hwif/asm/aarch64/`, `rmr/hwif/asm/x86_64/`, `rmr/hwif/detect/detect_x86.c`, `rmr/hwif/detect/detect_aarch64.c`, `rmr/hwif/detect/detect_fallback.c` | RMR autoral (interface HW, detecção runtime e backends ASM) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/core/validate.c`, `rmr/core/pai_validate.h` | RMR autoral (validação determinística de invariantes) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/core/lowlevel_freestanding.c` | RMR autoral (estado global da arena nomalloc freestanding) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/pai42/` | RMR autoral (ponte geométrica determinística entre 42 ciclos ATA OMEGA, projeção circular Q16, ferramenta de auditoria e testes) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/crypto/` | RMR autoral (registro criptográfico, perfil SHA-256, governança, custódia e testes) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/crypto/ZIP_BITSTACK_CUSTODY_PROFILE.md` | RMR autoral (perfil de cápsula ZIPRAF/RVC1, palavra, empilhamento estrutural, CRC, digests e âncoras) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/crypto/registry/architectures.json` | RMR autoral (snapshot de referências públicas; nenhum código de terceiro incorporado) | RMR Module License (`rmr/LICENSE_RMR`) para a seleção/organização autoral; nomes e direitos de terceiros permanecem de seus titulares |
@@ -95,9 +96,10 @@ Os seguintes arquivos não aceitam comentários de topo sem invalidar seu format
 - `rmr/crypto/registry/zip_custody_profile.json`;
 - `rmr/crypto/schemas/architecture-registry.schema.json`;
 - `rmr/crypto/claims/claims.jsonl`;
-- `rmr/crypto/claims/zip_bitstack_claims.jsonl`.
+- `rmr/crypto/claims/zip_bitstack_claims.jsonl`;
+- `rmr/pai42/schema/pai42-observation.schema.json`.
 
-Justificativa técnica: JSON e JSONL estritos não possuem sintaxe de comentário. A autoria e a licença são codificadas como dados (`_meta`, `$comment` ou primeiro registro `meta`) e esta exceção é registrada em 2026-07-26 conforme os critérios de `rmr/docs/ARCHITECTURE.md`.
+Justificativa técnica: JSON e JSONL estritos não possuem sintaxe de comentário. A autoria e a licença são codificadas como dados (`_meta`, `$comment`, `x-rmr-meta` ou primeiro registro `meta`) e esta exceção é registrada conforme os critérios de `rmr/docs/ARCHITECTURE.md`.
 
 Compliance Notice
 
@@ -180,3 +182,9 @@ Registrados os artefatos autorais externos:
 - `.github/workflows/rmr-zip-custody.yml`.
 
 O perfil fixa a evidência já existente de serialização RVC1, vínculo público `CRC32C(label) -> class_id`, cápsula CRC32C, ZIP method 0 `STORE`, roundtrip byte a byte e SHA-256 do payload. Ele separa codificação estrutural, detecção de erro, digest criptográfico, autenticação e confidencialidade; não altera `rmr/LICENSE_RMR`, o núcleo BLAKE3 upstream ou os arquivos `src/`, `c/` e `reference_impl/`. Assinatura, timestamp/DOI externo, BLAKE3 do arquivo e modo com chave permanecem `TOKEN_VAZIO` até evidência própria e revisão humana. O workflow executa somente validação de contrato, KATs, testes adversariais e verificação de cabeçalhos.
+
+### Atualização 2026-07-27 (ponte geométrica RMR PAI42)
+
+Criado `rmr/pai42/` para formalizar a ligação entre os 42 registros do `ATA_OMEGA.bin` e uma projeção circular determinística. O núcleo C usa tamanho fixo, aritmética Q16, tabela de 42 direções, zero heap e zero ponto flutuante; a referência Python é `stdlib-only` e permanece fora do hot path.
+
+A estrutura inclui contrato matemático, API C, implementação, schema JSON, leitor dos formatos ATA V1/compacto e testes de regressão. Ela não modifica o núcleo BLAKE3, não declara `HW_SIG64` como PUF e mantém classificação semântica, integração SIMD/NEON e vínculo criptográfico como `TOKEN_VAZIO` até evidência própria.
