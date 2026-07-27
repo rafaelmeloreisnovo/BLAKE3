@@ -10,16 +10,17 @@ Licensed under LICENSE_RMR.
 Os objetos AArch64 rastreados no commit
 `8ae6b70a672753d6e293b3c84a02b1d5b5ccd824` foram inspecionados diretamente.
 
-- `core.o` contém `AUTO-ID64`, `MIDR`, `MPIDR` e `HW_SIG64` e sua desmontagem
-  mostra escritas de `4 + 4 + 4 + 4 + 4 + 8` bytes antes dos registros. Portanto,
-  esse objeto já produzia o cabeçalho V1 estendido de 28 bytes.
+- `core.o` contém `AUTO-ID64`, `MIDR`, `MPIDR` e `HW_SIG64`. Sua desmontagem
+  mostra a composição `MIDR_EL1[31:0] << 32 | MPIDR_EL1[31:0]` e escritas de
+  `4 + 4 + 4 + 4 + 4 + 8` bytes antes dos registros. Portanto, esse objeto já
+  produzia o cabeçalho V1 estendido de 28 bytes.
 - `sync.o` abre o mesmo arquivo, lê 4 bytes de magic, depois 8 bytes como
   `hw_sig64` e em seguida registros de 24 bytes. Portanto, esse objeto ainda
   consumia o formato compacto de 12 bytes.
 
 Assim, os objetos rastreados não eram um par binariamente coerente entre si,
-embora ambos compilassem e preservassem as informações esperadas. A existência
-de outro executável ligado, em outro commit ou diretório, que tenha usado um par
+embora ambos compilassem e preservassem informações esperadas. A existência de
+outro executável ligado, em outro commit ou diretório, que tenha usado um par
 compatível permanece `TOKEN_VAZIO` sem o respectivo artefato e hash.
 
 A PR #54 removeu corretamente objetos e backups do versionamento. Ela não criou
@@ -59,9 +60,17 @@ são rejeitados; não são silenciosamente deslocados.
 
 ## Semântica da assinatura
 
-`hw_sig64` é um fingerprint determinístico derivado do backend HWIF. Ele registra
-capacidades/topologia observáveis da CPU e participa da custódia do arquivo ATA.
-Não deve ser descrito como serial físico único ou PUF sem experimento específico.
+No AArch64, o contrato histórico foi restaurado explicitamente:
+
+```text
+AUTO_ID64 = (MIDR_EL1[31:0] << 32) | MPIDR_EL1[31:0]
+hw_sig64  = AUTO_ID64
+```
+
+No x86_64, `read_cpu_id_raw()` continua sendo o fingerprint determinístico
+misturado a partir de registradores CPUID. Em ambos os casos, trata-se de
+identificação de modelo/topologia/capacidades observáveis, não de PUF nem de
+serial físico globalmente único.
 
 A correção mantém o comportamento histórico do sincronizador: `hw_sig64` é
 metadado forense exibido no log; a mistura dinâmica continua baseada em clock,
@@ -70,8 +79,10 @@ versão de formato separada, não uma alteração silenciosa do V1.
 
 ## Implementação
 
+- `rmr/hwif/asm/aarch64/rmr_hwif_backend.S`: restaura `MIDR || MPIDR`;
+- `rmr/hwif/include/rmr_hwif.h`: formaliza o contrato por arquitetura;
 - `rmr/runtime/ata_omega_format.h`: serialização e parser compartilhados;
-- `rmr/runtime/rafaelia_core.c`: escritor V1 canônico com escrita completa;
+- `rmr/runtime/rafaelia_core.c`: escritor V1 canônico e logs MIDR/MPIDR;
 - `rmr/runtime/sync_omega.c`: leitor V1 + compacto;
 - `rmr/runtime/sync_fast.c`: leitor V1 + compacto e limites seguros;
 - `rmr/tools/ata_decode.py`: auditoria offline dos dois formatos;
