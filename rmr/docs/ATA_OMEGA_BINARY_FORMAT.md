@@ -7,19 +7,23 @@ Licensed under LICENSE_RMR.
 
 ## Diagnóstico histórico
 
-O objeto AArch64 rastreado antes da limpeza de artefatos continha as mensagens
-`AUTO-ID64`, `MIDR`, `MPIDR` e `HW_SIG64`. Ele correspondia ao formato compacto
-histórico e funcionava em conjunto com o objeto de sincronização da mesma época.
+Os objetos AArch64 rastreados no commit
+`8ae6b70a672753d6e293b3c84a02b1d5b5ccd824` foram inspecionados diretamente.
 
-No commit anterior à remoção dos objetos (`8ae6b70a672753d6e293b3c84a02b1d5b5ccd824`),
-a fonte do escritor já emitia um cabeçalho estendido, enquanto as fontes de
-`sync_omega` e `ata_decode.py` ainda esperavam o cabeçalho compacto. Portanto, os
-objetos rastreados eram builds antigos e autoconsistentes, mas não reproduziam a
-fonte presente naquele commit.
+- `core.o` contém `AUTO-ID64`, `MIDR`, `MPIDR` e `HW_SIG64` e sua desmontagem
+  mostra escritas de `4 + 4 + 4 + 4 + 4 + 8` bytes antes dos registros. Portanto,
+  esse objeto já produzia o cabeçalho V1 estendido de 28 bytes.
+- `sync.o` abre o mesmo arquivo, lê 4 bytes de magic, depois 8 bytes como
+  `hw_sig64` e em seguida registros de 24 bytes. Portanto, esse objeto ainda
+  consumia o formato compacto de 12 bytes.
 
-A PR #54 removeu corretamente os objetos e backups do versionamento. O defeito
-não era a remoção dos binários: era a divergência de contrato escondida pelos
-objetos antigos.
+Assim, os objetos rastreados não eram um par binariamente coerente entre si,
+embora ambos compilassem e preservassem as informações esperadas. A existência
+de outro executável ligado, em outro commit ou diretório, que tenha usado um par
+compatível permanece `TOKEN_VAZIO` sem o respectivo artefato e hash.
+
+A PR #54 removeu corretamente objetos e backups do versionamento. Ela não criou
+o defeito; a divergência de contrato já existia antes da remoção.
 
 ## Formato canônico V1
 
@@ -37,20 +41,21 @@ Todos os inteiros são unsigned little-endian.
 
 Tamanho total V1: `28 + 42 × 24 = 1036 bytes`.
 
-## Formato histórico aceito
+## Formato compacto aceito
 
-Para preservar os binários e arquivos ATA antigos, os leitores também aceitam:
+Para preservar arquivos compatíveis com o leitor histórico, os leitores também
+aceitam:
 
 ```text
 magic[4] + hw_sig64[8] + 42 * record[24]
 ```
 
-Tamanho histórico completo: `12 + 42 × 24 = 1020 bytes`.
+Tamanho compacto completo: `12 + 42 × 24 = 1020 bytes`.
 
 Os leitores detectam o V1 somente quando `version=1`, `record_size=24`,
 `1 <= record_count <= 42` e `reserved=0`. Caso contrário, interpretam o fluxo
-como legado. Registros inválidos, sequência V1 quebrada e arquivos truncados são
-rejeitados; não são silenciosamente deslocados.
+como compacto. Registros inválidos, sequência V1 quebrada e arquivos truncados
+são rejeitados; não são silenciosamente deslocados.
 
 ## Semântica da assinatura
 
@@ -67,10 +72,10 @@ versão de formato separada, não uma alteração silenciosa do V1.
 
 - `rmr/runtime/ata_omega_format.h`: serialização e parser compartilhados;
 - `rmr/runtime/rafaelia_core.c`: escritor V1 canônico com escrita completa;
-- `rmr/runtime/sync_omega.c`: leitor V1 + legado;
-- `rmr/runtime/sync_fast.c`: leitor V1 + legado e limites seguros;
+- `rmr/runtime/sync_omega.c`: leitor V1 + compacto;
+- `rmr/runtime/sync_fast.c`: leitor V1 + compacto e limites seguros;
 - `rmr/tools/ata_decode.py`: auditoria offline dos dois formatos;
-- `rmr/tests/ata_omega_format_selftest.c`: contrato C V1 + legado;
+- `rmr/tests/ata_omega_format_selftest.c`: contrato C V1 + compacto;
 - `rmr/tests/test_ata_omega_format.py`: regressão de offset e truncamento.
 
 ## Validação
