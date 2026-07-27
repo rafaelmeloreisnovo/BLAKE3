@@ -5,6 +5,33 @@ Licensed under LICENSE_RMR.
 
 # ATA OMEGA — contrato binário e compatibilidade
 
+## O que foi restaurado
+
+Esta é a referência documental canônica da restauração incorporada ao `master`
+no merge commit `e0d08456097ad1a5f1c159b692c7db9925c828f7`.
+
+| Restauração | Estado anterior encontrado | Estado restaurado | Implementação |
+| --- | --- | --- | --- |
+| `AUTO_ID64` AArch64 | backend atual retornava somente `MPIDR_EL1` | `MIDR_EL1[31:0]` nos 32 bits altos e `MPIDR_EL1[31:0]` nos 32 bits baixos | `rmr/hwif/asm/aarch64/rmr_hwif_backend.S` |
+| `HW_SIG64` | aplicava transformação XOR posterior sobre o identificador | recebe diretamente o `AUTO_ID64`, preservando o contrato observado no objeto histórico | `rmr/runtime/rafaelia_core.c` |
+| Informações de hardware | logs explícitos haviam sido reduzidos | voltaram `MIDR`, `MPIDR`, `CPU_ID_RAW` e `HW_SIG64` em Base20 | `rmr/runtime/rafaelia_core.c` |
+| Cabeçalho ATA V1 | escritor e leitores usavam offsets incompatíveis | escritor canônico de 28 bytes, little-endian | `rmr/runtime/ata_omega_format.h` e `rmr/runtime/rafaelia_core.c` |
+| Leitura do binário | leitores esperavam apenas o formato compacto de 12 bytes | detecção e leitura de `V1_EXTENDED` e `LEGACY_COMPACT` | `rmr/runtime/sync_omega.c` e `rmr/runtime/sync_fast.c` |
+| Escrita do arquivo | retorno parcial de `write` não era concluído | laço de escrita completa e tratamento de falha | `rmr/runtime/rafaelia_core.c` |
+| Segurança de leitura | arquivo truncado podia deslocar campos ou deixar ciclos insuficientes | validação de magic, versão, tamanho, quantidade, sequência, paridade e truncamento | `rmr/runtime/ata_omega_format.h` |
+| Decodificação offline | `version` e `record_size` podiam ser interpretados como assinatura | decodificador reconhece offsets corretos nos dois formatos | `rmr/tools/ata_decode.py` |
+| Regressão automatizada | não havia prova dedicada do contrato | testes C e Python para V1, compacto, offset e truncamento | `rmr/tests/ata_omega_format_selftest.c` e `rmr/tests/test_ata_omega_format.py` |
+
+### O que não foi restaurado nem reivindicado
+
+- Os arquivos `.o` antigos **não** foram recolocados no Git.
+- `HW_SIG64` não é documentado como PUF, serial físico único ou segredo
+  criptográfico.
+- A existência de outro executável histórico, não localizado, que tenha combinado
+  escritor e leitor compatíveis permanece `TOKEN_VAZIO` até aparecer o artefato
+  acompanhado de hash.
+- Nenhuma alteração foi feita no núcleo criptográfico upstream BLAKE3.
+
 ## Diagnóstico histórico
 
 Os objetos AArch64 rastreados no commit
