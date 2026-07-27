@@ -1,0 +1,11 @@
+{"type":"meta","schema":"rmr-fc16-claims-v1","copyright":"2024-2026 Rafael Melo Reis","license":"RMR Module License","claim_allowed":false}
+{"id":"FC16-C01","claim":"pure core has no libc, heap, filesystem, clock, thread or syscall","status":"VERIFIED_SOURCE_AND_LINK_PROBE","falsifier":"forbidden symbol, PT_INTERP, DT_NEEDED, unexpected UND or syscall instruction in core"}
+{"id":"FC16-C02","claim":"16 fixed geometric lanes reduce in canonical order","status":"VERIFIED_CODE","falsifier":"same canonical input yields different content snapshot under different feed segmentation"}
+{"id":"FC16-C03","claim":"NEON or SSE2 handles 16-byte XOR/delta blocks with scalar fallback","status":"VERIFIED_COMPILE_MATRIX","falsifier":"ARMv7, AArch64 or x86_64 compile/link failure or selftest mismatch"}
+{"id":"FC16-C04","claim":"CRC32C uses ARMv8/x86 hardware when compiled and software otherwise","status":"VERIFIED_KAT_X86_AND_COMPILE_ARM","falsifier":"123456789 differs from e3069283 on any backend"}
+{"id":"FC16-C05","claim":"sparse delta changes only words carrying a nonzero XOR mask","status":"VERIFIED_SELFTEST","falsifier":"unlisted word changes or listed word fails to reach target"}
+{"id":"FC16-C06","claim":"Termux adapter scans twice and rejects A != B","status":"VERIFIED_CODE_AND_LOCAL_FIXTURE","falsifier":"different content roots are accepted"}
+{"id":"FC16-C07","claim":"ZIP method 0 round-trips the seal byte for byte","status":"VERIFIED_SELFTEST","falsifier":"method, size, CRC-32 or byte comparison differs"}
+{"id":"FC16-C08","claim":"final digest covers SHA-256(seal), SHA-256(zip) and CRC32C(record)","status":"VERIFIED_CODE","falsifier":"digest remains unchanged after mutation"}
+{"id":"FC16-C09","claim":"16 independent OS workers execute concurrently","status":"TOKEN_VAZIO_ADAPTER","falsifier":"materialized scheduler, hardware log and deterministic equivalence test"}
+{"id":"FC16-C10","claim":"hw_stamp is a physical PUF or unique silicon serial","status":"NOT_CLAIMED","falsifier":"requires physical characterization, stability and inter-device uniqueness evidence"}

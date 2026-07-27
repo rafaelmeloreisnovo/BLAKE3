@@ -1,0 +1,14 @@
+malloc
+calloc
+realloc
+free
+memcpy
+memset
+memcmp
+open
+read
+write
+clock_gettime
+pthread_create
+pthread_join
+dlopen
