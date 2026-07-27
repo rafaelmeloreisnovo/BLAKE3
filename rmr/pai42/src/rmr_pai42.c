@@ -31,6 +31,24 @@ static uint32_t rmr_pai42_clamp_q16(uint64_t value) {
     return value > RMR_PAI42_Q16_ONE ? RMR_PAI42_Q16_ONE : (uint32_t)value;
 }
 
+/* Computes floor(numerator * 65536 / denominator) without wide multiplication. */
+static uint32_t rmr_pai42_ratio_q16(uint64_t numerator, uint64_t denominator) {
+    uint32_t quotient = 0u;
+    uint32_t bit;
+    if (denominator == 0u) return RMR_PAI42_Q16_ONE / 2u;
+    if (numerator >= denominator) return RMR_PAI42_Q16_ONE;
+    for (bit = 0u; bit < 16u; ++bit) {
+        quotient <<= 1;
+        if (numerator >= denominator - numerator) {
+            numerator -= denominator - numerator;
+            quotient |= 1u;
+        } else {
+            numerator += numerator;
+        }
+    }
+    return quotient;
+}
+
 int rmr_pai42_build(uint64_t hw_sig64,
                     const uint64_t cycles[RMR_PAI42_COUNT],
                     rmr_pai42_observation *out) {
@@ -65,7 +83,7 @@ int rmr_pai42_build(uint64_t hw_sig64,
             radius = RMR_PAI42_Q16_ONE / 2u;
         } else {
             uint64_t delta = cycles[i] - min_cycle;
-            radius = (uint32_t)((delta * RMR_PAI42_Q16_ONE) / span);
+            radius = rmr_pai42_ratio_q16(delta, span);
         }
         out->radius_q16[i] = radius;
         out->x_q16[i] = (int32_t)(((int64_t)RMR_PAI42_COS_Q16[i] * radius) >> 16);
