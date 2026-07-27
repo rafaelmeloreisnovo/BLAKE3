@@ -1,0 +1,42 @@
+{
+  "schema": "rafaelia.packet-custody-local-validation/v1",
+  "executed_at": "2026-07-27T00:00:00-03:00",
+  "scope": "orchestration logic compiled against an API-compatible BLAKE3 stub",
+  "checks": {
+    "c_standard": "c99",
+    "compiler_warnings": "-Wall -Wextra -Werror -pedantic",
+    "compile": "PASS",
+    "execution": "PASS",
+    "payload_mutation_rejected": true,
+    "index_binding_verified": true,
+    "manifest_order_binding_verified": true,
+    "valid_duplicate_idempotent": true,
+    "invalid_fragment_not_recorded": true,
+    "missing_fragment_located": true,
+    "premature_completion_blocked": true,
+    "chunk_limit_gate_verified": true
+  },
+  "limits": [
+    "the local harness used a deterministic API-compatible stub, not the repository BLAKE3 implementation",
+    "no cryptographic security property was inferred from the stub",
+    "no performance result was measured",
+    "manifest-root authenticity remains an external protocol requirement",
+    "post-quantum key establishment or signatures were not implemented"
+  ],
+  "F_ok": [
+    "fixed-memory fragment state",
+    "domain-separated packet/index/length binding",
+    "ordered manifest commitment",
+    "selective missing-fragment discovery",
+    "fail-closed digest rejection"
+  ],
+  "F_gap": [
+    "build against the real fork C library",
+    "preserved stdout/stderr and binary hashes",
+    "adversarial packet-ID substitution fixture",
+    "reproducible latency and throughput matrix",
+    "authenticated-root integration"
+  ],
+  "F_next": "Run the documented build command on the branch and append a repository-integration receipt without deleting this preliminary receipt.",
+  "claim_allowed": false
+}
