@@ -12,6 +12,9 @@ typedef long s64;
 static const rmr_hwif_ops* g_hwif;
 
 #if defined(RMR_ARCH_AARCH64)
+extern u64 rmr_hwif_aarch64_midr_raw(void);
+extern u64 rmr_hwif_aarch64_mpidr_raw(void);
+
 static s64 sys_openat(int dfd, const char* path, int flags, int mode) {
     register s64 x0 asm("x0") = dfd;
     register const char* x1 asm("x1") = path;
@@ -111,7 +114,7 @@ static void v20(u64 x, char out[24]) {
 
 static int p9(u64 n) { return n ? (1 + (int)((n - 1) % 9)) : 0; }
 
-void main() {
+void main(void) {
     const int AT_FDCWD = -100;
     const int O_WRONLY = 1;
     const int O_CREAT = 0100;
@@ -124,14 +127,25 @@ void main() {
 
     s64 fd = sys_openat(AT_FDCWD, "ATA_OMEGA.bin", O_WRONLY | O_CREAT | O_TRUNC, 0600);
     u64 cpu_id = g_hwif->read_cpu_id_raw();
-    u64 hw_sig64 = (cpu_id << 1) ^ 0x9E3779B97F4A7C15UL;
+    u64 hw_sig64 = cpu_id;
 
     char cpu_v20[24], sig_v20[24];
     v20(cpu_id, cpu_v20);
     v20(hw_sig64, sig_v20);
 
-    raw_print("\n[RAFAELIA_OMEGA] ATA(V1) :: HWIF + 42\n");
+    raw_print("\n[RAFAELIA_OMEGA] ATA(V1) :: AUTO-ID64 + 42\n");
     raw_print("BACKEND: "); raw_print(g_hwif->backend_name); raw_print("\n");
+#if defined(RMR_ARCH_AARCH64)
+    {
+        u64 midr = rmr_hwif_aarch64_midr_raw();
+        u64 mpidr = rmr_hwif_aarch64_mpidr_raw();
+        char midr_v20[24], mpidr_v20[24];
+        v20(midr, midr_v20);
+        v20(mpidr, mpidr_v20);
+        raw_print("MIDR(V20): "); raw_print(midr_v20); raw_print("\n");
+        raw_print("MPIDR(V20): "); raw_print(mpidr_v20); raw_print("\n");
+    }
+#endif
     raw_print("CPU_ID_RAW(V20): "); raw_print(cpu_v20); raw_print("\n");
     raw_print("HW_SIG64(V20): "); raw_print(sig_v20); raw_print("\n");
     raw_print("ATA_FORMAT: V1 header=28 record=24 count=42 LE\n");
