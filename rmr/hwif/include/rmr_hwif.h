@@ -15,8 +15,11 @@ typedef long rmr_s64;
 typedef struct rmr_hwif_ops {
     rmr_u64 (*read_time_raw)(void);
     /*
-     * read_cpu_id_raw returns a deterministic 64-bit CPU capability
-     * fingerprint mixed from architecture-specific ID/feature registers.
+     * Returns a deterministic architecture-specific 64-bit hardware
+     * fingerprint. AArch64 preserves the historical RMR AUTO-ID64 layout:
+     * MIDR_EL1[31:0] in bits 63..32 and MPIDR_EL1[31:0] in bits 31..0.
+     * x86_64 folds CPUID model/capability registers. This is not a PUF or a
+     * guaranteed globally unique physical serial number.
      */
     rmr_u64 (*read_cpu_id_raw)(void);
     rmr_s64 (*raw_write)(int fd, const void* buf, rmr_u64 len);
