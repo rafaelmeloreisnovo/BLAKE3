@@ -23,12 +23,12 @@ Os três artefatos foram produzidos com `-nostdlib -static --gc-sections --build
 
 ## Fixture de árvore
 
-Fixture: três arquivos em três níveis, 13 bytes de conteúdo e seis entradas totais incluindo diretórios.
+Fixture final: três arquivos, um diretório aninhado, 13 bytes de conteúdo e quatro entradas totais incluindo o diretório.
 
 ```text
 FC16_OK
-root_crc32c=0xfff3b06b
-entries=6
+root_crc32c=0xa476b0d7
+entries=4
 bytes=13
 seal_bytes=376
 zip_bytes=500
