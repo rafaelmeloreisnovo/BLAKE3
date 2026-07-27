@@ -19,6 +19,7 @@ O código BLAKE3 upstream permanece sob suas licenças, autoria, notices e semâ
 6. `rmr/crypto/CONTRIBUTING.md` — protocolo de contribuição e importação de terceiros.
 7. `rmr/crypto/THIRD_PARTY_NOTICES.md` — notices, marcas e não afiliação.
 8. `rmr/crypto/SECURITY.md` — limites de segurança e reporte.
+9. `rmr/pai42/README.md` — ponte geométrica determinística entre os 42 ciclos ATA OMEGA e a observação circular PAI42.
 
 ## RMR Crypto Registry
 
@@ -31,6 +32,18 @@ Validação local:
 ```
 
 A validação comprova coerência estrutural do snapshot. Ela não equivale a certificação criptográfica, jurídica ou de segurança.
+
+## RMR PAI42
+
+`rmr/pai42/` recebe exatamente 42 registros válidos do `ATA_OMEGA.bin`, normaliza os ciclos em Q16 e produz uma projeção circular com raio, coordenadas, variância, simetria, estabilidade e escore de protótipo.
+
+O núcleo é C de tamanho fixo, sem heap e sem ponto flutuante. A ferramenta Python é `stdlib-only` e serve como leitor/auditor fora do hot path. A estrutura não modifica o algoritmo BLAKE3 nem reivindica que `HW_SIG64` seja PUF ou serial físico único.
+
+Validação local:
+
+```sh
+sh rmr/pai42/tests/run_tests.sh
+```
 
 ## Conteúdo jurídico versus não jurídico
 
