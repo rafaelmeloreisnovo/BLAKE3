@@ -1,0 +1,43 @@
+{
+  "schema": "rafaelia.blake3.forensic_event.v1",
+  "event_id": "EVT_YYYYMMDDTHHMMSSZ_SOURCE_KIND_ID",
+  "case_id": null,
+  "observed_at": "2026-08-03T10:04:00-03:00",
+  "source": {
+    "surface": "git",
+    "url": "",
+    "repository": "rafaelmeloreisnovo/BLAKE3",
+    "ref": null,
+    "sha": null,
+    "parents": [],
+    "tree": null,
+    "author_date": null,
+    "committer_date": null,
+    "github_event_at": null,
+    "receipt_at": null
+  },
+  "actors": {
+    "author": null,
+    "committer": null,
+    "pusher": null,
+    "reviewer": null,
+    "agent": null
+  },
+  "classification": "TOKEN_VAZIO",
+  "claim_allowed": false,
+  "claim": null,
+  "evidence": [],
+  "anomalies": [],
+  "counterevidence": [],
+  "limits": [],
+  "supersedes": null,
+  "next_actions": [],
+  "custody": {
+    "collector": "∆RafaelVerboΩ",
+    "command": "",
+    "tool_versions": {},
+    "environment": {},
+    "raw_path": null,
+    "manifest_path": null
+  }
+}
