@@ -1,0 +1,19 @@
+evidence_id	kind	date_utc	state	sha_or_number	title	classification	url
+E-001	commit	2019-12-07	merged	0cb4f6dd2cadbe9fa03a1eabeb3359d3bc66ebcc	fix a bad assert	PROVADO	https://github.com/BLAKE3-team/BLAKE3/commit/0cb4f6dd2cadbe9fa03a1eabeb3359d3bc66ebcc
+E-002	commit	2020-01-19	merged	b8c33e11ef4a85a0d88743cb7f00b66c2c9fc538	manually prefetch message blocks	PROVADO	https://github.com/BLAKE3-team/BLAKE3/commit/b8c33e11ef4a85a0d88743cb7f00b66c2c9fc538
+E-003	commit	2020-01-21	merged	67262dff31461d3fb801f3fe01382abb77387735	double maximum incremental subtree size	PROVADO	https://github.com/BLAKE3-team/BLAKE3/commit/67262dff31461d3fb801f3fe01382abb77387735
+E-004	PR	2021-07-26/2022-03-10	closed-unmerged	#185	cargo clippy style guidelines	PROVADO	https://github.com/BLAKE3-team/BLAKE3/pull/185
+E-005	issue	2021-11-05	closed	#206	incorrect output SSE2 Windows	PROVADO	https://github.com/BLAKE3-team/BLAKE3/issues/206
+E-006	commit	2021-11-05	merged	371b5483c95be1e0250c5209d68a8536406152de	fix incorrect output / UB Windows SSE2	PROVADO	https://github.com/BLAKE3-team/BLAKE3/commit/371b5483c95be1e0250c5209d68a8536406152de
+E-007	issue	2022-11	closed	#271	AVX-512 incorrect output GCC 5.4/6.1	PROVADO	https://github.com/BLAKE3-team/BLAKE3/issues/271
+E-008	commit	2024-07-14	merged	43ce639d136a41289595749710212ef4f67f5f7f	revert serde_bytes serialization	PROVADO	https://github.com/BLAKE3-team/BLAKE3/commit/43ce639d136a41289595749710212ef4f67f5f7f
+E-009	commit	2024-08-19	merged	919091615b1093c2096129646b21d9103193a30b	delete guts crate for now	PROVADO	https://github.com/BLAKE3-team/BLAKE3/commit/919091615b1093c2096129646b21d9103193a30b
+E-010	PR	2025-07-13	closed-unmerged	#495	Codex AVX-512 Windows experiment	PROVADO	https://github.com/BLAKE3-team/BLAKE3/pull/495
+E-011	PR	2025-08	merged	#507	fix prefetch pointer UB	PROVADO	https://github.com/BLAKE3-team/BLAKE3/pull/507
+E-012	issue	2025-09-15/2026-01-09	closed-not_planned	#517	VirusTotal 2/72 alert	PROVADO_ALERT_ONLY	https://github.com/BLAKE3-team/BLAKE3/issues/517
+E-013	PR	2025-09-29	merged	#521	Claude changes + Codex review	PROVADO	https://github.com/BLAKE3-team/BLAKE3/pull/521
+E-014	PR	2025-11-25	closed-unmerged	#533	A little bit of helping	PROVADO	https://github.com/BLAKE3-team/BLAKE3/pull/533
+E-015	commit	2026-03-06	merged	6eebbbd67935cc6b8fe24da164ae968a2e3973cb	cv_stack 1728 to 1760; Claude audit	PROVADO	https://github.com/BLAKE3-team/BLAKE3/commit/6eebbbd67935cc6b8fe24da164ae968a2e3973cb
+E-016	issue	2026-04	closed	#550	LTO build break Arch Linux ARM	PROVADO	https://github.com/BLAKE3-team/BLAKE3/issues/550
+E-017	commit	2026-05-21	merged	8aa5145039b972ba30e98e788752d37d14568824	latest upstream visible at snapshot	SNAPSHOT	https://github.com/BLAKE3-team/BLAKE3/commit/8aa5145039b972ba30e98e788752d37d14568824
+E-018	fork-commit	2026-08-03	merged	a129db273e47feed54b7ad79c2aa2a15a9bb2d98	fork master before forensic branch	SNAPSHOT	https://github.com/rafaelmeloreisnovo/BLAKE3/commit/a129db273e47feed54b7ad79c2aa2a15a9bb2d98
