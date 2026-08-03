@@ -1,0 +1,13 @@
+# SHA-256 — BLAKE3 forensic snapshot
+# generated_at=2026-08-03T08:41:00-03:00
+# repository=https://github.com/rafaelmeloreisnovo/BLAKE3
+# branch=audit/blake3-forensics-20260803
+# scope=files listed below; this receipt does not hash itself
+3d3d40c77770f7484540628b299f4fa421aa39c47dcd8339dc885f32f2e041d4  audit/forensics/BLAKE3_AI_PROVENANCE_AND_GOVERNANCE.md
+d70bbb91c518c715b966b8ce275f2b7b64884354eea54b64dd1804fa82653122  audit/forensics/BLAKE3_AUDIT_F_NEXT.md
+a3c1d2461307f1a3e533e92f108978bb29749f1dcd130df0dc4f837f63ad24b6  audit/forensics/BLAKE3_CLAIMS_LEDGER_20260803.json
+e8e727ad9f20d656ba93bb4b64f11a4f81c46df2fe1c19d28d5d01c0dd159669  audit/forensics/BLAKE3_ERROR_REVERT_ABORT_MATRIX.md
+1ec5bf1899d40534dfe39d423f7637621ee69527b967acbe9724b61a75e4447c  audit/forensics/BLAKE3_EVIDENCE_LINKS_20260803.tsv
+84bf00dd98ca8b5c870f8058f110d03fa9f6a3ca4f7293d4ede32fee00965b24  audit/forensics/BLAKE3_FORENSIC_TIMELINE_2019_2026.md
+7a7a4bcd16f3bf2d2733bdadf7bd9ac1934a539349696ed003b04929b9abe9da  audit/forensics/BLAKE3_PR_185_VS_533_RECURRENCE.md
+bc4cda88dcf463542b680d0bf56bf631607a1205ca482bde9c65fd544d65f671  audit/forensics/README.md
