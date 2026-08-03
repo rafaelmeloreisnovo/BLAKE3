@@ -1,5 +1,9 @@
 # BLAKE3 fork — RAFAELIA build orchestration notes
 
+**Estado:** `REFERENCE`  
+**Proprietário lógico:** `security-maintainer`  
+**Repositório:** [`rafaelmeloreisnovo/BLAKE3`](https://github.com/rafaelmeloreisnovo/BLAKE3)
+
 This repository is a fork/distribution of the BLAKE3 implementation. It is not affiliated with the official BLAKE3 team.
 
 The correct technical framing is:
@@ -131,7 +135,7 @@ This keeps the claim clean: BLAKE3 is the hash primitive; RAFAELIA supplies orch
 
 ## RMR / BLAKE3 / FiberHaga boundary
 
-RMR is not BLAKE3. BLAKE3 is a digest primitive inside an RMR custody chain. FiberHaga is not BLAKE3 and is not a “perfumaria” layer on top of BLAKE3; it is a separate RMR/RAFAELIA core to be specified and benchmarked separately.
+RMR is not BLAKE3. BLAKE3 is a digest primitive inside an RMR custody chain. FiberHaga is not BLAKE3 and is not a "perfumaria" layer on top of BLAKE3; it is a separate RMR/RAFAELIA core to be specified and benchmarked separately.
 
 Use this framing:
 
@@ -145,7 +149,7 @@ RAFAELIA = orchestration, custody, metadata, reproducibility and claim gates
 
 ## Claim gates
 
-Do not use broad language such as “globally superior to upstream” without target-specific evidence.
+Do not use broad language such as "globally superior to upstream" without target-specific evidence.
 
 Use these gates instead:
 
