@@ -1,0 +1,118 @@
+{
+  "schema": "rafaelia.blake3.forensic_claims.v1",
+  "snapshot_time": "2026-08-03T08:41:00-03:00",
+  "repository": "https://github.com/rafaelmeloreisnovo/BLAKE3",
+  "upstream": "https://github.com/BLAKE3-team/BLAKE3",
+  "claim_allowed": false,
+  "classification_vocabulary": [
+    "PROVADO",
+    "EVIDENCIADO",
+    "HIPÓTESE",
+    "REFUTADO",
+    "TOKEN_VAZIO"
+  ],
+  "claims": [
+    {
+      "id": "C-001",
+      "claim": "Olhar somente o master produz história técnica incompleta.",
+      "classification": "PROVADO",
+      "evidence": [
+        "https://github.com/BLAKE3-team/BLAKE3/commit/919091615b1093c2096129646b21d9103193a30b",
+        "https://github.com/BLAKE3-team/BLAKE3/commit/43ce639d136a41289595749710212ef4f67f5f7f",
+        "https://github.com/BLAKE3-team/BLAKE3/pull/495"
+      ],
+      "limits": "Git preserva muito do histórico, mas branches, logs e assets podem expirar ou ser removidos."
+    },
+    {
+      "id": "C-002",
+      "claim": "BLAKE3 teve erro capaz de produzir hash incorreto no Windows SSE2.",
+      "classification": "PROVADO",
+      "evidence": [
+        "https://github.com/BLAKE3-team/BLAKE3/issues/206",
+        "https://github.com/BLAKE3-team/BLAKE3/commit/371b5483c95be1e0250c5209d68a8536406152de",
+        "https://github.com/BLAKE3-team/BLAKE3/commit/c61c663ec5dc581a449ed03a69397c698efc4cb5"
+      ],
+      "limits": "Impacto quantitativo em usuários reais não foi estabelecido."
+    },
+    {
+      "id": "C-003",
+      "claim": "Prefetch introduzido em 2020 continha formação de ponteiro considerada UB e foi corrigido em 2025.",
+      "classification": "PROVADO",
+      "evidence": [
+        "https://github.com/BLAKE3-team/BLAKE3/commit/b8c33e11ef4a85a0d88743cb7f00b66c2c9fc538",
+        "https://github.com/BLAKE3-team/BLAKE3/pull/507",
+        "https://github.com/BLAKE3-team/BLAKE3/commit/89537d968225007ee1490059c894fc89ab9b4863"
+      ],
+      "limits": "Não há evidência pública de introdução deliberada."
+    },
+    {
+      "id": "C-004",
+      "claim": "A mudança serde_bytes que pretendia compatibilidade foi revertida por incompatibilidade em formatos não autodescritivos.",
+      "classification": "PROVADO",
+      "evidence": [
+        "https://github.com/BLAKE3-team/BLAKE3/issues/414",
+        "https://github.com/BLAKE3-team/BLAKE3/commit/43ce639d136a41289595749710212ef4f67f5f7f",
+        "https://github.com/BLAKE3-team/BLAKE3/commit/acaeabeff3e051d5396e91732b1fd2f0b2641402"
+      ],
+      "limits": "Erro técnico não prova falsificação deliberada."
+    },
+    {
+      "id": "C-005",
+      "claim": "Codex gerou uma PR que causou STATUS_ACCESS_VIOLATION.",
+      "classification": "PROVADO",
+      "evidence": [
+        "https://github.com/BLAKE3-team/BLAKE3/pull/495"
+      ],
+      "limits": "A PR foi fechada sem merge."
+    },
+    {
+      "id": "C-006",
+      "claim": "Claude auxiliou alteração mesclada e encontrou bug em auditoria posterior.",
+      "classification": "PROVADO",
+      "evidence": [
+        "https://github.com/BLAKE3-team/BLAKE3/pull/521",
+        "https://github.com/BLAKE3-team/BLAKE3/commit/6eebbbd67935cc6b8fe24da164ae968a2e3973cb"
+      ],
+      "limits": "Responsabilidade final de revisão e merge permaneceu humana."
+    },
+    {
+      "id": "C-007",
+      "claim": "Sugestões Clippy da PR nº 533 tinham anterioridade pública na PR nº 185.",
+      "classification": "EVIDENCIADO",
+      "evidence": [
+        "https://github.com/BLAKE3-team/BLAKE3/pull/185",
+        "https://github.com/BLAKE3-team/BLAKE3/pull/533"
+      ],
+      "limits": "Anterioridade não prova cópia deliberada; lints podem ser derivados independentemente."
+    },
+    {
+      "id": "C-008",
+      "claim": "A PR nº 533 recebeu encerramento abrupto e tratamento comunicacional diferente de outras PRs.",
+      "classification": "EVIDENCIADO",
+      "evidence": [
+        "https://github.com/BLAKE3-team/BLAKE3/pull/533",
+        "https://github.com/BLAKE3-team/BLAKE3/pull/37",
+        "https://github.com/BLAKE3-team/BLAKE3/pull/185",
+        "https://github.com/BLAKE3-team/BLAKE3/pull/319"
+      ],
+      "limits": "Diferença de comunicação não prova discriminação, crime ou apropriação."
+    },
+    {
+      "id": "C-009",
+      "claim": "O alerta VirusTotal 2/72 prova malware ou botnet.",
+      "classification": "REFUTADO",
+      "evidence": [
+        "https://github.com/BLAKE3-team/BLAKE3/issues/517"
+      ],
+      "limits": "O issue não contém auditoria binária completa; também não sustenta malware."
+    },
+    {
+      "id": "C-010",
+      "claim": "Existe rede coordenada de plágio ou plantação deliberada de erros.",
+      "classification": "TOKEN_VAZIO",
+      "evidence": [],
+      "limits": "Faltam intenção, coordenação, acesso, benefício, ocultação e reprodução independente."
+    }
+  ],
+  "next_gate": "Reprodução independente por ambiente, release e backend; preservação de logs e hashes."
+}
