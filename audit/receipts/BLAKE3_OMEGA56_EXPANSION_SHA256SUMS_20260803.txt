@@ -1,0 +1,11 @@
+# SHA-256 — BLAKE3 Ω56 forensic expansion
+# generated_at=2026-08-03T10:04:00-03:00
+# repository=https://github.com/rafaelmeloreisnovo/BLAKE3
+# branch=audit/blake3-forensics-20260803
+# scope=files listed below; this receipt does not hash itself
+6aa537a4d65470997cc413a16a7ff44f416471aa102908e555bf7678d7a48705  audit/forensics/INDEX_V2_OMEGA56_20260803.md
+5e60d887a7e20e3524a0cfbb917fae2adc271672d98494d8268c9159c5227854  audit/forensics/BLAKE3_OMEGA56_ROUTE_MAP_20260803.md
+e3dee50f1dd63098a7afed57169835d68a120666075f6be8c7b65f97c468a1cc  audit/forensics/BLAKE3_STORAGE_AND_CUSTODY_PATHS_20260803.md
+a83721a8b26cf7714a24d42e0747084f73dd4bf2318548c987d315bb07ab8e69  audit/schemas/blake3_forensic_event_v1.schema.json
+243020c500916483abd911747055ca5012723d645afca5305449942ac91ff389  audit/templates/BLAKE3_FORENSIC_EVENT_TEMPLATE.json
+edd094f19102aeb3b8a4aa352310f593299802e0bf159a00c9971a42f0899ec6  tools/forensics/capture_blake3_routes.sh
