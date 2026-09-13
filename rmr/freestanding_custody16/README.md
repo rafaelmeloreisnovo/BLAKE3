@@ -40,3 +40,22 @@ O probe final exige: `-nostdlib`, nenhum `DT_NEEDED`, nenhum `PT_INTERP` e nenhu
 - fallback sem `statx`: usa `d_type` e contagem prévia do arquivo;
 - paralelismo SIMD de 16 bytes: `IMPLEMENTADO`; paralelismo multicore real de 16 workers: `TOKEN_VAZIO_ADAPTER`;
 - leitura térmica/hardware: metadados são injetados pelo adapter; o core apenas aplica o gate determinístico.
+
+## Tempo forense
+
+O core continua deliberadamente sem relógio, timezone ou regra de horário de
+verão. O tempo participa da cadeia de custódia **depois** da geração do
+snapshot/selo:
+
+```text
+Custody16 seal/digest
+-> RMR-FORENSIC-TIME-V1
+-> UTC/epoch canônicos
+-> representação local com offset
+-> local_attestation_digest
+-> assinatura/âncora externa opcionais
+```
+
+Isso preserva a reprodutibilidade do core e, ao mesmo tempo, permite registrar
+o marco temporal local sem confundi-lo com a escala UTC. Ver
+`rmr/crypto/FORENSIC_TIME_PROFILE.md`.
