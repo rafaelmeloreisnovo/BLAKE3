@@ -14,9 +14,16 @@ evidence_id: RMR-CRYPTO-<UTC>-<sequence>
 source_type: REPOSITORY | FILE | ARCHIVE | LOG | EXECUTION | DECLARATION
 source_locator: <repo/path/url/local-reference>
 source_commit: <sha> | TOKEN_VAZIO
-observed_at_utc: <RFC3339>
+observed_at_utc: <RFC3339 Z>
+observed_at_unix_s: <integer>
+observed_at_local: <RFC3339 numeric offset>
+utc_offset: <+HH:MM|-HH:MM>
+timezone_id: <IANA name> | TOKEN_VAZIO
+clock_source: SYSTEM_CLOCK | NTP | GPS | TSA | MANUAL | TOKEN_VAZIO
+clock_sync_status: SYNCHRONIZED | UNVERIFIED | TOKEN_VAZIO
 operator: <identity>
 raw_sha256: <hex> | TOKEN_VAZIO
+time_attestation_digest_sha256: <hex> | TOKEN_VAZIO
 additional_digest: <algorithm:value> | NONE
 custody_status: CAPTURED | VERIFIED | TOKEN_VAZIO
 ```
@@ -31,7 +38,12 @@ custody_status: CAPTURED | VERIFIED | TOKEN_VAZIO
 - registrar ferramenta e versão;
 - manter resultado negativo e falha de teste;
 - não incluir segredo no manifesto;
-- não usar timestamps isolados como prova conclusiva de autoria.
+- não usar timestamps isolados como prova conclusiva de autoria;
+- usar UTC RFC3339 com `Z` + Unix epoch seconds como instante canônico;
+- preservar o horário civil local apenas com offset numérico explícito;
+- tratar horário de verão como política local de offset, nunca como alteração do UTC;
+- exigir equivalência entre UTC, epoch e representação local antes de selar o registro;
+- distinguir selo/digest temporal local, assinatura digital e timestamp externo confiável.
 
 ## 3. Snapshot de repositório
 
@@ -76,6 +88,33 @@ raw bytes → canonicalizer(version) → canonical bytes → digest
 ```
 
 O manifesto deve preservar digest do bruto e do canônico quando ambos existirem.
+
+### 5.1 Canonicalização temporal
+
+O contrato normativo está em `rmr/crypto/FORENSIC_TIME_PROFILE.md`.
+
+```text
+UTC RFC3339 Z + Unix epoch
+        |
+        +--> instant_digest
+        |
+hora local + offset + timezone + clock status
+        |
+        +--> local_attestation_digest
+```
+
+O `instant_digest` não depende de timezone ou horário de verão. O
+`local_attestation_digest` preserva essas informações como contexto forense.
+
+O core `rmr/freestanding_custody16` continua sem relógio. A camada externa
+vincula o registro temporal ao digest do selo/evidência.
+
+```text
+local_attestation_digest != assinatura digital
+assinatura local != timestamp externo confiável
+```
+
+O utilitário executável é `rmr/crypto/tools/forensic_time_attest.py`.
 
 ## 6. Hashchain
 
