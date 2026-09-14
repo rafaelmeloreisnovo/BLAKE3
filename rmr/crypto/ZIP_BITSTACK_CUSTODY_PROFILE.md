@@ -178,7 +178,14 @@ archive_sha256: <hex>
 archive_blake3: <hex> | TOKEN_VAZIO
 source_commit: <full Git SHA>
 parent_evidence_digest: <hex> | GENESIS
-created_at_utc: <RFC3339>
+created_at_utc: <RFC3339 Z>
+created_at_unix_s: <integer>
+local_time_rfc3339: <RFC3339 numeric offset>
+utc_offset: <+HH:MM|-HH:MM>
+timezone_id: <IANA name> | TOKEN_VAZIO
+clock_source: <source>
+clock_sync_status: <status>
+time_attestation_digest_sha256: <hex> | TOKEN_VAZIO
 toolchain: <compiler/tool versions>
 signer: <key identity> | TOKEN_VAZIO
 trusted_timestamp: <receipt> | TOKEN_VAZIO
@@ -267,6 +274,30 @@ sha256_payload_digest: VERIFIED_FIXTURE
 blake3_archive_digest: TOKEN_VAZIO
 secret_key_mode: TOKEN_VAZIO
 signature: TOKEN_VAZIO
+canonical_time_profile: RMR-FORENSIC-TIME-V1
+local_time_attestation: IMPLEMENTED_PROFILE
+digital_signature: TOKEN_VAZIO
 external_timestamp_or_doi: TOKEN_VAZIO
 claim_allowed: false
 ```
+
+## 13. Tempo forense canônico
+
+ZIPRAF/RVC1 usa `RMR-FORENSIC-TIME-V1` como perfil temporal externo.
+
+```text
+evidence digest
+-> UTC RFC3339 Z + Unix epoch
+-> instant_digest
+-> hora local + offset/TZID + estado do relógio
+-> local_attestation_digest
+-> assinatura destacada opcional
+-> TSA/DOI/release externo opcional
+```
+
+A adoção ou retirada de horário de verão pode alterar a representação local,
+mas não altera o UTC/epoch nem o `instant_digest`.
+
+A validação local de equivalência temporal não promove G7. O gate de âncora
+externa continua `TOKEN_VAZIO` até existir receipt verificável de TSA,
+release imutável, DOI ou outra autoridade temporal independente.

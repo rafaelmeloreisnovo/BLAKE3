@@ -55,6 +55,10 @@ Use o texto abaixo quando precisar explicitar copyright/fronteira:
 | `rmr/crypto/schemas/architecture-registry.schema.json` | RMR autoral (schema de dados) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/crypto/claims/claims.jsonl` | RMR autoral (ledger epistemológico) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/crypto/claims/zip_bitstack_claims.jsonl` | RMR autoral (ledger de claims e falsificadores ZIP/CRC/bit-stacking) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/crypto/FORENSIC_TIME_PROFILE.md` | RMR autoral (UTC canônico, contexto civil local e atestação temporal fail-closed) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/crypto/registry/forensic_time_profile.jsonl` | RMR autoral (perfil temporal executável) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/crypto/claims/forensic_time_claims.jsonl` | RMR autoral (claims/falsificadores do perfil temporal) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/crypto/tools/forensic_time_attest.py`, `rmr/crypto/tests/test_forensic_time_attest.py` | RMR autoral (canonização UTC/local, selos temporais e testes adversariais) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/crypto/tools/`, `rmr/crypto/tests/` | RMR autoral (auditoria offline e testes de contrato) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `.github/workflows/rmr-zip-custody.yml` | Externo autoral RMR (gate CI do perfil ZIPRAF/RVC1) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `DOCUMENTACAO.md`, `MANIFESTO*.md` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
@@ -97,6 +101,8 @@ Os seguintes arquivos não aceitam comentários de topo sem invalidar seu format
 - `rmr/crypto/schemas/architecture-registry.schema.json`;
 - `rmr/crypto/claims/claims.jsonl`;
 - `rmr/crypto/claims/zip_bitstack_claims.jsonl`;
+- `rmr/crypto/registry/forensic_time_profile.jsonl`;
+- `rmr/crypto/claims/forensic_time_claims.jsonl`;
 - `rmr/pai42/schema/pai42-observation.schema.json`.
 
 Justificativa técnica: JSON e JSONL estritos não possuem sintaxe de comentário. A autoria e a licença são codificadas como dados (`_meta`, `$comment`, `x-rmr-meta` ou primeiro registro `meta`) e esta exceção é registrada conforme os critérios de `rmr/docs/ARCHITECTURE.md`.
@@ -188,3 +194,21 @@ O perfil fixa a evidência já existente de serialização RVC1, vínculo públi
 Criado `rmr/pai42/` para formalizar a ligação entre os 42 registros do `ATA_OMEGA.bin` e uma projeção circular determinística. O núcleo C usa tamanho fixo, aritmética Q16, tabela de 42 direções, zero heap e zero ponto flutuante; a referência Python é `stdlib-only` e permanece fora do hot path.
 
 A estrutura inclui contrato matemático, API C, implementação, schema JSON, leitor dos formatos ATA V1/compacto e testes de regressão. Ela não modifica o núcleo BLAKE3, não declara `HW_SIG64` como PUF e mantém classificação semântica, integração SIMD/NEON e vínculo criptográfico como `TOKEN_VAZIO` até evidência própria.
+
+
+### Atualização 2026-09-13 (UTC canônico e atestação temporal local)
+
+Criado `RMR-FORENSIC-TIME-V1` na camada externa RMR. O perfil fixa UTC
+RFC3339 com `Z` e Unix epoch seconds como identidade temporal canônica,
+preserva horário civil local somente com offset explícito e mantém timezone/
+horário de verão como contexto forense.
+
+O `instant_digest` é independente da política civil local; o
+`local_attestation_digest` inclui offset, timezone declarado, fonte e estado
+de sincronização do relógio. Uma preimage separada é produzida para assinatura
+destacada futura. Assinatura digital e timestamp externo confiável permanecem
+`TOKEN_VAZIO` até evidência própria.
+
+O core `rmr/freestanding_custody16` não passa a ler relógio: a integração é
+sidecar vinculada ao digest da evidência. Nenhum arquivo do núcleo BLAKE3
+upstream (`src/`, `c/`, `reference_impl/`) foi alterado.

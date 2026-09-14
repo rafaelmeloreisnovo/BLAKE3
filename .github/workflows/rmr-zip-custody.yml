@@ -50,13 +50,18 @@ jobs:
         run: |
           python -m py_compile \
             rmr/crypto/tools/validate_zip_custody_profile.py \
-            rmr/crypto/tests/test_zip_custody_profile.py
+            rmr/crypto/tests/test_zip_custody_profile.py \
+            rmr/crypto/tools/forensic_time_attest.py \
+            rmr/crypto/tests/test_forensic_time_attest.py
 
       - name: Validate ZIP custody profile
         run: python rmr/crypto/tools/validate_zip_custody_profile.py
 
       - name: Run adversarial contract tests
         run: python -m unittest -v rmr/crypto/tests/test_zip_custody_profile.py
+
+      - name: Run forensic time contract tests
+        run: python -m unittest -v rmr/crypto/tests/test_forensic_time_attest.py
 
       - name: Verify RMR authorship headers
         run: python tools/check_rmr_headers.py
