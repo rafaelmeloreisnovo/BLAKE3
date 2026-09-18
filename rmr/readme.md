@@ -52,3 +52,14 @@ Conteúdos manifestários, conceituais ou técnicos não devem ser inseridos den
 ## Regra humana
 
 Nenhuma automação pode alterar termos de licença, atribuir autoria, importar terceiro ou promover claim jurídico sem revisão humana expressa. Quando faltar evidência, registrar `TOKEN_VAZIO` e o próximo passo verificável.
+
+## RMR FIXED256
+
+`rmr/fixed256/` adiciona um kernel determinístico de frame fixo 256 B em ASM bare-metal (x86_64/SSE2, AArch64/ASIMD e ARMv7/NEON) e um espelho Java low-level sem dependências de terceiros. O módulo remove caminho de tail variável por contrato de 16×16 bytes e é explicitamente não criptográfico: não substitui nem altera BLAKE3.
+
+Validação local:
+
+```sh
+sh rmr/fixed256/build/build_asm_probes.sh
+sh rmr/fixed256/build/run_java_selftest.sh
+```
