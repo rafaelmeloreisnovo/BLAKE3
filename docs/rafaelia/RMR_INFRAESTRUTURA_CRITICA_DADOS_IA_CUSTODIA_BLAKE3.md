@@ -242,7 +242,24 @@ Essa cadeia preserva a fronteira correta:
 - Google Maps Platform pricing: https://developers.google.com/maps/billing-and-pricing/pricing
 - BlackRock Aladdin: https://www.blackrock.com/aladdin
 
-## 16. Retroalimentação RAFAELIA
+## 16. Materiais de impressão e evidência físico-química
+
+RMR pode preservar SDS/FDS, identificação de cartucho/lote, registros de coleta, calibração, fotos, relatórios laboratoriais e metadados de exposição. BLAKE3 fornece integridade; a interpretação de perigo, dose, exposição e nexo permanece com fontes técnicas e especialistas adequados.
+
+Quando o registro estiver ligado a trabalhador, consumidor, denunciante ou outra pessoa natural — especialmente com informação de saúde — a camada de privacidade precisa ser tratada separadamente. O perfil operacional está em [`RMR_MATERIAL_HAZARD_CUSTODY_PROFILE_V1.md`](./RMR_MATERIAL_HAZARD_CUSTODY_PROFILE_V1.md).
+
+```text
+SDS/FDS + lote + contexto + coleta
+-> artefato bruto protegido
+-> BLAKE3/SHA-256
+-> RMR custody manifest
+-> análise especializada
+-> claim gate
+```
+
+`HASH != TOXICOLOGIA`; `CUSTÓDIA != CAUSALIDADE`.
+
+## 17. Retroalimentação RAFAELIA
 
 **F_ok:** fragmentação como blindagem operacional é forte e documentável como problema de governança.  
 **F_gap:** extorsão, conspiração, ilegalidade total, dolo algorítmico, blindagem intencional e claims Fiber H exigem prova interna, regulatória ou benchmark próprio.  
