@@ -176,6 +176,12 @@ Use these gates instead:
 - [`docs/rafaelia/RMR_LICENSE_FIBER_H_BOUNDARY.md`](docs/rafaelia/RMR_LICENSE_FIBER_H_BOUNDARY.md): license boundary, BLAKE3/RAFAELIA separation, and FiberHaga claim gates.
 - [`docs/rafaelia/RMR_BLAKE3_BINARY_ORCHESTRATION_VS_FIBERHAGA.md`](docs/rafaelia/RMR_BLAKE3_BINARY_ORCHESTRATION_VS_FIBERHAGA.md): explicit split between same-engine BLAKE3 binary orchestration, RMR forensic custody, and FiberHaga as separate core.
 
+## RMR — material hazard / chemical-evidence custody
+
+RMR também pode custodiar evidência de segurança química e exposição ocupacional (por exemplo, SDS/FDS, lote, amostragem, relatório laboratorial e metadados), mantendo uma fronteira rígida: **BLAKE3 prova integridade do artefato, não toxicidade, dose, exposição ou nexo causal**. Dados pessoais e de saúde devem ser minimizados/protegidos conforme a autoridade jurídica aplicável.
+
+Ver: [`docs/rafaelia/RMR_MATERIAL_HAZARD_CUSTODY_PROFILE_V1.md`](docs/rafaelia/RMR_MATERIAL_HAZARD_CUSTODY_PROFILE_V1.md).
+
 ## Termux / Android note
 
 For Termux-style local builds, start with:
