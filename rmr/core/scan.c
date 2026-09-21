@@ -9,6 +9,7 @@
 #define _XOPEN_SOURCE 700
 #include "pai_scan.h"
 #include "pai_hash.h"
+#include "blake3.h"
 
 #include <dirent.h>
 #include <errno.h>
@@ -77,10 +78,41 @@ static int is_excluded(const pai_scan_opts *opt, const char *base, const char *f
     return 0;
 }
 
-static void sha256_line_update(pai_sha256_ctx *mctx, const char *rel, long long size, const char hex[65]) {
+typedef struct {
+    int use_blake3;
+    pai_sha256_ctx sha256;
+    blake3_hasher blake3;
+} pai_manifest_digest_ctx;
+
+static int algo_is_blake3(const char *algo) {
+    return algo && strcmp(algo, "blake3") == 0;
+}
+
+static void manifest_digest_init(pai_manifest_digest_ctx *ctx, const char *algo) {
+    ctx->use_blake3 = algo_is_blake3(algo);
+    if(ctx->use_blake3) blake3_hasher_init(&ctx->blake3);
+    else pai_sha256_init(&ctx->sha256);
+}
+
+static void manifest_digest_update(pai_manifest_digest_ctx *ctx, const void *data, size_t len) {
+    if(ctx->use_blake3) blake3_hasher_update(&ctx->blake3, data, len);
+    else pai_sha256_update(&ctx->sha256, (const uint8_t*)data, len);
+}
+
+static void manifest_digest_final(pai_manifest_digest_ctx *ctx, uint8_t out[32]) {
+    if(ctx->use_blake3) blake3_hasher_finalize(&ctx->blake3, out, 32);
+    else pai_sha256_final(&ctx->sha256, out);
+}
+
+static int hash_file_for_algo(const char *algo, const char *path, uint8_t out[32]) {
+    if(algo_is_blake3(algo)) return pai_blake3_file(path, out);
+    return pai_sha256_file(path, out);
+}
+
+static void manifest_line_update(pai_manifest_digest_ctx *mctx, const char *rel, long long size, const char hex[65]) {
     char buf[PAI_MAX_PATH + 128];
     int n = snprintf(buf, sizeof(buf), "%s\t%lld\t%s\n", rel, size, hex);
-    if(n > 0) pai_sha256_update(mctx, (const uint8_t*)buf, (size_t)n);
+    if(n > 0) manifest_digest_update(mctx, buf, (size_t)n);
 }
 
 static int write_root_file(const char *path, const char hex[65]) {
@@ -97,7 +129,7 @@ static int scan_dir_rec(
     const char *dirpath,
     int depth,
     FILE *mf,
-    pai_sha256_ctx *mctx
+    pai_manifest_digest_ctx *mctx
 ) {
     int ret = 0;
     if(opt->max_depth >= 0 && depth > opt->max_depth) return 0;
@@ -201,16 +233,16 @@ static int scan_dir_rec(
 
             uint8_t h[32];
             char hex[65];
-            if(pai_sha256_file(full, h) != 0) {
+            if(hash_file_for_algo(opt->hash_algo, full, h) != 0) {
                 free(entries[i].name);
                 entries[i].name = NULL;
                 continue;
             }
-            pai_sha256_hex(h, hex);
+            pai_digest_hex32(h, hex);
 
             const char *rp = rel_path(base, full);
             fprintf(mf, "%s\t%lld\t%s\n", rp, sz, hex);
-            sha256_line_update(mctx, rp, sz, hex);
+            manifest_line_update(mctx, rp, sz, hex);
         }
 
         free(entries[i].name);
@@ -240,13 +272,10 @@ int pai_scan_run(const pai_scan_opts *opt) {
         return 4;
     }
 
-    if(!opt->hash_algo || strcmp(opt->hash_algo, "sha256") == 0) {
-        /* sha256 default */
-    } else if(strcmp(opt->hash_algo, "blake3") == 0) {
-        fprintf(stderr, "[scan] --hash blake3 ainda nao disponivel neste backend C externo; use --hash sha256\n");
-        return 5;
+    if(!opt->hash_algo || strcmp(opt->hash_algo, "sha256") == 0 || strcmp(opt->hash_algo, "blake3") == 0) {
+        /* supported */
     } else {
-        fprintf(stderr, "[scan] algoritmo de hash invalido: %s (use sha256)\n", opt->hash_algo);
+        fprintf(stderr, "[scan] algoritmo de hash invalido: %s (use sha256|blake3)\n", opt->hash_algo);
         return 5;
     }
 
@@ -261,16 +290,16 @@ int pai_scan_run(const pai_scan_opts *opt) {
     if(!mf) { perror("manifest"); return 1; }
     fprintf(mf, "# hash=%s\n", opt->hash_algo ? opt->hash_algo : "sha256");
 
-    pai_sha256_ctx mctx;
-    pai_sha256_init(&mctx);
+    pai_manifest_digest_ctx mctx;
+    manifest_digest_init(&mctx, opt->hash_algo);
 
     int rc = scan_dir_rec(opt, opt->base_dir, opt->base_dir, 0, mf, &mctx);
     fclose(mf);
 
     uint8_t root[32];
     char hex[65];
-    pai_sha256_final(&mctx, root);
-    pai_sha256_hex(root, hex);
+    manifest_digest_final(&mctx, root);
+    pai_digest_hex32(root, hex);
 
     if(write_root_file(linear_root_path, hex) != 0) { perror("linear_manifest_root"); return 1; }
     if(write_root_file(merkle_path, hex) != 0) { perror("merkle_root"); return 1; }
