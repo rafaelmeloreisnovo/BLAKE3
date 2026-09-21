@@ -17,7 +17,7 @@ typedef struct {
     int follow_symlinks;
     int max_depth;      // -1 unlimited
     long long max_size; // -1 unlimited
-    const char *hash_algo; // sha256 (default), blake3 (pendente)
+    const char *hash_algo; // sha256 (default) or blake3
 
     // excludes (paths relativos ou absolutos)
     const char **excludes;

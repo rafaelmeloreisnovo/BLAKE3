@@ -38,7 +38,9 @@ Use o texto abaixo quando precisar explicitar copyright/fronteira:
 | `media/` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
 | `README.md`, `CONTRIBUTING.md`, `LICENSE_*`, `Cargo.toml`, `Cargo.lock`, `build.rs` | Upstream BLAKE3 ou derivação documental explicitamente delimitada | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions e notices aplicáveis; material externo deve ser identificado |
 | `rmr/` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
-| `rmr/benchmark_framework/` | RMR autoral (blueprint) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/benchmark_framework/` | RMR autoral (benchmark/reproducibility framework; blueprint + executable BLAKE3 harness) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/CMakeLists.txt`, `rmr/core/hash_blake3.c` | RMR autoral (build/adaptador externo que consome a API pública do BLAKE3 em `c/`) | RMR Module License (`rmr/LICENSE_RMR`) para a camada RMR; BLAKE3 mantém suas licenças upstream |
+| `rmr/tools/orchestrate_blake3_compare.sh` | RMR autoral (orquestração reproduzível fork × upstream oficial fixado por SHA) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/docs/BugOrAdd/` | RMR autoral (base conceitual remodelável) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/docs/ASYNC_PARALLEL_EXECUTION_MODEL.md` | RMR autoral (arquitetura de escalonamento assíncrono por dependências) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/docs/ASYNC_PARALLEL_BENCHMARK_PROTOCOL.md` | RMR autoral (protocolo reproduzível de benchmark e cadeia de evidência) | RMR Module License (`rmr/LICENSE_RMR`) |
@@ -61,6 +63,7 @@ Use o texto abaixo quando precisar explicitar copyright/fronteira:
 | `rmr/crypto/tools/forensic_time_attest.py`, `rmr/crypto/tests/test_forensic_time_attest.py` | RMR autoral (canonização UTC/local, selos temporais e testes adversariais) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/crypto/tools/`, `rmr/crypto/tests/` | RMR autoral (auditoria offline e testes de contrato) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `.github/workflows/rmr-zip-custody.yml` | Externo autoral RMR (gate CI do perfil ZIPRAF/RVC1) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `.github/workflows/rmr-blake3-repro.yml` | Externo autoral RMR (gate CI do adapter, KAT, benchmark e receipts) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `DOCUMENTACAO.md`, `MANIFESTO*.md` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/MANIFESTO_RAFAELIA.md` | RMR autoral (texto não jurídico) | RMR Module License (`rmr/LICENSE_RMR`) |
 
@@ -212,3 +215,25 @@ destacada futura. Assinatura digital e timestamp externo confiável permanecem
 O core `rmr/freestanding_custody16` não passa a ler relógio: a integração é
 sidecar vinculada ao digest da evidência. Nenhum arquivo do núcleo BLAKE3
 upstream (`src/`, `c/`, `reference_impl/`) foi alterado.
+
+
+### Atualização 2026-09-21 (adapter BLAKE3 + CMake + benchmark reproduzível)
+
+Foi materializado um adapter explícito em rmr/ que consome a API pública da implementação C BLAKE3 já presente em c/, sem copiar, renomear ou alterar a função criptográfica.
+
+A trilha adiciona:
+- CMake próprio do RMR;
+- pai hash --algo blake3;
+- pai scan --hash blake3;
+- harness comum para comparação;
+- orquestrador que fixa o upstream oficial por SHA, executa KAT antes de medir e gera receipts SHA-256/BLAKE3;
+- gate CI dedicado.
+
+Estados:
+- RMR_BLAKE3_ADAPTER = IMPLEMENTED_PENDING_CI
+- RMR_CMAKE = IMPLEMENTED_PENDING_CI
+- UPSTREAM_COMPARISON_HARNESS = IMPLEMENTED_PENDING_CI
+- AUTOMATIC_RECEIPTS = IMPLEMENTED_PENDING_CI
+- INDEPENDENT_THIRD_PARTY_REPRODUCTION = TOKEN_VAZIO
+
+Nenhum claim de superioridade de desempenho é promovido pela existência do harness.

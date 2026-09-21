@@ -22,5 +22,10 @@ void pai_sha256_update(pai_sha256_ctx *ctx, const uint8_t *data, size_t len);
 void pai_sha256_final(pai_sha256_ctx *ctx, uint8_t out[32]);
 
 // helpers
+void pai_digest_hex32(const uint8_t digest[32], char out[65]);
 void pai_sha256_hex(const uint8_t hash[32], char out[65]);
 int  pai_sha256_file(const char *path, uint8_t out[32]);
+
+// Explicit BLAKE3 adapter. The primitive remains the repository c/ implementation.
+int pai_blake3_bytes(const void *data, size_t len, uint8_t out[32]);
+int pai_blake3_file(const char *path, uint8_t out[32]);

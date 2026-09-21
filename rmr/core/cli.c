@@ -23,8 +23,8 @@ static void usage(void) {
     puts("pai (Pipeline de Arquitetura Integradora) — C bare metal");
     puts("");
     puts("Comandos:");
-    puts("  pai hash  --file arquivo");
-    puts("  pai scan  --base DIR --out OUTDIR [--exclude PATH]... [--hidden] [--follow] [--max-depth N] [--max-size BYTES]");
+    puts("  pai hash  --file arquivo [--algo sha256|blake3]");
+    puts("  pai scan  --base DIR --out OUTDIR [--hash sha256|blake3] [--exclude PATH]... [--hidden] [--follow] [--max-depth N] [--max-size BYTES]");
     puts("  pai bases --values 7,12,30,42,56,70,144 --bases 10,7,14,60,20,18,13 --out out_bases");
     puts("  pai geom  --out out_geom --size 1024 --cycle42 --sin30 --sqrt2 --sqrt3 --fibo --shapes --mandel");
     puts("  pai toroid --tex out_geom/geom.pgm --out out_toroid [--nu 256] [--nv 128] [--R 1.0] [--r 0.35]");
@@ -42,23 +42,35 @@ static void usage(void) {
 
 static int cmd_hash(int argc, char **argv) {
     const char *file = NULL;
+    const char *algo = "sha256";
+
     for(int i=2;i<argc;i++) {
         if(!strcmp(argv[i],"--file") && i+1<argc) file = argv[++i];
+        else if(!strcmp(argv[i],"--algo") && i+1<argc) algo = argv[++i];
     }
+
     if(!file) {
-        fprintf(stderr,"uso: pai hash --file arquivo\n");
+        fprintf(stderr,"uso: pai hash --file arquivo [--algo sha256|blake3]\n");
         return 1;
     }
 
     uint8_t hash[32];
     char hex[65];
+    int rc = -1;
 
-    if(pai_sha256_file(file, hash)!=0) {
+    if(!strcmp(algo, "sha256")) rc = pai_sha256_file(file, hash);
+    else if(!strcmp(algo, "blake3")) rc = pai_blake3_file(file, hash);
+    else {
+        fprintf(stderr, "[erro] algoritmo invalido: %s (use sha256|blake3)\n", algo);
+        return 2;
+    }
+
+    if(rc != 0) {
         perror("hash");
         return 1;
     }
 
-    pai_sha256_hex(hash, hex);
+    pai_digest_hex32(hash, hex);
     printf("%s  %s\n", hex, file);
     return 0;
 }
