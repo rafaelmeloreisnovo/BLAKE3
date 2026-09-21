@@ -14,8 +14,17 @@ OUT_BASE="${OUT_BASE:-out_rmr_pipeline}"
 rm -rf "$OUT_BASE"
 mkdir -p "$OUT_BASE"
 
+printf "abc" > "$OUT_BASE/abc.txt"
+B3_GOT="$("${PAI_CMD[@]}" hash --algo blake3 --file "$OUT_BASE/abc.txt" | awk '{print $1}')"
+B3_EXPECTED="6437b3ac38465133ffb63b75273a8db548c558465d79db03fd359c6cd5bd9d85"
+if [[ "$B3_GOT" != "$B3_EXPECTED" ]]; then
+  echo "[FAIL] BLAKE3 KAT got=$B3_GOT expected=$B3_EXPECTED" >&2
+  exit 9
+fi
+
 "${PAI_CMD[@]}" validate --alpha 0.25 --attractors 42 --rows 10 --cols 10 --dr 7 --dc 9 --unique 42 --transitions 64 --len 128
 "${PAI_CMD[@]}" scan --base rmr --out "$OUT_BASE/scan" --max-size 1048576 --hash sha256
+"${PAI_CMD[@]}" scan --base rmr --out "$OUT_BASE/scan_blake3" --max-size 1048576 --hash blake3
 "${PAI_CMD[@]}" sign --base rmr --scan "$OUT_BASE/scan" --out "$OUT_BASE/scan" --self ./pai
 "${PAI_CMD[@]}" bench --repeat 3 --out "$OUT_BASE/bench_a" --metrics-store "$OUT_BASE/metrics" --new-session -- hash --file README.md
 "${PAI_CMD[@]}" benchdiff --a "$OUT_BASE/bench_a/bench.tsv" --b "$OUT_BASE/bench_a/bench.tsv" --out "$OUT_BASE/diff" --threshold 5
