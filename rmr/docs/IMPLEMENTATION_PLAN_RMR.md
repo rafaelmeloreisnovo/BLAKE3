@@ -28,3 +28,23 @@ Toda mudança deve ficar na camada `rmr/` e preservar a semântica do BLAKE3 ups
 - Scripts canônicos:
   - `rmr/tools/build_pai.sh`
   - `rmr/tools/run_full_audit.sh`
+
+
+## Update 2026-09-21 — BLAKE3 backend and reproducibility closure
+
+The previously documented backend gap is addressed by an explicit external adapter:
+- rmr/core/hash_blake3.c consumes the public c/blake3.h API;
+- rmr/CMakeLists.txt links the RMR executable against BLAKE3::blake3;
+- pai hash accepts --algo blake3;
+- pai scan accepts --hash blake3;
+- the upstream primitive remains outside rmr/.
+
+The comparison path is materialized by rmr/tools/orchestrate_blake3_compare.sh and the common harness in rmr/benchmark_framework/core/blake3_bench.c.
+
+Promotion states are intentionally split:
+- source implementation: IMPLEMENTED;
+- local build/test: requires observable run;
+- GitHub CI reproduction: requires workflow PASS;
+- independent third-party reproduction: TOKEN_VAZIO until external receipt.
+
+This update closes an implementation gap; it does not establish a performance winner.
