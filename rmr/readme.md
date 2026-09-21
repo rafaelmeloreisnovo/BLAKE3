@@ -63,3 +63,23 @@ Validação local:
 sh rmr/fixed256/build/build_asm_probes.sh
 sh rmr/fixed256/build/run_java_selftest.sh
 ```
+
+
+## RMR BLAKE3 execution and reproducibility path — 2026-09-21
+
+The RMR host path now has an explicit BLAKE3 adapter without reimplementing or relabeling the primitive.
+
+Navigation:
+
+1. rmr/CMakeLists.txt — RMR-owned build surface. It consumes the repository C BLAKE3 target as a library.
+2. rmr/core/hash_blake3.c — narrow adapter for bytes/files.
+3. pai hash --algo blake3 and pai scan --hash blake3 — operational entry points.
+4. rmr/tools/orchestrate_blake3_compare.sh — builds the RMR path and a pinned official upstream checkout, executes KAT/correctness before performance, then writes receipts.
+5. rmr/benchmark_framework/ — common harness and raw comparison outputs.
+6. .github/workflows/rmr-blake3-repro.yml — CI reproduction gate.
+
+Boundary:
+
+BLAKE3 algorithm and digest semantics remain upstream. RMR owns the adapter, orchestration, measurement, evidence normalization and custody records.
+
+Independent reproduction by an unaffiliated third party remains TOKEN_VAZIO until such a receipt is attached.
