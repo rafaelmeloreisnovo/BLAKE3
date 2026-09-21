@@ -3,7 +3,7 @@ Copyright (c) 2025 Rafael
 License: RMR Module License (see LICENSE_RMR)
 -->
 
-# RMR Benchmark Framework (Blueprint)
+# RMR Benchmark Framework
 
 Este diretório contém o **blueprint** do framework de benchmark industrial do
 RMR, **isolado do núcleo BLAKE3 upstream**. Nenhuma lógica criptográfica do
@@ -142,3 +142,24 @@ Para manter comparabilidade estatística entre execuções:
 - `-fPIC`: permitido somente para artefatos host/shared (ex.: integração dinâmica), vedado por padrão no freestanding.
 - `-pie`: obrigatório por padrão em binários freestanding do RMR.
 - `-nostdlib`: obrigatório por padrão em binários freestanding do RMR.
+
+
+## BLAKE3 comparative execution path — 2026-09-21
+
+The framework now has an executable comparison path in addition to the original blueprint.
+
+Common harness:
+- core/blake3_bench.c
+
+Orchestrator:
+- ../tools/orchestrate_blake3_compare.sh
+
+The comparison deliberately separates the build systems:
+- official checkout: official c/CMakeLists.txt at a pinned upstream SHA;
+- RMR/fork checkout: rmr/CMakeLists.txt, which consumes the fork c/ library through its public target.
+
+Correctness is a hard gate. The abc KAT and final digest equivalence must pass before performance results are summarized.
+
+Each campaign writes raw results, environment, summary, receipt, SHA256SUMS and BLAKE3SUMS.
+
+CI reproduction is evidence from a separate runner environment. It is not labeled independent third-party reproduction; that state remains TOKEN_VAZIO until an unaffiliated reproducer contributes a receipt.
