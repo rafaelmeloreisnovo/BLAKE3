@@ -27,7 +27,10 @@ enum rmr_topology_surface_bit {
   RMR_TOPOLOGY_COMMENT      = (1u << 8),
   RMR_TOPOLOGY_WARNING      = (1u << 9),
   RMR_TOPOLOGY_MODULE       = (1u << 10),
-  RMR_TOPOLOGY_OVERLAP      = (1u << 11)
+  RMR_TOPOLOGY_OVERLAP      = (1u << 11),
+  RMR_TOPOLOGY_CONDITION    = (1u << 12),
+  RMR_TOPOLOGY_COLOR        = (1u << 13),
+  RMR_TOPOLOGY_IOPS         = (1u << 14)
 };
 
 enum rmr_topology_arch {
