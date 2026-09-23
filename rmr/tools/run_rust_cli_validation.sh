@@ -23,9 +23,9 @@ cp "$ROOT/rmr/validation/rust_hash_bench.rs" "$WORK/upstream/examples/rmr_valida
 cp "$ROOT/rmr/validation/rust_hash_bench.rs" "$WORK/fork/examples/rmr_validation_bench.rs"
 
 echo "[rust] upstream tests"
-(cd "$WORK/upstream" && cargo test --release) >"$OUT/upstream-rust-test.txt" 2>&1
+if ! (cd "$WORK/upstream" && cargo test --release) >"$OUT/upstream-rust-test.txt" 2>&1; then cat "$OUT/upstream-rust-test.txt"; exit 101; fi
 echo "[rust] fork tests"
-(cd "$WORK/fork" && cargo test --release) >"$OUT/fork-rust-test.txt" 2>&1
+if ! (cd "$WORK/fork" && cargo test --release) >"$OUT/fork-rust-test.txt" 2>&1; then cat "$OUT/fork-rust-test.txt"; exit 102; fi
 
 echo "[rust] build common harness variants"
 CARGO_TARGET_DIR="$WORK/target-upstream" cargo build --release --manifest-path "$WORK/upstream/Cargo.toml" --example rmr_validation_bench >"$OUT/upstream-rust-build.txt" 2>&1
@@ -54,8 +54,8 @@ PY
 done
 
 echo "[b3sum] tests and builds"
-(cd "$WORK/upstream/b3sum" && cargo test --release) >"$OUT/upstream-b3sum-test.txt" 2>&1
-(cd "$WORK/fork/b3sum" && cargo test --release) >"$OUT/fork-b3sum-test.txt" 2>&1
+if ! (cd "$WORK/upstream/b3sum" && cargo test --release) >"$OUT/upstream-b3sum-test.txt" 2>&1; then cat "$OUT/upstream-b3sum-test.txt"; exit 103; fi
+if ! (cd "$WORK/fork/b3sum" && cargo test --release) >"$OUT/fork-b3sum-test.txt" 2>&1; then cat "$OUT/fork-b3sum-test.txt"; exit 104; fi
 CARGO_TARGET_DIR="$WORK/target-b3sum-upstream" cargo build --release --manifest-path "$WORK/upstream/b3sum/Cargo.toml" >"$OUT/upstream-b3sum-build.txt" 2>&1
 CARGO_TARGET_DIR="$WORK/target-b3sum-fork" cargo build --release --manifest-path "$WORK/fork/b3sum/Cargo.toml" >"$OUT/fork-b3sum-build.txt" 2>&1
 BU="$WORK/target-b3sum-upstream/release/b3sum"
