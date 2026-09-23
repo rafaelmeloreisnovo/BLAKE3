@@ -110,3 +110,15 @@ Boundary:
 BLAKE3 algorithm and digest semantics remain upstream. RMR owns the adapter, orchestration, measurement, evidence normalization and custody records.
 
 Independent reproduction by an unaffiliated third party remains TOKEN_VAZIO until such a receipt is attached.
+
+
+## RMR ARMv7 HWIF + IOPS — 2026-09-23
+
+ARMv7 agora possui fronteiras explícitas `user != privileged`. O user leaf
+não acessa CP15; PMCCNTR/MIDR/MPIDR só aparecem no leaf privileged com opt-in.
+A matriz `rmr/hwif/build/build_cross_matrix.sh` cobre x86_64, AArch64,
+ARMv7-user e ARMv7-privileged no nível compile/link.
+
+O harness `rmr-iops-bench` registra workload, block size, sync, cache policy,
+queue depth, tempo, IOPS e MiB/s. O V1 aceita somente queue depth 1 e registra
+`direct_io=false`; CI valida o instrumento, não promove desempenho físico.
