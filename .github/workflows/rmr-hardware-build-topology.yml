@@ -1,0 +1,46 @@
+name: RMR hardware build topology
+
+on:
+  pull_request:
+    paths:
+      - "rmr/**"
+      - ".github/workflows/rmr-hardware-build-topology.yml"
+  push:
+    branches:
+      - master
+    paths:
+      - "rmr/**"
+      - ".github/workflows/rmr-hardware-build-topology.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  topology:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure RMR topology
+        run: >
+          cmake -S rmr -B build/rmr-topology -G Ninja
+          -DRMR_BUILD_TESTS=ON
+          -DRMR_BUILD_TOPOLOGY=ON
+          -DRMR_STRICT_WARNINGS=ON
+
+      - name: Build topology selftest
+        run: cmake --build build/rmr-topology --target rmr-topology-selftest
+
+      - name: Run topology selftest
+        run: ctest --test-dir build/rmr-topology -R rmr_topology_selftest --output-on-failure
+
+      - name: Audit source compiler linker and binary topology
+        run: |
+          python3 -m py_compile rmr/tools/rmr_topology_audit.py
+          python3 rmr/tools/rmr_topology_audit.py             --root rmr             --binary build/rmr-topology/rmr-topology-selftest             --json-out build/rmr-topology/rmr_topology_audit.json             --color never
+
+      - name: Upload topology receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: rmr-hardware-build-topology
+          path: build/rmr-topology/rmr_topology_audit.json
