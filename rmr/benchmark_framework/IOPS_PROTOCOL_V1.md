@@ -69,3 +69,13 @@ rmr-iops-bench \
 A CI execution validates the instrument and JSON path only. Performance claims
 require a device-bound receipt with storage model, filesystem, kernel, thermal
 state and repeated runs.
+
+
+## Device receipt runner
+
+`rmr/tools/run_device_perf_receipt.sh` compiles the native user-mode HWIF
+self-test and this IOPS harness on the target device. It stores environment,
+JSON receipts and SHA-256 checksums under `rmr/reports/device_perf/`.
+
+The script never enables the ARMv7 privileged leaf. A successful device run is
+evidence for that device/run only; it does not promote a cross-device claim.
