@@ -7,7 +7,10 @@
 #include "rmr_crypto_runtime.h"
 #include "blake3.h"
 
-int rmr_crypto_blake3_digest(const uint8_t *input, size_t input_len,\n                             uint8_t *out, size_t out_cap, size_t *out_len);\n\nint rmr_crypto_blake3_digest(const uint8_t *input, size_t input_len,
+int rmr_crypto_blake3_digest(const uint8_t *input, size_t input_len,
+                             uint8_t *out, size_t out_cap, size_t *out_len);
+
+int rmr_crypto_blake3_digest(const uint8_t *input, size_t input_len,
                              uint8_t *out, size_t out_cap, size_t *out_len) {
   blake3_hasher hasher;
 
