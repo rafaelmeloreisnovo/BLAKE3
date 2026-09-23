@@ -12,6 +12,7 @@ project(rmr_external
 option(RMR_BUILD_TESTS "Build RMR host self-tests" ON)
 option(RMR_BUILD_TOPOLOGY "Build RMR hardware/build topology micro-module" ON)
 option(RMR_BUILD_HWIF "Build RMR hardware interface library" ON)
+option(RMR_BUILD_CRYPTO_RUNTIME "Build RMR provider-backed crypto runtime" ON)
 option(RMR_ARMV7_PRIVILEGED "Enable privileged ARMv7 CP15 HWIF leaf" OFF)
 option(RMR_STRICT_WARNINGS "Enable stricter warnings for new RMR topology code" ON)
 option(RMR_BLAKE3_USE_TBB "Build repository BLAKE3 with optional oneTBB path" OFF)
@@ -64,6 +65,43 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
   target_compile_options(pai PRIVATE -Wall -Wextra)
 endif()
 
+
+
+if(RMR_BUILD_CRYPTO_RUNTIME)
+  find_package(OpenSSL 3.0 QUIET COMPONENTS Crypto)
+  if(OpenSSL_FOUND)
+    add_library(rmr-crypto-runtime STATIC
+      crypto/runtime/src/rmr_crypto_common.c
+      crypto/runtime/src/rmr_crypto_blake3.c
+      crypto/runtime/src/rmr_crypto_openssl.c
+    )
+    target_compile_features(rmr-crypto-runtime PUBLIC c_std_11)
+    target_include_directories(rmr-crypto-runtime PUBLIC
+      "${CMAKE_CURRENT_SOURCE_DIR}/crypto/runtime/include"
+    )
+    target_link_libraries(rmr-crypto-runtime PRIVATE
+      BLAKE3::blake3
+      OpenSSL::Crypto
+    )
+    if(RMR_STRICT_WARNINGS AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+      target_compile_options(rmr-crypto-runtime PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Wshadow
+        -Wpointer-arith
+        -Wcast-align
+        -Wstrict-prototypes
+        -Wmissing-prototypes
+        -Wformat=2
+        -Wundef
+        -Wwrite-strings
+      )
+    endif()
+  else()
+    message(STATUS "RMR crypto runtime disabled: OpenSSL >= 3.0 Crypto not found")
+  endif()
+endif()
 
 if(RMR_BUILD_HWIF AND (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Android"))
   set(RMR_HWIF_SOURCES
@@ -163,6 +201,15 @@ if(RMR_BUILD_TESTS)
   )
   target_link_libraries(rmr-blake3-backend-selftest PRIVATE BLAKE3::blake3)
   add_test(NAME rmr_blake3_backend_selftest COMMAND rmr-blake3-backend-selftest)
+
+  if(TARGET rmr-crypto-runtime)
+    add_executable(rmr-crypto-runtime-selftest
+      crypto/runtime/tests/rmr_crypto_runtime_selftest.c
+    )
+    target_compile_features(rmr-crypto-runtime-selftest PRIVATE c_std_11)
+    target_link_libraries(rmr-crypto-runtime-selftest PRIVATE rmr-crypto-runtime)
+    add_test(NAME rmr_crypto_runtime_selftest COMMAND rmr-crypto-runtime-selftest)
+  endif()
 
   if(TARGET rmr-hwif)
     add_executable(rmr-hwif-selftest
