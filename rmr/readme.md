@@ -182,3 +182,13 @@ grava receipts por tamanho. Cross-compilação e SIMPERF não promovem esse esta
 preservam por SHA/run os números já observados de core, ablation, SIMD,
 ABI/binário, cross-arch e ARM físico histórico enquanto os gates exact-master
 continuam separados.
+
+
+## Official vs Fork Scorecard V1 — 2026-09-23
+
+A comparação canônica por superfície está em
+`rmr/docs/RMR_BLAKE3_OFFICIAL_VS_FORK_SCORECARD_V1.md`, com espelho
+machine-readable em `rmr/validation/OFFICIAL_VS_FORK_SCORECARD_V1.json`.
+
+Ela distingue C-core, source hints, SIMD, ARM físico histórico, ABI/ELF,
+Rust/LTO, b3sum, TBB, cross-arch e extensões RMR.
