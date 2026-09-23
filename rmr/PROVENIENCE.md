@@ -49,6 +49,7 @@ Use o texto abaixo quando precisar explicitar copyright/fronteira:
 | `rmr/hwif/include/rmr_hwif.h`, `rmr/hwif/include/rmr_detect.h`, `rmr/hwif/rmr_hwif.c`, `rmr/hwif/asm/aarch64/`, `rmr/hwif/asm/x86_64/`, `rmr/hwif/detect/detect_x86.c`, `rmr/hwif/detect/detect_aarch64.c`, `rmr/hwif/detect/detect_fallback.c` | RMR autoral (interface HW, detecção runtime e backends ASM) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/core/validate.c`, `rmr/core/pai_validate.h` | RMR autoral (validação determinística de invariantes) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/core/lowlevel_freestanding.c` | RMR autoral (estado global da arena nomalloc freestanding) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/topology/`, `rmr/tools/rmr_topology_audit.py`, `rmr/docs/RMR_HARDWARE_BUILD_TOPOLOGY_V1.md` | RMR autoral (topologia tipada de preprocessor/compiler/linker/binário/símbolos/pointers/loops/I/O/comentários/warnings/módulos/overlap) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/pai42/` | RMR autoral (ponte geométrica determinística entre 42 ciclos ATA OMEGA, projeção circular Q16, ferramenta de auditoria e testes) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/crypto/` | RMR autoral (registro criptográfico, perfil SHA-256, governança, custódia e testes) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/crypto/ZIP_BITSTACK_CUSTODY_PROFILE.md` | RMR autoral (perfil de cápsula ZIPRAF/RVC1, palavra, empilhamento estrutural, CRC, digests e âncoras) | RMR Module License (`rmr/LICENSE_RMR`) |
@@ -64,6 +65,7 @@ Use o texto abaixo quando precisar explicitar copyright/fronteira:
 | `rmr/crypto/tools/`, `rmr/crypto/tests/` | RMR autoral (auditoria offline e testes de contrato) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `.github/workflows/rmr-zip-custody.yml` | Externo autoral RMR (gate CI do perfil ZIPRAF/RVC1) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `.github/workflows/rmr-blake3-repro.yml` | Externo autoral RMR (gate CI do adapter, KAT, benchmark e receipts) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `.github/workflows/rmr-hardware-build-topology.yml` | Externo autoral RMR (gate CI da topologia de build/hardware e receipt JSON) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `DOCUMENTACAO.md`, `MANIFESTO*.md` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/MANIFESTO_RAFAELIA.md` | RMR autoral (texto não jurídico) | RMR Module License (`rmr/LICENSE_RMR`) |
 
@@ -237,3 +239,20 @@ Estados:
 - INDEPENDENT_THIRD_PARTY_REPRODUCTION = TOKEN_VAZIO
 
 Nenhum claim de superioridade de desempenho é promovido pela existência do harness.
+
+
+### Atualização 2026-09-23 (hardware/build topology V1)
+
+Criado `rmr/topology/` como micro-módulo autoral externo para separar e
+observar quinze superfícies: preprocessor, compiler, linker, binary, symbol,
+pointer, loop, I/O, comment, warning, module, overlap, condition, color e IOPS.
+
+O módulo não altera a primitiva BLAKE3. `void` é tratado como fronteira
+genérica explícita, não como ausência semântica; símbolos lexicais permanecem
+candidatos até evidência do linker; contadores de I/O são operações lógicas e
+não promovem claim de IOPS físico.
+
+O auditor `rmr/tools/rmr_topology_audit.py` é stdlib-only e usa ferramentas
+locais (`cc`, `readelf`, `nm`, `size`) somente quando disponíveis. O
+workflow `.github/workflows/rmr-hardware-build-topology.yml` materializa o
+gate reproduzível. Estado remoto permanece NOT_RUN até observação de CI.

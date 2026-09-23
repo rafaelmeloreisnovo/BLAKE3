@@ -65,6 +65,33 @@ sh rmr/fixed256/build/run_java_selftest.sh
 ```
 
 
+## RMR Hardware + Build Topology V1 — 2026-09-23
+
+`rmr/topology/` adds a non-invasive micro-module for typed observation of the
+preprocessor, compiler, linker, binary, symbols, pointers, loops, logical I/O,
+comments, warnings, child modules, overlap candidates, conditions, color and IOPS evidence.
+
+The C layer records compile/pointer topology and explicit saturating counters.
+The stdlib-only auditor `rmr/tools/rmr_topology_audit.py` can additionally read
+compiler predefined macros plus ELF/linker evidence through `readelf`, `nm`
+and `size` when those tools and a binary are supplied.
+
+Boundaries:
+
+```text
+void boundary != missing semantics
+warning != failure
+source symbol candidate != linked symbol
+logical I/O ops != physical storage IOPS
+color != state
+SOURCE != BUILD != EXECUTION != EVIDENCE != CLAIM
+```
+
+Validation is gated by `.github/workflows/rmr-hardware-build-topology.yml`.
+Physical IOPS and cross-device performance remain `TOKEN_VAZIO` until timed,
+device-bound receipts exist.
+
+
 ## RMR BLAKE3 execution and reproducibility path — 2026-09-21
 
 The RMR host path now has an explicit BLAKE3 adapter without reimplementing or relabeling the primitive.
