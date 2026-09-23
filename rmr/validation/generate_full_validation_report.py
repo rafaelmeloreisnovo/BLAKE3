@@ -59,38 +59,46 @@ def main() -> int:
     else:
         add("C-UPSTREAM-V2", "TOKEN_VAZIO_NOT_FOUND", "No V2 comparison receipt.")
 
-    p, ablation = find_schema(root, "RMR-C-ABLATION-V1")
+    p, ablation = find_schema(root, "RMR-C-ABLATION-V3")
+    if not ablation:
+        p, ablation = find_schema(root, "RMR-C-ABLATION-V1")
     add(
         "C-ABLATION",
         "PASS" if ablation else "TOKEN_VAZIO_NOT_FOUND",
-        "fork vs no-likely/no-restrict/no-hints with digest equivalence"
+        "fork/no-likely/no-restrict/no-hints causal matrix with digest equivalence"
         if ablation else "No ablation receipt.",
         p,
     )
 
-    p, simd = find_schema(root, "RMR-SIMD-BACKEND-MATRIX-V1")
+    p, simd = find_schema(root, "RMR-BLAKE3-BACKEND-MATRIX-V3")
+    if not simd:
+        p, simd = find_schema(root, "RMR-SIMD-BACKEND-MATRIX-V1")
     add(
         "SIMD-X86",
         "PASS" if simd else "TOKEN_VAZIO_NOT_FOUND",
-        "portable/SSE2/SSE4.1/AVX2/native matrix"
-        if simd else "No SIMD receipt.",
+        "official-vs-fork portable/SSE2/SSE4.1/AVX2/auto backend matrix"
+        if simd else "No SIMD/backend receipt.",
         p,
     )
 
-    p, rust = find_schema(root, "RMR-RUST-LTO-COMPARE-V1")
+    p, rust = find_schema(root, "RMR-RUST-LIBRARY-V3")
+    if not rust:
+        p, rust = find_schema(root, "RMR-RUST-LTO-COMPARE-V1")
     add(
         "RUST-LTO",
         "PASS" if rust else "TOKEN_VAZIO_NOT_FOUND",
-        "upstream/fork tuned/fork untuned common Rust harness"
+        "upstream/fork plus release-profile/LTO ablation"
         if rust else "No Rust receipt.",
         p,
     )
 
-    p, b3sum = find_schema(root, "RMR-B3SUM-COMPARE-V1")
+    p, b3sum = find_schema(root, "RMR-RUST-CLI-V3")
+    if not b3sum:
+        p, b3sum = find_schema(root, "RMR-B3SUM-COMPARE-V1")
     add(
         "B3SUM",
         "PASS" if b3sum else "TOKEN_VAZIO_NOT_FOUND",
-        "hash, mmap/no-mmap and 20k-line checkfile workloads"
+        "hash, threaded hash, mmap/no-mmap/checkfile-oriented CLI workloads"
         if b3sum else "No b3sum receipt.",
         p,
     )
