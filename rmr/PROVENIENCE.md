@@ -371,3 +371,14 @@ Registrados:
 O ledger preserva resultados observados por run/SHA e separa receipts históricos
 do exact-master atual. Paridade, regressões, FAIL e TOKEN_VAZIO permanecem
 append-only; nenhum resultado histórico é promovido automaticamente após merge.
+
+
+### Atualização 2026-09-23 (validation completeness V4)
+
+Os agregadores de validação passaram a separar
+`REPORT_GENERATION=PASS` de `VALIDATION_STATE`.
+Estados globais: COMPLETE, COMPLETE_WITH_REVIEW e PARTIAL.
+
+Adicionado `rmr/validation/tests/test_report_completeness.py` para garantir
+que a ausência deliberada de um eixo obrigatório resulte em PARTIAL e nunca
+seja mascarada como validação integral.
