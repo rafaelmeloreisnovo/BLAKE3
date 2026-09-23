@@ -103,10 +103,18 @@ jobs:
           ROUNDS: "5"
           TARGET_MIB: "64"
         run: bash rmr/tools/benchmark_backends_v3.sh
+      - name: C source ablation
+        env:
+          CC: clang
+          ROUNDS: "7"
+          TARGET_MIB: "64"
+        run: bash rmr/tools/run_c_ablation_v3.sh
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-backends
-          path: rmr/benchmark_framework/output/upstream-v3-backends/**
+          path: |
+            rmr/benchmark_framework/output/upstream-v3-backends/**
+            rmr/benchmark_framework/output/upstream-v3-ablation/**
 
   abi-elf:
     runs-on: ubuntu-latest
@@ -176,7 +184,12 @@ jobs:
       - name: Install cross compilers
         run: |
           sudo apt-get update
-          sudo apt-get install -y             gcc gcc-multilib             gcc-arm-linux-gnueabihf             gcc-aarch64-linux-gnu             gcc-riscv64-linux-gnu             gcc-powerpc64le-linux-gnu
+          sudo apt-get install -y \
+            clang gcc gcc-multilib \
+            gcc-arm-linux-gnueabihf \
+            gcc-aarch64-linux-gnu \
+            gcc-riscv64-linux-gnu \
+            gcc-powerpc64le-linux-gnu
           rustup target add wasm32-unknown-unknown
       - name: Cross architecture compile matrix
         run: bash rmr/tools/build_cross_arch_blake3_v3.sh
@@ -218,6 +231,27 @@ jobs:
       - rmr-integration
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: upstream-v3-*
+          path: artifacts
+          merge-multiple: false
+      - name: Generate aggregated V3 receipt
+        run: |
+          mkdir -p final
+          python3 rmr/upstream_validation/generate_v3_report.py \
+            --artifacts artifacts \
+            --json-out final/RMR_UPSTREAM_COMPREHENSIVE_V3.json \
+            --md-out final/RMR_UPSTREAM_COMPREHENSIVE_V3.md
+          cat final/RMR_UPSTREAM_COMPREHENSIVE_V3.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: upstream-v3-final-receipt
+          path: final/**
       - name: Gate summary
         env:
           SOURCE: ${{ needs.source.result }}
