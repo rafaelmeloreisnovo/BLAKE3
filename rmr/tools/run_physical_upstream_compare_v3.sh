@@ -26,6 +26,44 @@ FORK_BUILD="$WORK/build-fork"
 mkdir -p "$OUT" "$WORK"
 rm -rf "$OFFICIAL_BUILD" "$FORK_BUILD"
 
+snapshot_runtime() {
+  local label="$1"
+  local file="$OUT/telemetry-$label.txt"
+  {
+    echo "label=$label"
+    echo "observed_at_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || true)"
+    echo "arch=$ARCH"
+    if command -v nproc >/dev/null 2>&1; then
+      echo "logical_cpus=$(nproc 2>/dev/null || true)"
+    elif command -v getconf >/dev/null 2>&1; then
+      echo "logical_cpus=$(getconf _NPROCESSORS_ONLN 2>/dev/null || true)"
+    fi
+    if [ -r /proc/meminfo ]; then
+      grep -E '^(MemTotal|MemFree|MemAvailable):' /proc/meminfo || true
+    fi
+    for cpu in /sys/devices/system/cpu/cpu[0-9]*; do
+      [ -d "$cpu" ] || continue
+      name=$(basename "$cpu")
+      for field in scaling_cur_freq scaling_min_freq scaling_max_freq scaling_governor cpuinfo_cur_freq cpuinfo_max_freq; do
+        p="$cpu/cpufreq/$field"
+        [ -r "$p" ] && echo "$name.$field=$(cat "$p" 2>/dev/null || true)"
+      done
+    done
+    for zone in /sys/class/thermal/thermal_zone*; do
+      [ -d "$zone" ] || continue
+      z=$(basename "$zone")
+      type=""
+      temp=""
+      [ -r "$zone/type" ] && type=$(cat "$zone/type" 2>/dev/null || true)
+      [ -r "$zone/temp" ] && temp=$(cat "$zone/temp" 2>/dev/null || true)
+      echo "$z.type=$type"
+      echo "$z.temp=$temp"
+    done
+  } >"$file"
+}
+
+snapshot_runtime before
+
 for t in git cmake "$CC_BIN" "$CXX_BIN" python3 sha256sum; do
   command -v "$t" >/dev/null 2>&1 || {
     echo "missing_command=$t" >&2
@@ -144,6 +182,8 @@ python3 "$ROOT/rmr/benchmark_framework/simperf/analyze_blake3_compare_v2.py" \
   --out "$OUT/summary.json" \
   | tee "$OUT/analysis.txt"
 
+snapshot_runtime after
+
 {
   echo "schema=RMR-PHYSICAL-UPSTREAM-COMPARE-V3"
   echo "observed_at_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -156,6 +196,9 @@ python3 "$ROOT/rmr/benchmark_framework/simperf/analyze_blake3_compare_v2.py" \
   echo "cflags=$CFLAGS"
   echo "rounds=$ROUNDS"
   echo "target_mib_per_measurement=$TARGET_MIB"
+  echo "telemetry_before=telemetry-before.txt"
+  echo "telemetry_after=telemetry-after.txt"
+  echo "thermal_dvfs_interpretation=REQUIRED_FOR_PHYSICAL_PERFORMANCE_CLAIMS"
   echo "claim_allowed=false"
   if command -v getprop >/dev/null 2>&1; then
     echo "android_release=$(getprop ro.build.version.release 2>/dev/null || true)"
