@@ -1,3 +1,8 @@
+<!--
+Copyright (c) 2024-2026 Rafael Melo Reis
+Licensed under LICENSE_RMR.
+-->
+
 # RMR BLAKE3 — upstream 1.8.7 synchronization
 
 State: IMPLEMENTED_UNTESTED  
