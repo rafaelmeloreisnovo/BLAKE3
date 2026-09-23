@@ -6,7 +6,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 OFFICIAL_REPO="${OFFICIAL_REPO:-https://github.com/BLAKE3-team/BLAKE3.git}"
 OFFICIAL_REF="${OFFICIAL_REF:-6aab490a26124663329dfd3961b8469f8fdb158b}"
-WORK="${WORK:-$ROOT/.rmr-work/rust-cli}"
+WORK="${WORK:-/tmp/rmr-rust-cli}"
 OUT="${OUT:-$ROOT/rmr/validation/output/rust-cli}"
 ROUNDS="${ROUNDS:-5}"
 TARGET_MIB="${TARGET_MIB:-64}"
