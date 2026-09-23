@@ -1,0 +1,237 @@
+name: RMR upstream comprehensive V3
+
+on:
+  pull_request:
+    paths:
+      - "c/**"
+      - "src/**"
+      - "b3sum/**"
+      - "Cargo.toml"
+      - "rmr/**"
+      - ".github/workflows/rmr-upstream-comprehensive-v3.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rmr-upstream-comprehensive-v3-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  OFFICIAL_REF: 6aab490a26124663329dfd3961b8469f8fdb158b
+
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Validate surface registry
+        run: python3 rmr/upstream_validation/validate_surfaces.py
+      - name: Audit full source delta
+        run: bash rmr/tools/audit_source_delta_v3.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: upstream-v3-source
+          path: rmr/benchmark_framework/output/upstream-v3-source/**
+
+  c-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config
+      - name: Strict correctness, sanitizers and install consumer
+        env:
+          CC: clang
+          CXX: clang++
+        run: bash rmr/tools/validate_c_quality_v3.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: upstream-v3-c-quality
+          path: rmr/benchmark_framework/output/upstream-v3-quality/**
+
+  core-performance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build
+      - name: V2 paired multi-size comparison
+        env:
+          CC: clang
+          CXX: clang++
+          ROUNDS: "9"
+          TARGET_MIB: "128"
+          SIZES: "64 256 1024 4096 65536 1048576 16777216"
+        run: bash rmr/tools/orchestrate_blake3_compare_v2.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: upstream-v3-core-performance
+          path: rmr/benchmark_framework/output/comparisons-v2/**
+
+  backends:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build
+      - name: Backend and dispatch matrix
+        env:
+          CC: clang
+          CXX: clang++
+          ROUNDS: "5"
+          TARGET_MIB: "64"
+        run: bash rmr/tools/benchmark_backends_v3.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: upstream-v3-backends
+          path: rmr/benchmark_framework/output/upstream-v3-backends/**
+
+  abi-elf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build binutils
+      - name: ABI symbols and ELF
+        env:
+          CC: clang
+          CXX: clang++
+        run: bash rmr/tools/audit_abi_elf_v3.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: upstream-v3-abi-elf
+          path: rmr/benchmark_framework/output/upstream-v3-abi/**
+
+  tbb:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Install oneTBB build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build libtbb-dev
+      - name: Compare oneTBB path
+        env:
+          CC: clang
+          CXX: clang++
+        run: bash rmr/tools/benchmark_tbb_v3.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: upstream-v3-tbb
+          path: rmr/benchmark_framework/output/upstream-v3-tbb/**
+
+  rust-cli:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Rust library, profile ablation and b3sum
+        run: bash rmr/tools/benchmark_rust_cli_v3.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: upstream-v3-rust-cli
+          path: rmr/benchmark_framework/output/upstream-v3-rust/**
+
+  cross-arch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Install cross compilers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y             gcc gcc-multilib             gcc-arm-linux-gnueabihf             gcc-aarch64-linux-gnu             gcc-riscv64-linux-gnu             gcc-powerpc64le-linux-gnu
+          rustup target add wasm32-unknown-unknown
+      - name: Cross architecture compile matrix
+        run: bash rmr/tools/build_cross_arch_blake3_v3.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: upstream-v3-cross-arch
+          path: rmr/benchmark_framework/output/upstream-v3-cross/**
+
+  rmr-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Install RMR dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build libssl-dev binutils
+      - name: Full RMR integration
+        run: bash rmr/tools/validate_rmr_integration_v3.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: upstream-v3-rmr-integration
+          path: rmr/benchmark_framework/output/upstream-v3-rmr-integration/**
+
+  summary:
+    if: always()
+    needs:
+      - source
+      - c-quality
+      - core-performance
+      - backends
+      - abi-elf
+      - tbb
+      - rust-cli
+      - cross-arch
+      - rmr-integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Gate summary
+        env:
+          SOURCE: ${{ needs.source.result }}
+          C_QUALITY: ${{ needs.c-quality.result }}
+          CORE_PERF: ${{ needs.core-performance.result }}
+          BACKENDS: ${{ needs.backends.result }}
+          ABI_ELF: ${{ needs.abi-elf.result }}
+          TBB: ${{ needs.tbb.result }}
+          RUST_CLI: ${{ needs.rust-cli.result }}
+          CROSS_ARCH: ${{ needs.cross-arch.result }}
+          RMR_INTEGRATION: ${{ needs.rmr-integration.result }}
+        run: |
+          printf '%s\n'             "source=$SOURCE"             "c_quality=$C_QUALITY"             "core_performance=$CORE_PERF"             "backends=$BACKENDS"             "abi_elf=$ABI_ELF"             "tbb=$TBB"             "rust_cli=$RUST_CLI"             "cross_arch=$CROSS_ARCH"             "rmr_integration=$RMR_INTEGRATION"
+          for state in "$SOURCE" "$C_QUALITY" "$CORE_PERF" "$BACKENDS" "$ABI_ELF" "$TBB" "$RUST_CLI" "$CROSS_ARCH" "$RMR_INTEGRATION"; do
+            [ "$state" = "success" ] || exit 1
+          done
+          echo "RMR_UPSTREAM_COMPREHENSIVE_V3=PASS"
