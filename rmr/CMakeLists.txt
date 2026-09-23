@@ -65,7 +65,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
 endif()
 
 
-if(RMR_BUILD_HWIF)
+if(RMR_BUILD_HWIF AND (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Android"))
   set(RMR_HWIF_SOURCES
     hwif/rmr_hwif.c
   )
@@ -164,7 +164,7 @@ if(RMR_BUILD_TESTS)
   target_link_libraries(rmr-blake3-backend-selftest PRIVATE BLAKE3::blake3)
   add_test(NAME rmr_blake3_backend_selftest COMMAND rmr-blake3-backend-selftest)
 
-  if(RMR_BUILD_HWIF)
+  if(TARGET rmr-hwif)
     add_executable(rmr-hwif-selftest
       hwif/tests/rmr_hwif_selftest.c
     )
