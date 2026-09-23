@@ -10,10 +10,16 @@ for t in git cargo rustc python3 dd sha256sum stat; do rmr_need "$t"; done
 WORK="${WORK_ROOT:-$ROOT/.rmr-work/upstream-v3-rust}"
 OUT="${RESULT_ROOT:-$ROOT/rmr/benchmark_framework/output/upstream-v3-rust}"
 OFFICIAL_ROOT="$WORK/official"
+FORK_ROOT="$WORK/fork"
 ROUNDS="${ROUNDS:-5}"
-rm -rf "$OUT" "$WORK/target-"*
+TARGET_MIB="${TARGET_MIB:-64}"
+
+rm -rf "$OUT" "$WORK/target-"* "$FORK_ROOT"
 mkdir -p "$WORK" "$OUT"
 OFFICIAL_COMMIT="$(rmr_checkout_official "$OFFICIAL_ROOT")"
+git clone --local "$RMR_REPO_ROOT" "$FORK_ROOT" >/dev/null 2>&1
+git -C "$FORK_ROOT" checkout --detach "$(git -C "$RMR_REPO_ROOT" rev-parse HEAD)" >/dev/null 2>&1
+
 rmr_write_common_environment "$OUT/environment.txt" "$OFFICIAL_COMMIT"
 {
   echo "rustc=$(rustc --version)"
@@ -21,15 +27,71 @@ rmr_write_common_environment "$OUT/environment.txt" "$OFFICIAL_COMMIT"
 } >>"$OUT/environment.txt"
 
 cargo test --manifest-path "$OFFICIAL_ROOT/Cargo.toml" -p blake3 --lib   >"$OUT/official-blake3-test.log" 2>&1
-cargo test --manifest-path "$RMR_REPO_ROOT/Cargo.toml" -p blake3 --lib   >"$OUT/fork-blake3-test.log" 2>&1
+cargo test --manifest-path "$FORK_ROOT/Cargo.toml" -p blake3 --lib   >"$OUT/fork-blake3-test.log" 2>&1
 cargo test --manifest-path "$OFFICIAL_ROOT/Cargo.toml" -p b3sum   >"$OUT/official-b3sum-test.log" 2>&1
-cargo test --manifest-path "$RMR_REPO_ROOT/Cargo.toml" -p b3sum   >"$OUT/fork-b3sum-test.log" 2>&1
+cargo test --manifest-path "$FORK_ROOT/Cargo.toml" -p b3sum   >"$OUT/fork-b3sum-test.log" 2>&1
+
+mkdir -p "$OFFICIAL_ROOT/examples" "$FORK_ROOT/examples"
+cp "$ROOT/upstream_validation/rust_hash_bench.rs" "$OFFICIAL_ROOT/examples/rmr_v3_hash_bench.rs"
+cp "$ROOT/upstream_validation/rust_hash_bench.rs" "$FORK_ROOT/examples/rmr_v3_hash_bench.rs"
+
+CARGO_TARGET_DIR="$WORK/target-rust-official"   cargo build --manifest-path "$OFFICIAL_ROOT/Cargo.toml" --release   --example rmr_v3_hash_bench >"$OUT/official-rust-harness-build.log" 2>&1
+
+CARGO_TARGET_DIR="$WORK/target-rust-fork"   cargo build --manifest-path "$FORK_ROOT/Cargo.toml" --release   --example rmr_v3_hash_bench >"$OUT/fork-rust-harness-build.log" 2>&1
+
+CARGO_TARGET_DIR="$WORK/target-rust-fork-ablated" CARGO_PROFILE_RELEASE_LTO=false CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16   cargo build --manifest-path "$FORK_ROOT/Cargo.toml" --release   --example rmr_v3_hash_bench >"$OUT/fork-rust-harness-ablated-build.log" 2>&1
+
+RUST_OFFICIAL="$WORK/target-rust-official/release/examples/rmr_v3_hash_bench"
+RUST_FORK="$WORK/target-rust-fork/release/examples/rmr_v3_hash_bench"
+RUST_ABLATED="$WORK/target-rust-fork-ablated/release/examples/rmr_v3_hash_bench"
+
+printf 'variant,size_bytes,round,mib_s,digest\n' >"$OUT/rust-library.csv"
+for size in 64 1024 65536 1048576; do
+  iters="$(python3 - "$size" "$TARGET_MIB" <<'PY'
+import math,sys
+print(max(1,math.ceil(int(sys.argv[2])*1024*1024/int(sys.argv[1]))))
+PY
+)"
+  for spec in "official:$RUST_OFFICIAL" "fork:$RUST_FORK" "fork_ablated:$RUST_ABLATED"; do
+    name="${spec%%:*}"; bin="${spec#*:}"
+    "$bin" "$size" "$iters" >/dev/null
+    for ((r=1;r<=ROUNDS;r++)); do
+      line="$("$bin" "$size" "$iters")"
+      printf '%s\n' "$line" | awk -F, -v v="$name" -v r="$r"         '$1=="RUST_RESULT"{printf "%s,%s,%s,%s,%s\n",v,$2,r,$4,$6}'         >>"$OUT/rust-library.csv"
+    done
+  done
+done
+
+python3 - "$OUT/rust-library.csv" "$OUT/rust-library-summary.json" "$RUST_OFFICIAL" "$RUST_FORK" "$RUST_ABLATED" <<'PY'
+import csv,json,os,statistics,sys
+from collections import defaultdict
+rows=list(csv.DictReader(open(sys.argv[1],encoding="utf-8")))
+g=defaultdict(list); dig=defaultdict(set)
+for r in rows:
+    k=(r["variant"],int(r["size_bytes"]))
+    g[k].append(float(r["mib_s"])); dig[int(r["size_bytes"])].add(r["digest"])
+assert all(len(x)==1 for x in dig.values())
+out=[]
+for (v,size),xs in sorted(g.items()):
+    out.append({"variant":v,"size_bytes":size,"rounds":len(xs),
+                "median_mib_s":statistics.median(xs),
+                "mean_mib_s":statistics.fmean(xs),
+                "cv_percent":statistics.stdev(xs)/statistics.fmean(xs)*100 if len(xs)>1 else 0.0})
+payload={"schema":"RMR-RUST-LIBRARY-V3","claim_allowed":False,
+         "digest_equivalence":"PASS","rows":out,
+         "binary_sizes":{
+           "official":os.path.getsize(sys.argv[3]),
+           "fork":os.path.getsize(sys.argv[4]),
+           "fork_ablated":os.path.getsize(sys.argv[5])
+         }}
+json.dump(payload,open(sys.argv[2],"w"),indent=2)
+print("RMR_RUST_LIBRARY_V3=PASS")
+for r in out: print(r)
+PY
 
 CARGO_TARGET_DIR="$WORK/target-official"   cargo build --manifest-path "$OFFICIAL_ROOT/Cargo.toml" --release -p b3sum   >"$OUT/official-release-build.log" 2>&1
-
-CARGO_TARGET_DIR="$WORK/target-fork"   cargo build --manifest-path "$RMR_REPO_ROOT/Cargo.toml" --release -p b3sum   >"$OUT/fork-release-build.log" 2>&1
-
-CARGO_TARGET_DIR="$WORK/target-fork-ablated" CARGO_PROFILE_RELEASE_LTO=false CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16   cargo build --manifest-path "$RMR_REPO_ROOT/Cargo.toml" --release -p b3sum   >"$OUT/fork-ablated-build.log" 2>&1
+CARGO_TARGET_DIR="$WORK/target-fork"   cargo build --manifest-path "$FORK_ROOT/Cargo.toml" --release -p b3sum   >"$OUT/fork-release-build.log" 2>&1
+CARGO_TARGET_DIR="$WORK/target-fork-ablated" CARGO_PROFILE_RELEASE_LTO=false CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16   cargo build --manifest-path "$FORK_ROOT/Cargo.toml" --release -p b3sum   >"$OUT/fork-ablated-build.log" 2>&1
 
 OFFICIAL_BIN="$WORK/target-official/release/b3sum"
 FORK_BIN="$WORK/target-fork/release/b3sum"
@@ -92,6 +154,7 @@ python3 "$ROOT/upstream_validation/analyze_rust_cli_v3.py"   "$OUT/timings.csv" 
   echo "RMR_RUST_CLI_V3=PASS"
   echo "cargo_test_blake3=PASS_BOTH"
   echo "cargo_test_b3sum=PASS_BOTH"
+  echo "rust_library_common_harness=PASS"
   echo "release_build=PASS_OFFICIAL_FORK_ABLATED"
   echo "digest_equivalence=PASS"
   echo "claim_allowed=false"
