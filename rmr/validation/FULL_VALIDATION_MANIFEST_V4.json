@@ -69,7 +69,15 @@
       "id": "DEVICE-UPSTREAM-COMPARE",
       "tool": "rmr/tools/run_physical_upstream_compare_v3.sh",
       "state": "TOKEN_VAZIO_PHYSICAL",
-      "evidence": "canonical x86_64/ARMv7/AArch64 device runner with identical official/fork contract"
+      "evidence": "canonical x86_64/ARMv7/AArch64 device runner with identical official/fork contract",
+      "telemetry": [
+        "cpu-frequency-before-after",
+        "scaling-governor",
+        "thermal-zones-before-after",
+        "memory-availability",
+        "logical-cpu-count",
+        "telemetry-delta-json"
+      ]
     },
     {
       "id": "ARM-PHYSICAL",
@@ -95,6 +103,7 @@
     "X86_GAIN!=ARM_GAIN",
     "SIMD_GAIN!=TBB_GAIN",
     "COMPILE_PASS!=PHYSICAL_EXECUTION",
-    "RMR_PIPELINE_GAIN!=BLAKE3_PRIMITIVE_GAIN"
+    "RMR_PIPELINE_GAIN!=BLAKE3_PRIMITIVE_GAIN",
+    "TELEMETRY_DELTA!=CAUSAL_THROTTLING_PROOF"
   ]
 }
