@@ -166,19 +166,6 @@ def scan_source(root: Path) -> dict:
         if totals["lines"] else 0.0
     )
 
-    gnu_stack_line = None
-    gnu_stack_executable = None
-    if programs.get("state") == "PASS":
-        for line in programs.get("stdout", "").splitlines():
-            if "GNU_STACK" in line:
-                gnu_stack_line = line.strip()
-                flags = [
-                    token for token in line.split()
-                    if token and set(token).issubset(set("RWE")) and any(ch in token for ch in "RWE")
-                ]
-                gnu_stack_executable = any("E" in token for token in flags)
-                break
-
     return {
         "state": "PASS",
         "root": str(root),
@@ -258,6 +245,19 @@ def binary_snapshot(binary: Path) -> dict:
         if result.get("state") != "PASS":
             return None
         return sum(1 for line in result.get("stdout", "").splitlines() if line.strip())
+
+    gnu_stack_line = None
+    gnu_stack_executable = None
+    if programs.get("state") == "PASS":
+        for line in programs.get("stdout", "").splitlines():
+            if "GNU_STACK" in line:
+                gnu_stack_line = line.strip()
+                flags = [
+                    token for token in line.split()
+                    if token and set(token).issubset(set("RWE")) and any(ch in token for ch in "RWE")
+                ]
+                gnu_stack_executable = any("E" in token for token in flags)
+                break
 
     return {
         "state": "PASS",
