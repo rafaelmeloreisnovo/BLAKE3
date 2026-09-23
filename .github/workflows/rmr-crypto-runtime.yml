@@ -1,0 +1,74 @@
+name: RMR crypto runtime matrix
+
+on:
+  pull_request:
+    paths:
+      - "rmr/crypto/runtime/**"
+      - "rmr/CMakeLists.txt"
+      - ".github/workflows/rmr-crypto-runtime.yml"
+  push:
+    branches:
+      - master
+    paths:
+      - "rmr/crypto/runtime/**"
+      - "rmr/CMakeLists.txt"
+      - ".github/workflows/rmr-crypto-runtime.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rmr-crypto-runtime-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Record provider
+        run: |
+          openssl version
+          pkg-config --modversion openssl
+
+      - name: Validate registry and BLAKE3 architecture evidence
+        run: |
+          python3 -m py_compile rmr/crypto/runtime/tools/validate_runtime_registry.py
+          python3 rmr/crypto/runtime/tools/validate_runtime_registry.py
+
+      - name: Compile provider-neutral architecture matrix
+        run: sh rmr/crypto/runtime/build/build_contract_matrix.sh
+
+      - name: Configure
+        run: >
+          cmake -S rmr -B build/rmr-crypto -G Ninja
+          -DRMR_BUILD_TESTS=ON
+          -DRMR_BUILD_CRYPTO_RUNTIME=ON
+          -DRMR_STRICT_WARNINGS=ON
+
+      - name: Build KAT target
+        run: cmake --build build/rmr-crypto --target rmr-crypto-runtime-selftest
+
+      - name: Run KAT target
+        run: ctest --test-dir build/rmr-crypto -R rmr_crypto_runtime_selftest --output-on-failure
+
+      - name: Materialize 90-cell runtime matrix
+        run: |
+          python3 rmr/crypto/runtime/tools/generate_runtime_matrix.py \
+            --native-kat-pass \
+            --out build/rmr-crypto/rmr_crypto_runtime_matrix.json
+          python3 - <<'PY'
+          import json
+          p = "build/rmr-crypto/rmr_crypto_runtime_matrix.json"
+          d = json.load(open(p, encoding="utf-8"))
+          assert d["cells"] == 90
+          assert sum(r["execution_state"] == "KAT_PASS_NATIVE" for r in d["rows"]) == 10
+          print("RMR_CRYPTO_NATIVE_CELLS=10/10")
+          PY
+
+      - name: Upload crypto runtime receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: rmr-crypto-runtime-matrix
+          path: build/rmr-crypto/rmr_crypto_runtime_matrix.json
