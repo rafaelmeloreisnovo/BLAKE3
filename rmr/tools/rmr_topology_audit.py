@@ -22,6 +22,8 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 SOURCE_EXTENSIONS = {".c", ".h", ".cc", ".cpp", ".s", ".S", ".asm", ".py", ".rs", ".java", ".sh"}
+C_SYMBOL_EXTENSIONS = {".c", ".cc", ".cpp"}
+RESERVED_SYMBOL_NAMES = {"if", "for", "while", "switch", "return", "sizeof"}
 SURFACE_BITS = {
     "PREPROCESSOR": 0,
     "COMPILER": 1,
@@ -99,6 +101,7 @@ def scan_source(root: Path) -> dict:
     modules: dict[str, Counter] = defaultdict(Counter)
     includes = []
     symbol_files: dict[str, list[str]] = defaultdict(list)
+    entrypoint_files: list[str] = []
     files_out = []
 
     for path in source_files(root):
@@ -130,15 +133,31 @@ def scan_source(root: Path) -> dict:
         for inc in INCLUDE_RE.findall(text):
             includes.append({"parent": rel, "child": inc})
 
-        for symbol in FUNC_RE.findall(text):
-            symbol_files[symbol].append(rel)
+        if path.suffix in C_SYMBOL_EXTENSIONS:
+            for symbol in FUNC_RE.findall(text):
+                if symbol in RESERVED_SYMBOL_NAMES:
+                    continue
+                if symbol == "main":
+                    entrypoint_files.append(rel)
+                    continue
+                symbol_files[symbol].append(rel)
 
         files_out.append({"path": rel, "module": mod, **metrics})
 
-    overlaps = {
-        name: paths
+    duplicates = {
+        name: sorted(set(paths))
         for name, paths in sorted(symbol_files.items())
         if len(set(paths)) > 1
+    }
+    conditional_providers = {
+        name: paths
+        for name, paths in duplicates.items()
+        if all(path.startswith("hwif/detect/") for path in paths)
+    }
+    overlaps = {
+        name: paths
+        for name, paths in duplicates.items()
+        if name not in conditional_providers
     }
 
     totals["files"] = len(files_out)
@@ -154,11 +173,15 @@ def scan_source(root: Path) -> dict:
         "comment_line_ratio": comment_ratio,
         "modules": {k: dict(v) for k, v in sorted(modules.items())},
         "include_edges": includes,
+        "entrypoint_candidates": sorted(entrypoint_files),
+        "conditional_provider_candidates": conditional_providers,
         "source_symbol_overlap_candidates": overlaps,
         "files": files_out,
         "boundary": {
             "source_symbol_candidate": "not_linked_symbol",
             "duplicate_candidate": "not_linker_collision",
+            "entrypoint_candidate": "not_symbol_overlap",
+            "conditional_provider": "compile_time_selected_not_linker_collision",
             "void_pointer": "generic_boundary_not_missing_semantics",
             "comment": "not_execution",
         },
@@ -307,6 +330,8 @@ def main() -> int:
         f"symbol_overlap_candidates={overlap_count}"
     )
     print("logical_io_ops != physical_storage_iops")
+    for symbol, paths in sorted(source["conditional_provider_candidates"].items()):
+        print(f"conditional_provider={symbol} paths={','.join(paths)}")
     for symbol, paths in sorted(source["source_symbol_overlap_candidates"].items()):
         print(f"overlap_candidate={symbol} paths={','.join(paths)}")
 
