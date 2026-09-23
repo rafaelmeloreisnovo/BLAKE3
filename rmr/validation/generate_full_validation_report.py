@@ -148,9 +148,34 @@ def main() -> int:
         "No independent third-party reproduction was created by this workflow.",
     )
 
+    required_ci_axes = {
+        "C-KAT-SAN",
+        "C-UPSTREAM-V2",
+        "C-ABLATION",
+        "SIMD-X86",
+        "RUST-LTO",
+        "B3SUM",
+        "BINARY",
+        "CROSS-ARCH",
+    }
+    missing_required = [
+        row["axis"] for row in axes
+        if row["axis"] in required_ci_axes
+        and row["state"].startswith("TOKEN_VAZIO")
+    ]
+    review_required = [
+        row["axis"] for row in axes
+        if row["axis"] in required_ci_axes and row["state"] == "REVIEW"
+    ]
+    execution_complete = not missing_required
+
     result = {
-        "schema": "RMR-BLAKE3-FULL-VALIDATION-RECEIPT-V1",
+        "schema": "RMR-BLAKE3-FULL-VALIDATION-RECEIPT-V2",
         "claim_allowed": False,
+        "report_generation_state": "PASS",
+        "execution_complete": execution_complete,
+        "missing_required_axes": missing_required,
+        "review_required_axes": review_required,
         "axes": axes,
         "boundaries": [
             "FORK!=UPSTREAM",
@@ -180,13 +205,23 @@ def main() -> int:
         )
     lines += [
         "",
+        "",
+        f"CI execution complete: {str(execution_complete).lower()}",
+        f"Missing required axes: {', '.join(missing_required) if missing_required else 'none'}",
+        f"Review-required axes: {', '.join(review_required) if review_required else 'none'}",
+        "",
         "Physical ARM and physical IOPS remain TOKEN_VAZIO unless device-bound",
         "receipts exist. No repository-wide superiority claim is emitted.",
         "",
     ]
     Path(args.md_out).write_text("\n".join(lines), encoding="utf-8")
 
-    print("RMR_FULL_VALIDATION_RECEIPT=PASS")
+    print("RMR_FULL_VALIDATION_REPORT_GENERATION=PASS")
+    print("RMR_FULL_VALIDATION_EXECUTION_COMPLETE=" + ("true" if execution_complete else "false"))
+    if missing_required:
+        print("missing_required_axes=" + ",".join(missing_required))
+    if review_required:
+        print("review_required_axes=" + ",".join(review_required))
     for row in axes:
         print(f"{row['axis']}={row['state']}")
     return 0
