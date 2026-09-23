@@ -323,3 +323,16 @@ permissiva até mudança prospectiva explícita e revisão humana/jurídica.
 A segunda expansão crypto adiciona SHA3-256, BLAKE2b-512, HMAC-SHA512, X25519
 e PBKDF2-HMAC-SHA256, levando o runtime a 15 algoritmos. A matriz cartesiana
 passa a 9 perfis arquiteturais x 15 algoritmos = 135 células.
+
+
+### Atualização 2026-09-23 (upstream comprehensive validation V3)
+
+A suíte `rmr/upstream_validation/` e o workflow
+`.github/workflows/rmr-upstream-comprehensive-v3.yml` separam explicitamente
+correção, performance, backend/dispatch, oneTBB, Rust/CLI, ABI/ELF, cross-arch,
+sanitizers, instalação/consumer e integração RMR.
+
+Os comparadores usam `BLAKE3-team/BLAKE3@6aab490a26124663329dfd3961b8469f8fdb158b`
+como referência oficial fixada e o exact-head do fork como alvo. Nenhum PASS
+de uma superfície é herdado por outra. Execução física ARM e reprodução
+independente permanecem TOKEN_VAZIO até receipts observáveis.
