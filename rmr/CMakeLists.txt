@@ -10,6 +10,8 @@ project(rmr_external
 )
 
 option(RMR_BUILD_TESTS "Build RMR host self-tests" ON)
+option(RMR_BUILD_TOPOLOGY "Build RMR hardware/build topology micro-module" ON)
+option(RMR_STRICT_WARNINGS "Enable stricter warnings for new RMR topology code" ON)
 option(RMR_BLAKE3_USE_TBB "Build repository BLAKE3 with optional oneTBB path" OFF)
 
 set(BLAKE3_USE_TBB "${RMR_BLAKE3_USE_TBB}" CACHE BOOL "" FORCE)
@@ -105,4 +107,13 @@ if(RMR_BUILD_TESTS)
   )
   target_link_libraries(rmr-blake3-backend-selftest PRIVATE BLAKE3::blake3)
   add_test(NAME rmr_blake3_backend_selftest COMMAND rmr-blake3-backend-selftest)
+
+  if(RMR_BUILD_TOPOLOGY)
+    add_executable(rmr-topology-selftest
+      topology/tests/rmr_topology_selftest.c
+    )
+    target_compile_features(rmr-topology-selftest PRIVATE c_std_11)
+    target_link_libraries(rmr-topology-selftest PRIVATE rmr-topology)
+    add_test(NAME rmr_topology_selftest COMMAND rmr-topology-selftest)
+  endif()
 endif()
