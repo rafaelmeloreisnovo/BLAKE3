@@ -9,6 +9,16 @@ on:
       - "Cargo.toml"
       - "rmr/**"
       - ".github/workflows/rmr-upstream-comprehensive-v3.yml"
+  push:
+    branches:
+      - master
+    paths:
+      - "c/**"
+      - "src/**"
+      - "b3sum/**"
+      - "Cargo.toml"
+      - "rmr/**"
+      - ".github/workflows/rmr-upstream-comprehensive-v3.yml"
   workflow_dispatch:
 
 permissions:
