@@ -74,7 +74,7 @@
     {
       "id": "ARM-PHYSICAL",
       "state": "TOKEN_VAZIO_PHYSICAL",
-      "evidence": "device-bound official-vs-fork receipt; ARMv7/AArch64 performance remains TOKEN_VAZIO until executed",
+      "evidence": "device-bound official-vs-fork receipt; ARMv7/AArch64 remain TOKEN_VAZIO until executed",
       "tool": "rmr/tools/run_physical_upstream_compare_v3.sh"
     },
     {
