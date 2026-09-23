@@ -1,6 +1,6 @@
 <!--
-DRAFT ONLY — NOT AN ACTIVE LICENSE.
-Copyright (c) 2024-2026 Rafael Melo Reis.
+Copyright (c) 2024–2026 Rafael Melo Reis
+Licensed under LICENSE_RMR.
 -->
 
 # RMR Research / Commercial License V2 — DRAFT
