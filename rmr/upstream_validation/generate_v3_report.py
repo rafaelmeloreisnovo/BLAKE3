@@ -114,12 +114,18 @@ def main():
       if x["axis"] in required_ci_axes and x["state"]=="REVIEW"
     ]
     execution_complete=not missing_required
+    validation_state=(
+      "PARTIAL" if missing_required
+      else "COMPLETE_WITH_REVIEW" if review_required
+      else "COMPLETE"
+    )
 
     payload={
       "schema":"RMR-UPSTREAM-COMPREHENSIVE-V4",
       "claim_allowed":False,
       "report_generation_state":"PASS",
       "execution_complete":execution_complete,
+      "validation_state":validation_state,
       "missing_required_axes":missing_required,
       "review_required_axes":review_required,
       "axes":axes,
@@ -131,7 +137,7 @@ def main():
     }
     Path(a.json_out).write_text(json.dumps(payload,indent=2,sort_keys=True)+"\n",encoding="utf-8")
     lines=[
-      "# RMR upstream comprehensive validation V3",
+      "# RMR upstream comprehensive validation V4",
       "",
       "SOURCE != BUILD != EXECUTION != EVIDENCE != CLAIM",
       "",
@@ -143,6 +149,7 @@ def main():
     lines += [
       "",
       f"CI execution complete: {str(execution_complete).lower()}",
+      f"Validation state: {validation_state}",
       f"Missing required axes: {', '.join(missing_required) if missing_required else 'none'}",
       f"Review-required axes: {', '.join(review_required) if review_required else 'none'}",
       "",
@@ -152,6 +159,7 @@ def main():
     Path(a.md_out).write_text("\n".join(lines),encoding="utf-8")
     print("RMR_UPSTREAM_COMPREHENSIVE_REPORT_GENERATION=PASS")
     print("RMR_UPSTREAM_COMPREHENSIVE_EXECUTION_COMPLETE=" + ("true" if execution_complete else "false"))
+    print("RMR_UPSTREAM_COMPREHENSIVE_STATE=" + validation_state)
     if missing_required:
         print("missing_required_axes=" + ",".join(missing_required))
     if review_required:
