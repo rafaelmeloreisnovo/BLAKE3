@@ -103,3 +103,29 @@ RUST_LTO @ exact build profile
 ```
 
 Everything else remains parity, FAIL, REVIEW or TOKEN_VAZIO as observed.
+
+
+## Device-bound execution route
+
+The canonical physical official-vs-fork runner is:
+
+`rmr/tools/run_physical_upstream_compare_v3.sh`
+
+It supports x86-64, ARMv7 and AArch64 profiles and records the exact official
+and fork commits, compiler, CMake version, architecture profile, flags,
+message sizes, paired alternating rounds, raw throughput, digest equivalence,
+bootstrap classification and SHA-256 receipts.
+
+The runner uses the same benchmark source for both implementations. On ARMv7
+it selects the NEON contract; on AArch64 it selects the NEON contract; on
+x86-64 it uses the normal AMD64 assembly/dispatch route.
+
+Until the script actually exits successfully on a target device:
+
+```text
+DEVICE_UPSTREAM_COMPARE = TOKEN_VAZIO_PHYSICAL
+ARMV7_PHYSICAL = TOKEN_VAZIO_PHYSICAL
+AARCH64_PHYSICAL = TOKEN_VAZIO_PHYSICAL
+```
+
+Cross compilation and SIMPERF are never substituted for this receipt.
