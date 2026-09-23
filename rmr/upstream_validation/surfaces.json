@@ -6,22 +6,108 @@
     "principle": "SOURCE != BUILD != EXECUTION != EVIDENCE != CLAIM"
   },
   "surfaces": [
-    {"id":"correctness-c","scope":"official-vs-fork","gate":"CMake/CTest + KAT + differential modes","state":"PENDING_CI"},
-    {"id":"performance-core-c","scope":"official-vs-fork","gate":"7 sizes x paired rounds + bootstrap","state":"PENDING_CI"},
-    {"id":"backend-dispatch-x86","scope":"portable/SSE2/SSE4.1/AVX2/auto","gate":"forced-backend build + simd degree + digest + throughput","state":"PENDING_CI"},
-    {"id":"arm-neon","scope":"ARMv7/AArch64","gate":"cross compile + physical receipts when available","state":"PENDING_CI_PHYSICAL_TOKEN_VAZIO"},
-    {"id":"strict-warnings","scope":"official-vs-fork","gate":"-Wall -Wextra -Wpedantic -Werror","state":"PENDING_CI"},
-    {"id":"sanitizers","scope":"official-vs-fork","gate":"ASan+UBSan common harness","state":"PENDING_CI"},
-    {"id":"abi-symbol-elf","scope":"official-vs-fork","gate":"nm/readelf/size/export diff/GNU_STACK","state":"PENDING_CI"},
-    {"id":"cmake-install-pkgconfig","scope":"official-vs-fork","gate":"install + pkg-config + external consumer","state":"PENDING_CI"},
-    {"id":"rust-library","scope":"official-vs-fork","gate":"cargo test + release build + binary size","state":"PENDING_CI"},
-    {"id":"rust-profile-ablation","scope":"fork","gate":"LTO/codegen-units default vs ablated","state":"PENDING_CI"},
-    {"id":"b3sum-cli","scope":"official-vs-fork","gate":"file hash + checkfile workload + digest equality","state":"PENDING_CI"},
-    {"id":"cross-architecture-c","scope":"official-vs-fork","gate":"x86-32/x86-64/ARMv7/AArch64/RISC-V/PPC compile","state":"PENDING_CI"},
-    {"id":"wasm-rust","scope":"official-vs-fork","gate":"wasm32-unknown-unknown cargo check","state":"PENDING_CI"},
-    {"id":"rmr-integration","scope":"fork-only","gate":"topology/HWIF/crypto/SIMPERF/CTest","state":"PENDING_CI"},
-    {"id":"source-provenance","scope":"official-vs-fork","gate":"classified changed upstream files + commit pins","state":"PENDING_CI"},
-    {"id":"physical-independent-reproduction","scope":"external devices","gate":"independent receipt","state":"TOKEN_VAZIO"}
+    {
+      "id": "correctness-c",
+      "scope": "official-vs-fork",
+      "gate": "CMake/CTest + KAT + differential modes",
+      "state": "PENDING_CI"
+    },
+    {
+      "id": "performance-core-c",
+      "scope": "official-vs-fork",
+      "gate": "7 sizes x paired rounds + bootstrap",
+      "state": "PENDING_CI"
+    },
+    {
+      "id": "backend-dispatch-x86",
+      "scope": "portable/SSE2/SSE4.1/AVX2/auto",
+      "gate": "forced-backend build + simd degree + digest + throughput",
+      "state": "PENDING_CI"
+    },
+    {
+      "id": "arm-neon",
+      "scope": "ARMv7/AArch64",
+      "gate": "cross compile + physical receipts when available",
+      "state": "PENDING_CI_PHYSICAL_TOKEN_VAZIO"
+    },
+    {
+      "id": "strict-warnings",
+      "scope": "official-vs-fork",
+      "gate": "-Wall -Wextra -Wpedantic -Werror",
+      "state": "PENDING_CI"
+    },
+    {
+      "id": "sanitizers",
+      "scope": "official-vs-fork",
+      "gate": "ASan+UBSan common harness",
+      "state": "PENDING_CI"
+    },
+    {
+      "id": "abi-symbol-elf",
+      "scope": "official-vs-fork",
+      "gate": "nm/readelf/size/export diff/GNU_STACK",
+      "state": "PENDING_CI"
+    },
+    {
+      "id": "cmake-install-pkgconfig",
+      "scope": "official-vs-fork",
+      "gate": "install + pkg-config + external consumer",
+      "state": "PENDING_CI"
+    },
+    {
+      "id": "rust-library",
+      "scope": "official-vs-fork",
+      "gate": "cargo test + release build + binary size",
+      "state": "PENDING_CI"
+    },
+    {
+      "id": "rust-profile-ablation",
+      "scope": "fork",
+      "gate": "LTO/codegen-units default vs ablated",
+      "state": "PENDING_CI"
+    },
+    {
+      "id": "b3sum-cli",
+      "scope": "official-vs-fork",
+      "gate": "file hash + checkfile workload + digest equality",
+      "state": "PENDING_CI"
+    },
+    {
+      "id": "cross-architecture-c",
+      "scope": "official-vs-fork",
+      "gate": "x86-32/x86-64/ARMv7/AArch64/RISC-V/PPC compile",
+      "state": "PENDING_CI"
+    },
+    {
+      "id": "wasm-rust",
+      "scope": "official-vs-fork",
+      "gate": "wasm32-unknown-unknown cargo check",
+      "state": "PENDING_CI"
+    },
+    {
+      "id": "rmr-integration",
+      "scope": "fork-only",
+      "gate": "topology/HWIF/crypto/SIMPERF/CTest",
+      "state": "PENDING_CI"
+    },
+    {
+      "id": "source-provenance",
+      "scope": "official-vs-fork",
+      "gate": "classified changed upstream files + commit pins",
+      "state": "PENDING_CI"
+    },
+    {
+      "id": "physical-independent-reproduction",
+      "scope": "external devices",
+      "gate": "independent receipt",
+      "state": "TOKEN_VAZIO"
+    },
+    {
+      "id": "physical-device-upstream",
+      "scope": "ARMv7/AArch64/x86_64 device",
+      "gate": "run_physical_upstream_compare_v3.sh receipt",
+      "state": "TOKEN_VAZIO"
+    }
   ],
   "boundaries": [
     "CORE_GAIN != CLI_GAIN",

@@ -169,3 +169,23 @@ must remain bound to the exact tested surface and receipt.
 
 GitHub-hosted CI cannot replace device receipts for ARMv7/AArch64 or independent
 third-party reproduction. Those states remain TOKEN_VAZIO until observed.
+
+
+## Physical device runner
+
+`rmr/tools/run_physical_upstream_compare_v3.sh` is the canonical device-bound
+runner for ARMv7, AArch64 and x86-64 Linux/Android environments.
+
+It selects the same architecture contract for official and fork builds:
+
+- ARMv7: NEON intrinsics + ARMv7/NEON flags;
+- AArch64: NEON intrinsics + ARMv8-A;
+- x86-64: native automatic dispatch;
+- unsupported architectures: portable fallback.
+
+The runner uses the same size harness and V2 statistical analyzer, records the
+exact upstream/fork commits, compiler/CMake, architecture and non-unique CPU
+capability fields, and preserves all CSV/JSON/SHA-256 receipts.
+
+No physical state is promoted until that runner exits successfully on the
+target device.
