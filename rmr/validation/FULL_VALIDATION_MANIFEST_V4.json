@@ -66,9 +66,16 @@
       "evidence": "topology,HWIF,crypto,SIMPERF,fixed256,freestanding,PAI42"
     },
     {
+      "id": "DEVICE-UPSTREAM-COMPARE",
+      "tool": "rmr/tools/run_physical_upstream_compare_v3.sh",
+      "state": "TOKEN_VAZIO_PHYSICAL",
+      "evidence": "canonical x86_64/ARMv7/AArch64 device runner with identical official/fork contract"
+    },
+    {
       "id": "ARM-PHYSICAL",
       "state": "TOKEN_VAZIO_PHYSICAL",
-      "evidence": "device receipt required"
+      "evidence": "device-bound official-vs-fork receipt; ARMv7/AArch64 performance remains TOKEN_VAZIO until executed",
+      "tool": "rmr/tools/run_physical_upstream_compare_v3.sh"
     },
     {
       "id": "IOPS-PHYSICAL",
