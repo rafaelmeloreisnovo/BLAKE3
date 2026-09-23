@@ -4,9 +4,9 @@
 set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
-CC=\${CC:-clang}
-LD=\${LD:-ld.lld}
-OUT=\${OUT:-/tmp/rmr_hwif_matrix}
+CC=${CC:-clang}
+LD=${LD:-ld.lld}
+OUT=${OUT:-/tmp/rmr_hwif_matrix}
 
 rm -rf "$OUT"
 mkdir -p "$OUT"
