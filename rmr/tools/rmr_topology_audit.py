@@ -296,6 +296,8 @@ def main() -> int:
         f"symbol_overlap_candidates={overlap_count}"
     )
     print("logical_io_ops != physical_storage_iops")
+    for symbol, paths in sorted(source["source_symbol_overlap_candidates"].items()):
+        print(f"overlap_candidate={symbol} paths={','.join(paths)}")
 
     if args.json_out:
         out = Path(args.json_out)
