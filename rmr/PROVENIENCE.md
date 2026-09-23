@@ -323,3 +323,29 @@ permissiva até mudança prospectiva explícita e revisão humana/jurídica.
 A segunda expansão crypto adiciona SHA3-256, BLAKE2b-512, HMAC-SHA512, X25519
 e PBKDF2-HMAC-SHA256, levando o runtime a 15 algoritmos. A matriz cartesiana
 passa a 9 perfis arquiteturais x 15 algoritmos = 135 células.
+
+
+### Atualização 2026-09-23 (Full Validation Matrix V1)
+
+Criada campanha integrada `rmr/validation/` para comparar separadamente:
+upstream BLAKE3, core C do fork, build Rust, CLI b3sum e sistema RMR.
+
+Artefatos autorais principais:
+- `rmr/validation/manifest.json`;
+- `rmr/validation/README.md`;
+- `rmr/validation/blake3_backend_probe.c`;
+- `rmr/validation/blake3_contract.c`;
+- `rmr/validation/rust_hash_bench.rs`;
+- `rmr/validation/generate_full_validation_report.py`;
+- `rmr/tools/run_c_correctness_sanitizers.sh`;
+- `rmr/tools/run_c_ablation_matrix.sh`;
+- `rmr/tools/run_simd_backend_matrix.sh`;
+- `rmr/tools/run_rust_cli_validation.sh`;
+- `rmr/tools/run_binary_surface_audit.sh`;
+- `rmr/tools/run_cross_arch_blake3_contract.sh`;
+- `.github/workflows/rmr-full-validation.yml`;
+- `rmr/docs/RMR_FULL_VALIDATION_MATRIX_V1.md`.
+
+A campanha preserva `FORK!=UPSTREAM`, `CORE!=CLI!=RMR_PIPELINE`,
+`COMPILE!=EXECUTION` e `CI!=PHYSICAL_DEVICE`. Nenhuma vantagem de
+performance é promovida sem KAT, backend identificado, mesma carga e receipt.
