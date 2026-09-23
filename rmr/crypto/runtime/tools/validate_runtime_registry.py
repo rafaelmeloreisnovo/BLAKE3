@@ -16,6 +16,8 @@ EXPECTED_ARCH = {
 EXPECTED_ALG = {
     "blake3", "md5", "sha1", "sha256", "sha512", "hmac-sha256",
     "hkdf-sha256", "ed25519", "chacha20-poly1305", "aes-256-gcm",
+    "sha3-256", "blake2b-512", "hmac-sha512", "x25519",
+    "pbkdf2-hmac-sha256",
 }
 
 def fail(message: str) -> int:
