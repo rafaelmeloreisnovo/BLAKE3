@@ -5,7 +5,6 @@ set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
 CC=${CC:-clang}
-LD=${LD:-ld.lld}
 OUT=${OUT:-/tmp/rmr_hwif_matrix}
 
 rm -rf "$OUT"
@@ -34,8 +33,9 @@ compile_s() {
 
 combine() {
   name=$1
-  shift
-  "$LD" -r "$@" -o "$OUT/$name.o"
+  target=$2
+  shift 2
+  "$CC" --target="$target" -fuse-ld=lld -nostdlib -Wl,-r "$@" -o "$OUT/$name.o"
   if command -v readelf >/dev/null 2>&1; then
     readelf -Ws "$OUT/$name.o" | awk '
       $7=="UND" && $8!="" {
@@ -50,20 +50,20 @@ combine() {
 
 compile_c x86_64-none-elf x86_64 ""
 compile_s x86_64-none-elf x86_64 "$ROOT/hwif/asm/x86_64/rmr_hwif_backend.S" ""
-combine x86_64 "$OUT/x86_64.c.o" "$OUT/x86_64.s.o"
+combine x86_64 x86_64-none-elf "$OUT/x86_64.c.o" "$OUT/x86_64.s.o"
 
 compile_c aarch64-none-elf aarch64 ""
 compile_s aarch64-none-elf aarch64 "$ROOT/hwif/asm/aarch64/rmr_hwif_backend.S" ""
-combine aarch64 "$OUT/aarch64.c.o" "$OUT/aarch64.s.o"
+combine aarch64 aarch64-none-elf "$OUT/aarch64.c.o" "$OUT/aarch64.s.o"
 
 compile_c armv7a-linux-gnueabihf armv7_user ""
 compile_s armv7a-linux-gnueabihf armv7_user "$ROOT/hwif/asm/armv7/rmr_hwif_user.S" "-march=armv7-a -mthumb"
-combine armv7_user "$OUT/armv7_user.c.o" "$OUT/armv7_user.s.o"
+combine armv7_user armv7a-linux-gnueabihf "$OUT/armv7_user.c.o" "$OUT/armv7_user.s.o"
 
 compile_c armv7a-linux-gnueabihf armv7_priv "-DRMR_ARMV7_ASSUME_PRIVILEGED=1"
 compile_s armv7a-linux-gnueabihf armv7_priv_user "$ROOT/hwif/asm/armv7/rmr_hwif_user.S" "-march=armv7-a -mthumb"
 compile_s armv7a-linux-gnueabihf armv7_priv "$ROOT/hwif/asm/armv7/rmr_hwif_privileged.S" "-march=armv7-a"
-combine armv7_priv "$OUT/armv7_priv.c.o" "$OUT/armv7_priv_user.s.o" "$OUT/armv7_priv.s.o"
+combine armv7_priv armv7a-linux-gnueabihf "$OUT/armv7_priv.c.o" "$OUT/armv7_priv_user.s.o" "$OUT/armv7_priv.s.o"
 
 echo "RMR_HWIF_MATRIX=4/4"
 echo "EXECUTION_PHYSICAL=TOKEN_VAZIO"
