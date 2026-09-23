@@ -69,7 +69,7 @@ sh rmr/fixed256/build/run_java_selftest.sh
 
 `rmr/topology/` adds a non-invasive micro-module for typed observation of the
 preprocessor, compiler, linker, binary, symbols, pointers, loops, logical I/O,
-comments, warnings, child modules and overlap candidates.
+comments, warnings, child modules, overlap candidates, conditions, color and IOPS evidence.
 
 The C layer records compile/pointer topology and explicit saturating counters.
 The stdlib-only auditor `rmr/tools/rmr_topology_audit.py` can additionally read
