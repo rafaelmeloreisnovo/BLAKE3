@@ -142,6 +142,15 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
   target_compile_options(rmr-blake3-bench PRIVATE -O3 -Wall -Wextra -Wpedantic)
 endif()
 
+if(UNIX)
+  add_executable(rmr-iops-bench benchmark_framework/core/iops_bench.c)
+  target_compile_features(rmr-iops-bench PRIVATE c_std_11)
+  target_compile_definitions(rmr-iops-bench PRIVATE _GNU_SOURCE)
+  if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+    target_compile_options(rmr-iops-bench PRIVATE -O2 -Wall -Wextra -Wpedantic -Wformat=2)
+  endif()
+endif()
+
 if(RMR_BUILD_TESTS)
   include(CTest)
   add_executable(rmr-blake3-backend-selftest
