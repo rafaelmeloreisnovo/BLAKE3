@@ -162,3 +162,15 @@ A campanha canônica está em
 Ela cruza upstream oficial e fork por source delta, qualidade C, performance,
 ablation, SIMD, TBB, ABI/ELF, Rust/LTO, b3sum, cross-architecture e integração
 RMR. Resultados físicos ARM/IOPS e reprodução independente não são inferidos.
+
+
+### Physical upstream-vs-fork receipt
+
+Para executar a mesma comparação em hardware real:
+
+```sh
+bash rmr/tools/run_physical_upstream_compare_v3.sh
+```
+
+O runner escolhe um contrato de arquitetura para x86-64, ARMv7 ou AArch64 e
+grava receipts por tamanho. Cross-compilação e SIMPERF não promovem esse estado.
