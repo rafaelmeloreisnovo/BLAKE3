@@ -256,3 +256,24 @@ O auditor `rmr/tools/rmr_topology_audit.py` é stdlib-only e usa ferramentas
 locais (`cc`, `readelf`, `nm`, `size`) somente quando disponíveis. O
 workflow `.github/workflows/rmr-hardware-build-topology.yml` materializa o
 gate reproduzível. Estado remoto permanece NOT_RUN até observação de CI.
+
+
+### Atualização 2026-09-23 (ARMv7 HWIF split + IOPS protocol)
+
+A camada RMR separa ARMv7 user-mode de privileged-mode. O caminho user não
+acessa CP15; o caminho privileged exige opt-in explícito
+`RMR_ARMV7_ASSUME_PRIVILEGED=1`. A largura de `rmr_u64/rmr_s64` foi fixada
+em 64 bits por `stdint.h`, evitando a ambiguidade LP32 de ARMv7.
+
+Artefatos autorais:
+- `rmr/hwif/asm/armv7/rmr_hwif_user.S`;
+- `rmr/hwif/asm/armv7/rmr_hwif_privileged.S`;
+- `rmr/hwif/build/build_cross_matrix.sh`;
+- `rmr/hwif/tests/rmr_hwif_selftest.c`;
+- `rmr/docs/RMR_ARMV7_HWIF_SPLIT_V1.md`;
+- `rmr/benchmark_framework/core/iops_bench.c`;
+- `rmr/benchmark_framework/IOPS_PROTOCOL_V1.md`.
+
+A matriz cross-arch prova apenas compilação/linkagem. IOPS de CI é smoke do
+instrumento e não claim de armazenamento físico. Queue depth >1 permanece
+`TOKEN_VAZIO_V1` até implementação assíncrona real.
