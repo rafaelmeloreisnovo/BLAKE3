@@ -373,13 +373,12 @@ do exact-master atual. Paridade, regressões, FAIL e TOKEN_VAZIO permanecem
 append-only; nenhum resultado histórico é promovido automaticamente após merge.
 
 
-### Atualização 2026-09-23 (physical telemetry V4)
+### Atualização 2026-09-23 (validation completeness V4)
 
-O executor físico `rmr/tools/run_physical_upstream_compare_v3.sh` passou a
-registrar contexto de frequência, governor, memória e thermal zones antes/depois
-do benchmark quando essas superfícies são expostas pelo kernel.
+Os agregadores de validação passaram a separar
+`REPORT_GENERATION=PASS` de `VALIDATION_STATE`.
+Estados globais: COMPLETE, COMPLETE_WITH_REVIEW e PARTIAL.
 
-O analisador `rmr/validation/analyze_physical_telemetry.py` produz delta
-machine-readable sem coletar serial/identificador único. Telemetria ausente
-permanece TOKEN_VAZIO e variação térmica/frequência não é promovida
-automaticamente a causalidade de performance.
+Adicionado `rmr/validation/tests/test_report_completeness.py` para garantir
+que a ausência deliberada de um eixo obrigatório resulte em PARTIAL e nunca
+seja mascarada como validação integral.

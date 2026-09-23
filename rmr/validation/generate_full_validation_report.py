@@ -148,9 +148,40 @@ def main() -> int:
         "No independent third-party reproduction was created by this workflow.",
     )
 
+    required_ci_axes = {
+        "C-KAT-SAN",
+        "C-UPSTREAM-V2",
+        "C-ABLATION",
+        "SIMD-X86",
+        "RUST-LTO",
+        "B3SUM",
+        "BINARY",
+        "CROSS-ARCH",
+    }
+    missing_required = [
+        row["axis"] for row in axes
+        if row["axis"] in required_ci_axes
+        and row["state"].startswith("TOKEN_VAZIO")
+    ]
+    review_required = [
+        row["axis"] for row in axes
+        if row["axis"] in required_ci_axes and row["state"] == "REVIEW"
+    ]
+    execution_complete = not missing_required
+    validation_state = (
+        "PARTIAL" if missing_required
+        else "COMPLETE_WITH_REVIEW" if review_required
+        else "COMPLETE"
+    )
+
     result = {
-        "schema": "RMR-BLAKE3-FULL-VALIDATION-RECEIPT-V1",
+        "schema": "RMR-BLAKE3-FULL-VALIDATION-RECEIPT-V2",
         "claim_allowed": False,
+        "report_generation_state": "PASS",
+        "execution_complete": execution_complete,
+        "validation_state": validation_state,
+        "missing_required_axes": missing_required,
+        "review_required_axes": review_required,
         "axes": axes,
         "boundaries": [
             "FORK!=UPSTREAM",
@@ -167,7 +198,7 @@ def main() -> int:
     )
 
     lines = [
-        "# RMR BLAKE3 Full Validation Receipt V1",
+        "# RMR BLAKE3 Full Validation Receipt V2",
         "",
         "SOURCE != BUILD != EXECUTION != EVIDENCE != CLAIM",
         "",
@@ -180,13 +211,25 @@ def main() -> int:
         )
     lines += [
         "",
+        "",
+        f"CI execution complete: {str(execution_complete).lower()}",
+        f"Validation state: {validation_state}",
+        f"Missing required axes: {', '.join(missing_required) if missing_required else 'none'}",
+        f"Review-required axes: {', '.join(review_required) if review_required else 'none'}",
+        "",
         "Physical ARM and physical IOPS remain TOKEN_VAZIO unless device-bound",
         "receipts exist. No repository-wide superiority claim is emitted.",
         "",
     ]
     Path(args.md_out).write_text("\n".join(lines), encoding="utf-8")
 
-    print("RMR_FULL_VALIDATION_RECEIPT=PASS")
+    print("RMR_FULL_VALIDATION_REPORT_GENERATION=PASS")
+    print("RMR_FULL_VALIDATION_EXECUTION_COMPLETE=" + ("true" if execution_complete else "false"))
+    print("RMR_FULL_VALIDATION_STATE=" + validation_state)
+    if missing_required:
+        print("missing_required_axes=" + ",".join(missing_required))
+    if review_required:
+        print("review_required_axes=" + ",".join(review_required))
     for row in axes:
         print(f"{row['axis']}={row['state']}")
     return 0

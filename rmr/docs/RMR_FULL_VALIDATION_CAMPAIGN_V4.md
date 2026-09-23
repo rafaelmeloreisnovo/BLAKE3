@@ -124,36 +124,25 @@ MASTER_PUSH_SUCCESS = exact-master CI evidence
 ```
 
 
-## Physical telemetry gate
+## Report completeness semantics
 
-The device-bound runner records privacy-safe runtime context before and after
-the benchmark:
-
-- current/min/max CPU frequency where the kernel exposes cpufreq;
-- scaling governor;
-- thermal-zone type and raw temperature value;
-- MemTotal/MemFree/MemAvailable;
-- logical CPU count.
-
-The analyzer
-`rmr/validation/analyze_physical_telemetry.py` materializes
-`telemetry-delta.json`.
-
-A physical speed result may be reported without available telemetry, but its
-interpretation must explicitly preserve:
+Report generation and validation completeness are separate states.
 
 ```text
-THERMAL/DVFS = TOKEN_VAZIO_PLATFORM_TELEMETRY_UNAVAILABLE
+REPORT_GENERATION=PASS
+does not imply
+VALIDATION_STATE=COMPLETE
 ```
 
-when the platform does not expose these surfaces.
+The aggregators emit:
 
-When telemetry exists:
+- `COMPLETE` — all required CI axes are present;
+- `COMPLETE_WITH_REVIEW` — all required axes executed, but at least one
+  requires review;
+- `PARTIAL` — one or more required axes are missing.
 
-```text
-THROUGHPUT_DELTA != THROTTLING_CAUSALITY
-FREQUENCY_DELTA != PERFORMANCE_CAUSALITY
-THERMAL_DELTA != REGRESSION_CAUSALITY
-```
+Physical ARM/IOPS and independent third-party reproduction remain separate
+TOKEN_VAZIO gates and do not get silently converted into CI completeness.
 
-The measurements are contextual evidence, not automatic causal attribution.
+The selftest `rmr/validation/tests/test_report_completeness.py` verifies both
+complete and deliberately incomplete synthetic artifact sets.
