@@ -151,3 +151,14 @@ correção, performance por tamanho, backends SIMD, oneTBB, Rust/b3sum,
 sanitizers, ABI/ELF, install/pkg-config, cross-architecture e integração RMR.
 Resultados são receipts por superfície; não existe promoção automática para
 uma alegação genérica de superioridade.
+
+
+## RMR Full Validation Campaign V4 — 2026-09-23
+
+A campanha canônica está em
+`rmr/docs/RMR_FULL_VALIDATION_CAMPAIGN_V4.md` e o contrato executável em
+`rmr/validation/FULL_VALIDATION_MANIFEST_V4.json`.
+
+Ela cruza upstream oficial e fork por source delta, qualidade C, performance,
+ablation, SIMD, TBB, ABI/ELF, Rust/LTO, b3sum, cross-architecture e integração
+RMR. Resultados físicos ARM/IOPS e reprodução independente não são inferidos.
