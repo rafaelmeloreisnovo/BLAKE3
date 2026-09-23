@@ -15,6 +15,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: rmr-hardware-build-topology-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   topology:
     runs-on: ubuntu-latest
