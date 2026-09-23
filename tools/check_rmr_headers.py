@@ -21,7 +21,8 @@ CANONICAL_LICENSE = 'Licensed under LICENSE_RMR.'
 
 C_STYLE_EXTS = {'.c', '.h', '.S', '.s', '.ld', '.inc'}
 HASH_STYLE_EXTS = {'.sh', '.bash', '.py', '.rb', '.pl', '.mk'}
-HTML_STYLE_EXTS = {'.md', '.txt', '.yaml', '.yml', '.toml', '.json'}
+HTML_STYLE_EXTS = {'.md', '.txt', '.yaml', '.yml', '.toml'}
+JSON_STYLE_EXTS = {'.json'}
 
 LEGACY_LICENSE_RE = re.compile(r'License:\s*RMR Module License\s*\(see\s*(?:rmr/)?LICENSE_RMR\)', re.IGNORECASE)
 CANONICAL_COPY_RE = re.compile(
@@ -62,6 +63,11 @@ def style_matches(path: Path, header_lines: list[str]) -> bool:
             return False
         first = header_lines[0].strip()
         return first.startswith('/*') or first.startswith('//')
+    if path.suffix in JSON_STYLE_EXTS:
+        if not header_lines:
+            return False
+        first = header_lines[0].lstrip()
+        return first.startswith('{') or first.startswith('[')
     if path.suffix in HTML_STYLE_EXTS:
         return header_lines and header_lines[0].strip().startswith('<!--')
     return True
