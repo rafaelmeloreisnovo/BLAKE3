@@ -272,7 +272,7 @@ Artefatos autorais:
 - `rmr/hwif/tests/rmr_hwif_selftest.c`;
 - `rmr/docs/RMR_ARMV7_HWIF_SPLIT_V1.md`;
 - `rmr/benchmark_framework/core/iops_bench.c`;
-- `rmr/benchmark_framework/IOPS_PROTOCOL_V1.md`.
+- `rmr/benchmark_framework/IOPS_PROTOCOL_V1.md`;\n- `rmr/tools/run_device_perf_receipt.sh`.
 
 A matriz cross-arch prova compilação + fechamento de símbolos; link nativo é testado separadamente e link cross-executável permanece TOKEN_VAZIO sem linker no runner. IOPS de CI é smoke do
 instrumento e não claim de armazenamento físico. Queue depth >1 permanece
