@@ -41,3 +41,5 @@ rmr_hwif_aarch64_raw_write:
 rmr_hwif_aarch64_backend_probe:
     mov x0, #1
     ret
+
+.section .note.GNU-stack,"",%progbits
