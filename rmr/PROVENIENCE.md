@@ -360,3 +360,14 @@ alterna a ordem das rodadas e materializa CSV/JSON/ambiente/SHA-256.
 
 A existência do executor não é evidência de execução física. ARMv7/AArch64
 permanecem `TOKEN_VAZIO_PHYSICAL` até receipt produzido no dispositivo.
+
+
+### Atualização 2026-09-23 (Full Validation Evidence V4)
+
+Registrados:
+- `rmr/validation/FULL_VALIDATION_EVIDENCE_V4.json`;
+- `rmr/docs/RMR_FULL_VALIDATION_EVIDENCE_V4.md`.
+
+O ledger preserva resultados observados por run/SHA e separa receipts históricos
+do exact-master atual. Paridade, regressões, FAIL e TOKEN_VAZIO permanecem
+append-only; nenhum resultado histórico é promovido automaticamente após merge.
