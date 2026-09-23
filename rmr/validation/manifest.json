@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "copyright": "Copyright (c) 2024-2026 Rafael Melo Reis",
+    "license": "Licensed under LICENSE_RMR.",
+    "schema": "RMR-BLAKE3-FULL-VALIDATION-V1",
+    "claim_allowed": false
+  },
+  "axes": [
+    {"id":"C-KAT-SAN","scope":"C correctness + ASan/UBSan","gate":"PASS|FAIL"},
+    {"id":"C-UPSTREAM-V2","scope":"official upstream vs fork C core","gate":"per-size bootstrap"},
+    {"id":"C-ABLATION","scope":"fork baseline vs no-likely/no-restrict/no-hints","gate":"paired performance + digest"},
+    {"id":"SIMD-X86","scope":"portable/SSE2/SSE4.1/AVX2/native","gate":"digest + throughput"},
+    {"id":"RUST-TEST","scope":"Rust crate tests","gate":"cargo test"},
+    {"id":"RUST-LTO","scope":"fork release LTO/codegen-units ablation","gate":"binary size + CLI timing"},
+    {"id":"B3SUM-HASH","scope":"official vs fork b3sum hashing","gate":"digest + timing"},
+    {"id":"B3SUM-CHECK","scope":"official vs fork checkfile parsing/verification","gate":"correctness + timing"},
+    {"id":"BINARY","scope":"ELF size/sections/symbols/GNU_STACK","gate":"audit receipt"},
+    {"id":"WARNINGS","scope":"strict compiler warnings","gate":"new RMR targets fatal; legacy observed"},
+    {"id":"CROSS-ARCH","scope":"x86-32/x86-64/ARMv7/AArch64/WASM/RISC-V/PPC contracts","gate":"compile or TOKEN_VAZIO toolchain"},
+    {"id":"ARM-PHYSICAL","scope":"ARMv7/AArch64 physical execution","gate":"device receipt only"},
+    {"id":"IOPS","scope":"physical IO protocol","gate":"workload-bound receipt only"},
+    {"id":"PROVENANCE","scope":"source/build/execution/evidence/claim separation","gate":"append-only receipt"}
+  ],
+  "boundaries": [
+    "FORK!=UPSTREAM",
+    "CORE!=CLI!=RMR_PIPELINE",
+    "SIMD_BACKEND!=ARCHITECTURE",
+    "CI_RUNNER!=PHYSICAL_DEVICE_FAMILY",
+    "MEDIAN_DELTA!=STATISTICAL_SEPARATION",
+    "COMPILE!=EXECUTE",
+    "SOURCE!=BUILD!=EXECUTION!=EVIDENCE!=CLAIM"
+  ]
+}
