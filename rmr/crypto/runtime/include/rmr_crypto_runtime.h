@@ -21,11 +21,16 @@ typedef enum {
   RMR_CRYPTO_SHA1,
   RMR_CRYPTO_SHA256,
   RMR_CRYPTO_SHA512,
+  RMR_CRYPTO_SHA3_256,
+  RMR_CRYPTO_BLAKE2B_512,
   RMR_CRYPTO_HMAC_SHA256,
+  RMR_CRYPTO_HMAC_SHA512,
   RMR_CRYPTO_HKDF_SHA256,
   RMR_CRYPTO_ED25519,
   RMR_CRYPTO_CHACHA20_POLY1305,
-  RMR_CRYPTO_AES_256_GCM
+  RMR_CRYPTO_AES_256_GCM,
+  RMR_CRYPTO_X25519,
+  RMR_CRYPTO_PBKDF2_HMAC_SHA256
 } rmr_crypto_algorithm;
 
 const char *rmr_crypto_algorithm_name(rmr_crypto_algorithm algorithm);
@@ -38,6 +43,9 @@ int rmr_crypto_digest(rmr_crypto_algorithm algorithm,
 int rmr_crypto_hmac_sha256(const uint8_t *key, size_t key_len,
                            const uint8_t *input, size_t input_len,
                            uint8_t out[32]);
+int rmr_crypto_hmac_sha512(const uint8_t *key, size_t key_len,
+                           const uint8_t *input, size_t input_len,
+                           uint8_t out[64]);
 
 int rmr_crypto_hkdf_sha256(const uint8_t *ikm, size_t ikm_len,
                            const uint8_t *salt, size_t salt_len,
@@ -52,6 +60,17 @@ int rmr_crypto_ed25519_sign(const uint8_t seed[32],
 int rmr_crypto_ed25519_verify(const uint8_t public_key[32],
                               const uint8_t *message, size_t message_len,
                               const uint8_t signature[64]);
+
+int rmr_crypto_x25519_public_from_private(const uint8_t private_key[32],
+                                          uint8_t public_key[32]);
+int rmr_crypto_x25519_shared_secret(const uint8_t private_key[32],
+                                    const uint8_t peer_public_key[32],
+                                    uint8_t shared_secret[32]);
+
+int rmr_crypto_pbkdf2_hmac_sha256(const uint8_t *password, size_t password_len,
+                                  const uint8_t *salt, size_t salt_len,
+                                  uint32_t iterations,
+                                  uint8_t *out, size_t out_len);
 
 int rmr_crypto_aead_encrypt(rmr_crypto_algorithm algorithm,
                             const uint8_t key[32], const uint8_t nonce[12],
