@@ -122,3 +122,12 @@ ARMv7-user e ARMv7-privileged por compilação + fechamento de símbolos; link c
 O harness `rmr-iops-bench` registra workload, block size, sync, cache policy,
 queue depth, tempo, IOPS e MiB/s. O V1 aceita somente queue depth 1 e registra
 `direct_io=false`; CI valida o instrumento, não promove desempenho físico.
+
+
+## RMR Crypto Runtime Matrix — 2026-09-23
+
+`rmr/crypto/runtime/` operacionaliza BLAKE3 + MD5/SHA/HMAC/HKDF/Ed25519 e
+dois AEADs sem confundir primitive, provider e arquitetura. O contrato cruza
+x86-32/x86-64/ARMv7/AArch64/WASM32/RISC-V/PPC; os KATs provider-backed são
+promovidos somente na arquitetura onde OpenSSL 3 foi realmente ligado e
+executado.

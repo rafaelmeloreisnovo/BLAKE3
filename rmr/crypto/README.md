@@ -195,3 +195,33 @@ F_ok   = módulo isolado; RVC1/ZIP STORE, palavra, CRC e SHA-256 fixados por evi
 F_gap  = BLAKE3 do arquivo, assinatura, timestamp/DOI e modo com chave permanecem TOKEN_VAZIO
 F_next = executar auditores, reproduzir a fixture e ancorar uma release assinada sem apagar resultados negativos
 ```
+
+
+## 12. Runtime criptográfico operacional — 2026-09-23
+
+`rmr/crypto/runtime/` adiciona uma camada operacional separando
+`ALGORITHM != PROVIDER != ARCHITECTURE`.
+
+Primitivas expostas:
+- BLAKE3 via API upstream existente;
+- MD5 e SHA-1 somente para compatibilidade/regressão;
+- SHA-256 e SHA-512;
+- HMAC-SHA256;
+- HKDF-SHA256;
+- Ed25519;
+- ChaCha20-Poly1305;
+- AES-256-GCM.
+
+O provider adicional atual é OpenSSL 3. A presença de um backend SIMD BLAKE3
+não é usada como evidência de aceleração das outras primitivas.
+
+A matriz registra x86-32, x86-64, ARMv7, ARMv8-32, AArch64, WASM32 e a rota
+portable usada para RISC-V/PPC. O contrato provider-neutral é compilado para
+sete alvos no CI; provider cross-arch permanece
+`TOKEN_VAZIO_PROVIDER_TOOLCHAIN` até toolchain e biblioteca observáveis.
+
+Validação:
+```sh
+python3 rmr/crypto/runtime/tools/validate_runtime_registry.py
+sh rmr/crypto/runtime/build/build_contract_matrix.sh
+```
