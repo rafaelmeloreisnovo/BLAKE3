@@ -5,7 +5,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$ROOT/upstream_validation/common.sh"
-for t in git python3 cargo rustc; do rmr_need "$t"; done
+for t in git python3 cargo rustc clang; do rmr_need "$t"; done
 
 WORK="${WORK_ROOT:-$ROOT/.rmr-work/upstream-v3-cross}"
 OUT="${RESULT_ROOT:-$ROOT/rmr/benchmark_framework/output/upstream-v3-cross}"
@@ -39,6 +39,15 @@ compile_neon() {
   printf '%s,%s,neon,PASS\n' "$side" "$target" >>"$OUT/matrix.csv"
 }
 
+
+compile_contract() {
+  local side="$1" src="$2" target_name="$3" clang_target="$4"
+  local dir="$WORK/obj/$side-$target_name-contract"
+  mkdir -p "$dir"
+  clang --target="$clang_target" -std=c11 -ffreestanding     -Wall -Wextra -Wpedantic -Werror -I"$src/c"     -c "$ROOT/upstream_validation/blake3_contract.c"     -o "$dir/contract.o"
+  printf '%s,%s,public-api-contract,PASS\n' "$side" "$target_name" >>"$OUT/matrix.csv"
+}
+
 compile_x86_intrinsics() {
   local side="$1" src="$2"
   local cc="gcc -m32" dir="$WORK/obj/$side-x86_32-simd"
@@ -63,6 +72,19 @@ compile_neon official "$OFFICIAL_ROOT" armv7 arm-linux-gnueabihf-gcc "-march=arm
 compile_neon fork "$RMR_REPO_ROOT" armv7 arm-linux-gnueabihf-gcc "-march=armv7-a -mfpu=neon -mfloat-abi=hard"
 compile_neon official "$OFFICIAL_ROOT" aarch64 aarch64-linux-gnu-gcc ""
 compile_neon fork "$RMR_REPO_ROOT" aarch64 aarch64-linux-gnu-gcc ""
+
+for contract in \
+  "x86_64|x86_64-none-elf" \
+  "x86_32|i686-none-elf" \
+  "armv7|armv7a-none-eabi" \
+  "aarch64|aarch64-none-elf" \
+  "wasm32|wasm32-unknown-unknown" \
+  "riscv64|riscv64-none-elf" \
+  "ppc64le|powerpc64le-none-elf"; do
+  IFS='|' read -r name target <<<"$contract"
+  compile_contract official "$OFFICIAL_ROOT" "$name" "$target"
+  compile_contract fork "$RMR_REPO_ROOT" "$name" "$target"
+done
 
 if [ -f "$RMR_REPO_ROOT/c/blake3_neon_armv7_unix.S" ]; then
   arm-linux-gnueabihf-gcc -march=armv7-a -c "$RMR_REPO_ROOT/c/blake3_neon_armv7_unix.S"     -o "$WORK/obj/fork-armv7-marker.o"
