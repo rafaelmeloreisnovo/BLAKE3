@@ -29,7 +29,10 @@ uint32_t rmr_topology_surface_mask(void) {
       RMR_TOPOLOGY_COMMENT |
       RMR_TOPOLOGY_WARNING |
       RMR_TOPOLOGY_MODULE |
-      RMR_TOPOLOGY_OVERLAP;
+      RMR_TOPOLOGY_OVERLAP |
+      RMR_TOPOLOGY_CONDITION |
+      RMR_TOPOLOGY_COLOR |
+      RMR_TOPOLOGY_IOPS;
 }
 
 rmr_build_topology rmr_topology_compile_snapshot(void) {
