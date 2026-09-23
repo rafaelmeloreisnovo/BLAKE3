@@ -11,6 +11,8 @@ project(rmr_external
 
 option(RMR_BUILD_TESTS "Build RMR host self-tests" ON)
 option(RMR_BUILD_TOPOLOGY "Build RMR hardware/build topology micro-module" ON)
+option(RMR_BUILD_HWIF "Build RMR hardware interface library" ON)
+option(RMR_ARMV7_PRIVILEGED "Enable privileged ARMv7 CP15 HWIF leaf" OFF)
 option(RMR_STRICT_WARNINGS "Enable stricter warnings for new RMR topology code" ON)
 option(RMR_BLAKE3_USE_TBB "Build repository BLAKE3 with optional oneTBB path" OFF)
 
@@ -62,6 +64,51 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
   target_compile_options(pai PRIVATE -Wall -Wextra)
 endif()
 
+
+if(RMR_BUILD_HWIF)
+  set(RMR_HWIF_SOURCES
+    hwif/rmr_hwif.c
+  )
+
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
+    list(APPEND RMR_HWIF_SOURCES hwif/asm/x86_64/rmr_hwif_backend.S)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|ARM64)$")
+    list(APPEND RMR_HWIF_SOURCES hwif/asm/aarch64/rmr_hwif_backend.S)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm|armv7|armv7l)")
+    list(APPEND RMR_HWIF_SOURCES hwif/asm/armv7/rmr_hwif_user.S)
+    if(RMR_ARMV7_PRIVILEGED)
+      list(APPEND RMR_HWIF_SOURCES hwif/asm/armv7/rmr_hwif_privileged.S)
+    endif()
+  endif()
+
+  add_library(rmr-hwif STATIC ${RMR_HWIF_SOURCES})
+  target_compile_features(rmr-hwif PUBLIC c_std_11)
+  target_include_directories(rmr-hwif PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/hwif/include"
+  )
+
+  if(RMR_ARMV7_PRIVILEGED)
+    target_compile_definitions(rmr-hwif PRIVATE RMR_ARMV7_ASSUME_PRIVILEGED=1)
+  endif()
+
+  if(RMR_STRICT_WARNINGS AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+    target_compile_options(rmr-hwif PRIVATE
+      -Wall
+      -Wextra
+      -Wpedantic
+      -Wshadow
+      -Wpointer-arith
+      -Wcast-align
+      -Wstrict-prototypes
+      -Wmissing-prototypes
+      -Wformat=2
+      -Wundef
+      -Wwrite-strings
+    )
+  endif()
+endif()
+
 if(RMR_BUILD_TOPOLOGY)
   add_library(rmr-topology STATIC
     topology/src/rmr_topology.c
@@ -107,6 +154,15 @@ if(RMR_BUILD_TESTS)
   )
   target_link_libraries(rmr-blake3-backend-selftest PRIVATE BLAKE3::blake3)
   add_test(NAME rmr_blake3_backend_selftest COMMAND rmr-blake3-backend-selftest)
+
+  if(RMR_BUILD_HWIF)
+    add_executable(rmr-hwif-selftest
+      hwif/tests/rmr_hwif_selftest.c
+    )
+    target_compile_features(rmr-hwif-selftest PRIVATE c_std_11)
+    target_link_libraries(rmr-hwif-selftest PRIVATE rmr-hwif)
+    add_test(NAME rmr_hwif_selftest COMMAND rmr-hwif-selftest)
+  endif()
 
   if(RMR_BUILD_TOPOLOGY)
     add_executable(rmr-topology-selftest
