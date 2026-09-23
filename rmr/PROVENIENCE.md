@@ -336,3 +336,16 @@ Os comparadores usam `BLAKE3-team/BLAKE3@6aab490a26124663329dfd3961b8469f8fdb158
 como referência oficial fixada e o exact-head do fork como alvo. Nenhum PASS
 de uma superfície é herdado por outra. Execução física ARM e reprodução
 independente permanecem TOKEN_VAZIO até receipts observáveis.
+
+
+### Atualização 2026-09-23 (Full Validation Campaign V4)
+
+Registrados como artefatos autorais RMR:
+- `rmr/validation/FULL_VALIDATION_MANIFEST_V4.json`;
+- `rmr/docs/RMR_FULL_VALIDATION_CAMPAIGN_V4.md`.
+
+A campanha não altera o algoritmo BLAKE3 upstream. Ela orquestra e documenta
+comparações oficiais-vs-fork nos eixos source, C correctness/performance,
+ablation, SIMD, TBB, ABI/ELF, Rust, b3sum, cross-arch e integração RMR.
+Execução física ARM/IOPS e reprodução independente permanecem TOKEN_VAZIO sem
+receipts correspondentes.
