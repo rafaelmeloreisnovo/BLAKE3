@@ -142,3 +142,12 @@ incerteza. Simulação nunca é promovida automaticamente a benchmark físico.
 `rmr/legal/` documenta a transição pretendida de pesquisa livre/uso comercial
 restrito sem afirmar retroatividade: o `LICENSE_RMR` atual permanece vigente
 até ativação prospectiva válida. Upstream BLAKE3 mantém suas licenças próprias.
+
+
+## Upstream comprehensive validation V3 — 2026-09-23
+
+A suíte `rmr/upstream_validation/` compara o BLAKE3 oficial e o fork em
+correção, performance por tamanho, backends SIMD, oneTBB, Rust/b3sum,
+sanitizers, ABI/ELF, install/pkg-config, cross-architecture e integração RMR.
+Resultados são receipts por superfície; não existe promoção automática para
+uma alegação genérica de superioridade.
