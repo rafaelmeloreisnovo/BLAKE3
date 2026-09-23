@@ -274,6 +274,6 @@ Artefatos autorais:
 - `rmr/benchmark_framework/core/iops_bench.c`;
 - `rmr/benchmark_framework/IOPS_PROTOCOL_V1.md`.
 
-A matriz cross-arch prova apenas compilação/linkagem. IOPS de CI é smoke do
+A matriz cross-arch prova compilação + fechamento de símbolos; link nativo é testado separadamente e link cross-executável permanece TOKEN_VAZIO sem linker no runner. IOPS de CI é smoke do
 instrumento e não claim de armazenamento físico. Queue depth >1 permanece
 `TOKEN_VAZIO_V1` até implementação assíncrona real.
