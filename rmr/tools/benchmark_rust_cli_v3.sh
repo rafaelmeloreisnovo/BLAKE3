@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+# Copyright (c) 2024-2026 Rafael Melo Reis
+# Licensed under LICENSE_RMR.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$ROOT/upstream_validation/common.sh"
+for t in git cargo rustc python3 dd sha256sum stat; do rmr_need "$t"; done
+
+WORK="${WORK_ROOT:-$ROOT/.rmr-work/upstream-v3-rust}"
+OUT="${RESULT_ROOT:-$ROOT/rmr/benchmark_framework/output/upstream-v3-rust}"
+OFFICIAL_ROOT="$WORK/official"
+ROUNDS="${ROUNDS:-5}"
+rm -rf "$OUT" "$WORK/target-"*
+mkdir -p "$WORK" "$OUT"
+OFFICIAL_COMMIT="$(rmr_checkout_official "$OFFICIAL_ROOT")"
+rmr_write_common_environment "$OUT/environment.txt" "$OFFICIAL_COMMIT"
+{
+  echo "rustc=$(rustc --version)"
+  echo "cargo=$(cargo --version)"
+} >>"$OUT/environment.txt"
+
+cargo test --manifest-path "$OFFICIAL_ROOT/Cargo.toml" -p blake3 --lib   >"$OUT/official-blake3-test.log" 2>&1
+cargo test --manifest-path "$RMR_REPO_ROOT/Cargo.toml" -p blake3 --lib   >"$OUT/fork-blake3-test.log" 2>&1
+cargo test --manifest-path "$OFFICIAL_ROOT/Cargo.toml" -p b3sum   >"$OUT/official-b3sum-test.log" 2>&1
+cargo test --manifest-path "$RMR_REPO_ROOT/Cargo.toml" -p b3sum   >"$OUT/fork-b3sum-test.log" 2>&1
+
+CARGO_TARGET_DIR="$WORK/target-official"   cargo build --manifest-path "$OFFICIAL_ROOT/Cargo.toml" --release -p b3sum   >"$OUT/official-release-build.log" 2>&1
+
+CARGO_TARGET_DIR="$WORK/target-fork"   cargo build --manifest-path "$RMR_REPO_ROOT/Cargo.toml" --release -p b3sum   >"$OUT/fork-release-build.log" 2>&1
+
+CARGO_TARGET_DIR="$WORK/target-fork-ablated" CARGO_PROFILE_RELEASE_LTO=false CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16   cargo build --manifest-path "$RMR_REPO_ROOT/Cargo.toml" --release -p b3sum   >"$OUT/fork-ablated-build.log" 2>&1
+
+OFFICIAL_BIN="$WORK/target-official/release/b3sum"
+FORK_BIN="$WORK/target-fork/release/b3sum"
+ABLATE_BIN="$WORK/target-fork-ablated/release/b3sum"
+for b in "$OFFICIAL_BIN" "$FORK_BIN" "$ABLATE_BIN"; do [ -x "$b" ]; done
+
+dd if=/dev/zero of="$WORK/data64m.bin" bs=1M count=64 status=none
+: >"$WORK/tiny.bin"
+
+OFFICIAL_DIGEST="$("$OFFICIAL_BIN" --num-threads 1 "$WORK/data64m.bin" | awk '{print $1}')"
+FORK_DIGEST="$("$FORK_BIN" --num-threads 1 "$WORK/data64m.bin" | awk '{print $1}')"
+ABLATE_DIGEST="$("$ABLATE_BIN" --num-threads 1 "$WORK/data64m.bin" | awk '{print $1}')"
+[ "$OFFICIAL_DIGEST" = "$FORK_DIGEST" ] && [ "$OFFICIAL_DIGEST" = "$ABLATE_DIGEST" ]
+
+TINY_DIGEST="$("$OFFICIAL_BIN" "$WORK/tiny.bin" | awk '{print $1}')"
+python3 - "$WORK/checkfile.txt" "$TINY_DIGEST" "$WORK/tiny.bin" <<'PY'
+import sys
+path,digest,target=sys.argv[1:]
+with open(path,"w",encoding="utf-8") as f:
+    for _ in range(20000):
+        f.write(f"{digest}  {target}\n")
+PY
+
+printf 'binary,workload,round,seconds\n' >"$OUT/timings.csv"
+
+python3 - "$OUT/timings.csv" "$ROUNDS" "$OFFICIAL_BIN" "$FORK_BIN" "$ABLATE_BIN" "$WORK/data64m.bin" "$WORK/checkfile.txt" <<'PY'
+import csv,subprocess,sys,time
+csv_path,rounds,official,fork,ablated,data,check=sys.argv[1:]
+rounds=int(rounds)
+bins=[("official",official),("fork",fork),("fork_ablated",ablated)]
+workloads=[
+ ("hash_1thread",lambda b:[b,"--num-threads","1",data]),
+ ("hash_4thread",lambda b:[b,"--num-threads","4",data]),
+ ("checkfile_20k",lambda b:[b,"--check","--quiet",check]),
+]
+with open(csv_path,"a",newline="",encoding="utf-8") as f:
+    w=csv.writer(f)
+    for workload,cmdfn in workloads:
+        for r in range(1,rounds+1):
+            order=bins[r%len(bins):]+bins[:r%len(bins)]
+            for name,b in order:
+                t0=time.perf_counter()
+                cp=subprocess.run(cmdfn(b),stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
+                dt=time.perf_counter()-t0
+                if cp.returncode:
+                    raise SystemExit(f"{name}/{workload} failed: {cp.stderr.decode(errors='replace')}")
+                w.writerow([name,workload,r,f"{dt:.9f}"])
+PY
+
+{
+  echo "official_b3sum_bytes=$(stat -c '%s' "$OFFICIAL_BIN")"
+  echo "fork_b3sum_bytes=$(stat -c '%s' "$FORK_BIN")"
+  echo "fork_ablated_b3sum_bytes=$(stat -c '%s' "$ABLATE_BIN")"
+  echo "digest_equivalence=PASS"
+} >"$OUT/binary-sizes.txt"
+
+python3 "$ROOT/upstream_validation/analyze_rust_cli_v3.py"   "$OUT/timings.csv" "$OUT/summary.json" | tee "$OUT/analysis.txt"
+
+{
+  echo "RMR_RUST_CLI_V3=PASS"
+  echo "cargo_test_blake3=PASS_BOTH"
+  echo "cargo_test_b3sum=PASS_BOTH"
+  echo "release_build=PASS_OFFICIAL_FORK_ABLATED"
+  echo "digest_equivalence=PASS"
+  echo "claim_allowed=false"
+} >"$OUT/receipt.txt"
+sha256sum "$OUT"/*.txt "$OUT"/*.csv "$OUT"/*.json >"$OUT/SHA256SUMS.txt"
