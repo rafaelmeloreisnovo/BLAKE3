@@ -9,6 +9,16 @@ on:
       - "b3sum/**"
       - "rmr/**"
       - ".github/workflows/rmr-full-validation.yml"
+  push:
+    branches:
+      - master
+    paths:
+      - "c/**"
+      - "Cargo.toml"
+      - "build.rs"
+      - "b3sum/**"
+      - "rmr/**"
+      - ".github/workflows/rmr-full-validation.yml"
   workflow_dispatch:
 
 permissions:
