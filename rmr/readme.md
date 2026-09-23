@@ -174,3 +174,11 @@ bash rmr/tools/run_physical_upstream_compare_v3.sh
 
 O runner escolhe um contrato de arquitetura para x86-64, ARMv7 ou AArch64 e
 grava receipts por tamanho. Cross-compilação e SIMPERF não promovem esse estado.
+
+
+## RMR Full Validation Evidence V4 — 2026-09-23
+
+`rmr/docs/RMR_FULL_VALIDATION_EVIDENCE_V4.md` e o JSON correspondente
+preservam por SHA/run os números já observados de core, ablation, SIMD,
+ABI/binário, cross-arch e ARM físico histórico enquanto os gates exact-master
+continuam separados.
