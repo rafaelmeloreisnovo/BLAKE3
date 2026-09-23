@@ -5,6 +5,9 @@
 
 #include "../hwif/include/rmr_hwif.h"
 
+_Static_assert(sizeof(rmr_u64) == 8u, "rmr_u64 must be exactly 64 bits");
+_Static_assert(sizeof(rmr_s64) == 8u, "rmr_s64 must be exactly 64 bits");
+
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L) && !defined(__STDC_NO_ATOMICS__)
 #include <stdatomic.h>
 #define RMR_HWIF_LOAD_PTR_ACQUIRE(v) atomic_load_explicit(&(v), memory_order_acquire)
@@ -47,6 +50,7 @@ static const rmr_hwif_ops g_fallback_ops = {
     fallback_time_raw,
     fallback_cpu_id_raw,
     fallback_raw_write,
+    0u,
     "c_fallback"
 };
 
@@ -60,6 +64,10 @@ static const rmr_hwif_ops g_aarch64_ops = {
     rmr_hwif_aarch64_time_raw,
     rmr_hwif_aarch64_cpu_id_raw,
     rmr_hwif_aarch64_raw_write,
+    RMR_HWIF_CAP_TIME_HARDWARE |
+        RMR_HWIF_CAP_CPU_ID_HARDWARE |
+        RMR_HWIF_CAP_RAW_WRITE_DIRECT |
+        RMR_HWIF_CAP_PRIVILEGED_REGS,
     "aarch64_asm"
 };
 #endif
@@ -74,8 +82,43 @@ static const rmr_hwif_ops g_x86_64_ops = {
     rmr_hwif_x86_64_time_raw,
     rmr_hwif_x86_64_cpu_id_raw,
     rmr_hwif_x86_64_raw_write,
+    RMR_HWIF_CAP_TIME_HARDWARE |
+        RMR_HWIF_CAP_CPU_ID_HARDWARE |
+        RMR_HWIF_CAP_RAW_WRITE_DIRECT,
     "x86_64_asm"
 };
+#endif
+
+
+#if defined(RMR_ARCH_ARM)
+#if defined(RMR_OS_LINUX)
+extern rmr_s64 rmr_hwif_armv7_user_raw_write(int fd, const void* buf, rmr_u64 len);
+extern rmr_u64 rmr_hwif_armv7_user_backend_probe(void);
+
+static const rmr_hwif_ops g_armv7_user_ops = {
+    fallback_time_raw,
+    fallback_cpu_id_raw,
+    rmr_hwif_armv7_user_raw_write,
+    RMR_HWIF_CAP_RAW_WRITE_DIRECT,
+    "armv7_linux_user"
+};
+#endif
+
+#if defined(RMR_ARMV7_ASSUME_PRIVILEGED)
+extern rmr_u64 rmr_hwif_armv7_priv_time_raw(void);
+extern rmr_u64 rmr_hwif_armv7_priv_cpu_id_raw(void);
+extern rmr_u64 rmr_hwif_armv7_priv_backend_probe(void);
+
+static const rmr_hwif_ops g_armv7_privileged_ops = {
+    rmr_hwif_armv7_priv_time_raw,
+    rmr_hwif_armv7_priv_cpu_id_raw,
+    fallback_raw_write,
+    RMR_HWIF_CAP_TIME_HARDWARE |
+        RMR_HWIF_CAP_CPU_ID_HARDWARE |
+        RMR_HWIF_CAP_PRIVILEGED_REGS,
+    "armv7_privileged"
+};
+#endif
 #endif
 
 static rmr_hwif_ops_ptr_atomic_t g_current = &g_fallback_ops;
@@ -96,8 +139,19 @@ const rmr_hwif_ops* rmr_hwif_bootstrap(void) {
 
     if (RMR_HWIF_CAS_STATE_ACQ_REL(g_bootstrap_state, expected, 1)) {
         const rmr_hwif_ops* selected = &g_fallback_ops;
+#if defined(RMR_ARCH_ARM)
+#if defined(RMR_ARMV7_ASSUME_PRIVILEGED)
+        if (rmr_hwif_armv7_priv_backend_probe() == 1u) {
+            selected = &g_armv7_privileged_ops;
+        }
+#elif defined(RMR_OS_LINUX)
+        if (rmr_hwif_armv7_user_backend_probe() == 1u) {
+            selected = &g_armv7_user_ops;
+        }
+#endif
+#endif
 #if defined(RMR_ARCH_AARCH64)
-        if (rmr_hwif_aarch64_backend_probe() == 1) {
+        if (rmr_hwif_aarch64_backend_probe() == 1u) {
             selected = &g_aarch64_ops;
         }
 #endif

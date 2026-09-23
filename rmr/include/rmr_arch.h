@@ -22,10 +22,11 @@
 #define RMR_OS_WINDOWS 1
 #elif defined(__APPLE__) && defined(__MACH__)
 #define RMR_OS_DARWIN 1
-#elif defined(__linux__)
-#define RMR_OS_LINUX 1
 #elif defined(__ANDROID__)
 #define RMR_OS_ANDROID 1
+#define RMR_OS_LINUX 1
+#elif defined(__linux__)
+#define RMR_OS_LINUX 1
 #elif defined(__FreeBSD__)
 #define RMR_OS_FREEBSD 1
 #elif defined(__OpenBSD__)

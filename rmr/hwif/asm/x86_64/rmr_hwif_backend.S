@@ -89,3 +89,5 @@ rmr_hwif_x86_64_raw_write:
 rmr_hwif_x86_64_backend_probe:
     mov $1, %rax
     ret
+
+.section .note.GNU-stack,"",@progbits

@@ -15,6 +15,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: rmr-hardware-build-topology-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   topology:
     runs-on: ubuntu-latest
@@ -28,19 +32,34 @@ jobs:
           -DRMR_BUILD_TOPOLOGY=ON
           -DRMR_STRICT_WARNINGS=ON
 
-      - name: Build topology selftest
-        run: cmake --build build/rmr-topology --target rmr-topology-selftest
+      - name: Build topology and HWIF selftests
+        run: cmake --build build/rmr-topology --target rmr-topology-selftest rmr-hwif-selftest rmr-iops-bench
 
-      - name: Run topology selftest
-        run: ctest --test-dir build/rmr-topology -R rmr_topology_selftest --output-on-failure
+      - name: Run topology and HWIF selftests
+        run: |
+          ctest --test-dir build/rmr-topology -R 'rmr_(topology|hwif)_selftest' --output-on-failure
+
+      - name: Cross-compile HWIF matrix
+        run: sh rmr/hwif/build/build_cross_matrix.sh
+
+      - name: Run bounded IOPS smoke receipts
+        run: |
+          mkdir -p build/rmr-topology/iops
+          build/rmr-topology/rmr-iops-bench             --file build/rmr-topology/iops/test.bin             --mode write --pattern seq --block-size 4096             --file-size 1048576 --ops 128 --sync end             --cache os-default --queue-depth 1             > build/rmr-topology/iops/write.json
+          build/rmr-topology/rmr-iops-bench             --file build/rmr-topology/iops/test.bin             --mode read --pattern random --block-size 4096             --file-size 1048576 --ops 128 --sync none             --cache warm --queue-depth 1             > build/rmr-topology/iops/read.json
+          cat build/rmr-topology/iops/write.json
+          cat build/rmr-topology/iops/read.json
 
       - name: Audit source compiler linker and binary topology
         run: |
           python3 -m py_compile rmr/tools/rmr_topology_audit.py
-          python3 rmr/tools/rmr_topology_audit.py             --root rmr             --binary build/rmr-topology/rmr-topology-selftest             --json-out build/rmr-topology/rmr_topology_audit.json             --color never
+          python3 rmr/tools/rmr_topology_audit.py             --root rmr             --binary build/rmr-topology/rmr-hwif-selftest             --json-out build/rmr-topology/rmr_topology_audit.json             --color never
 
       - name: Upload topology receipt
         uses: actions/upload-artifact@v4
         with:
           name: rmr-hardware-build-topology
-          path: build/rmr-topology/rmr_topology_audit.json
+          path: |
+            build/rmr-topology/rmr_topology_audit.json
+            build/rmr-topology/iops/write.json
+            build/rmr-topology/iops/read.json
