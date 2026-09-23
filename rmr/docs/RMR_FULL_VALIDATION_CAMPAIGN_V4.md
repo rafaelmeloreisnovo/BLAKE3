@@ -122,3 +122,38 @@ PR_HEAD validation != MASTER_PUSH validation
 MERGE != VALIDATION
 MASTER_PUSH_SUCCESS = exact-master CI evidence
 ```
+
+
+## Physical telemetry gate
+
+The device-bound runner records privacy-safe runtime context before and after
+the benchmark:
+
+- current/min/max CPU frequency where the kernel exposes cpufreq;
+- scaling governor;
+- thermal-zone type and raw temperature value;
+- MemTotal/MemFree/MemAvailable;
+- logical CPU count.
+
+The analyzer
+`rmr/validation/analyze_physical_telemetry.py` materializes
+`telemetry-delta.json`.
+
+A physical speed result may be reported without available telemetry, but its
+interpretation must explicitly preserve:
+
+```text
+THERMAL/DVFS = TOKEN_VAZIO_PLATFORM_TELEMETRY_UNAVAILABLE
+```
+
+when the platform does not expose these surfaces.
+
+When telemetry exists:
+
+```text
+THROUGHPUT_DELTA != THROTTLING_CAUSALITY
+FREQUENCY_DELTA != PERFORMANCE_CAUSALITY
+THERMAL_DELTA != REGRESSION_CAUSALITY
+```
+
+The measurements are contextual evidence, not automatic causal attribution.
