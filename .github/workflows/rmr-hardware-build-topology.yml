@@ -53,7 +53,7 @@ jobs:
       - name: Audit source compiler linker and binary topology
         run: |
           python3 -m py_compile rmr/tools/rmr_topology_audit.py
-          python3 rmr/tools/rmr_topology_audit.py             --root rmr             --binary build/rmr-topology/rmr-topology-selftest             --json-out build/rmr-topology/rmr_topology_audit.json             --color never
+          python3 rmr/tools/rmr_topology_audit.py             --root rmr             --binary build/rmr-topology/rmr-hwif-selftest             --json-out build/rmr-topology/rmr_topology_audit.json             --color never
 
       - name: Upload topology receipt
         uses: actions/upload-artifact@v4
