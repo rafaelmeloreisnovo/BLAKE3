@@ -1,6 +1,6 @@
 <!--
-Copyright (c) 2024-2026 Rafael Melo Reis
-Operational checklist; verify current INPI requirements before filing.
+Copyright (c) 2024–2026 Rafael Melo Reis
+Licensed under LICENSE_RMR.
 -->
 
 # INPI software registration checklist — RMR
