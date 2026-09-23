@@ -117,7 +117,7 @@ Independent reproduction by an unaffiliated third party remains TOKEN_VAZIO unti
 ARMv7 agora possui fronteiras explícitas `user != privileged`. O user leaf
 não acessa CP15; PMCCNTR/MIDR/MPIDR só aparecem no leaf privileged com opt-in.
 A matriz `rmr/hwif/build/build_cross_matrix.sh` cobre x86_64, AArch64,
-ARMv7-user e ARMv7-privileged no nível compile/link.
+ARMv7-user e ARMv7-privileged por compilação + fechamento de símbolos; link cross-executável permanece TOKEN_VAZIO quando o runner não fornece linker.
 
 O harness `rmr-iops-bench` registra workload, block size, sync, cache policy,
 queue depth, tempo, IOPS e MiB/s. O V1 aceita somente queue depth 1 e registra
