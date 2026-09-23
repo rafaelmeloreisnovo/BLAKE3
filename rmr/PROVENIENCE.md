@@ -244,8 +244,8 @@ Nenhum claim de superioridade de desempenho é promovido pela existência do har
 ### Atualização 2026-09-23 (hardware/build topology V1)
 
 Criado `rmr/topology/` como micro-módulo autoral externo para separar e
-observar doze superfícies: preprocessor, compiler, linker, binary, symbol,
-pointer, loop, I/O, comment, warning, module e overlap.
+observar quinze superfícies: preprocessor, compiler, linker, binary, symbol,
+pointer, loop, I/O, comment, warning, module, overlap, condition, color e IOPS.
 
 O módulo não altera a primitiva BLAKE3. `void` é tratado como fronteira
 genérica explícita, não como ausência semântica; símbolos lexicais permanecem
