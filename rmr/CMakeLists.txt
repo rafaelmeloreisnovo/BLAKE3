@@ -96,6 +96,7 @@ if(RMR_BUILD_CRYPTO_RUNTIME)
         -Wformat=2
         -Wundef
         -Wwrite-strings
+      -Werror
       )
     endif()
   else()
