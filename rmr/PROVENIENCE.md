@@ -349,3 +349,14 @@ comparações oficiais-vs-fork nos eixos source, C correctness/performance,
 ablation, SIMD, TBB, ABI/ELF, Rust, b3sum, cross-arch e integração RMR.
 Execução física ARM/IOPS e reprodução independente permanecem TOKEN_VAZIO sem
 receipts correspondentes.
+
+
+### Atualização 2026-09-23 (device-bound upstream comparison V3)
+
+Registrado `rmr/tools/run_physical_upstream_compare_v3.sh` como executor
+autoral RMR para comparação física upstream oficial × fork em x86-64, ARMv7 e
+AArch64. O executor fixa o upstream por SHA, usa o mesmo harness dos dois lados,
+alterna a ordem das rodadas e materializa CSV/JSON/ambiente/SHA-256.
+
+A existência do executor não é evidência de execução física. ARMv7/AArch64
+permanecem `TOKEN_VAZIO_PHYSICAL` até receipt produzido no dispositivo.
