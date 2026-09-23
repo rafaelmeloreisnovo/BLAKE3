@@ -166,6 +166,19 @@ def scan_source(root: Path) -> dict:
         if totals["lines"] else 0.0
     )
 
+    gnu_stack_line = None
+    gnu_stack_executable = None
+    if programs.get("state") == "PASS":
+        for line in programs.get("stdout", "").splitlines():
+            if "GNU_STACK" in line:
+                gnu_stack_line = line.strip()
+                flags = [
+                    token for token in line.split()
+                    if token and set(token).issubset(set("RWE")) and any(ch in token for ch in "RWE")
+                ]
+                gnu_stack_executable = any("E" in token for token in flags)
+                break
+
     return {
         "state": "PASS",
         "root": str(root),
@@ -234,6 +247,7 @@ def binary_snapshot(binary: Path) -> dict:
         return {"state": "FAIL", "error": "binary_not_found", "path": str(binary)}
 
     header = run_tool(["readelf", "-h", str(binary)])
+    programs = run_tool(["readelf", "-l", "-W", str(binary)])
     sections = run_tool(["readelf", "-S", "-W", str(binary)])
     relocs = run_tool(["readelf", "-r", "-W", str(binary)])
     defined = run_tool(["nm", "-g", "--defined-only", str(binary)])
@@ -251,6 +265,9 @@ def binary_snapshot(binary: Path) -> dict:
         "size_bytes": binary.stat().st_size,
         "elf_header_state": header.get("state"),
         "elf_header": parse_elf_header(header.get("stdout", "")),
+        "program_header_tool_state": programs.get("state"),
+        "gnu_stack_line": gnu_stack_line,
+        "gnu_stack_executable": gnu_stack_executable,
         "section_tool_state": sections.get("state"),
         "section_lines": nonempty_lines(sections),
         "relocation_tool_state": relocs.get("state"),
@@ -292,15 +309,16 @@ def main() -> int:
         return 2
 
     source = scan_source(root)
+    binary = binary_snapshot(Path(args.binary).resolve()) if args.binary else {
+        "state": "TOKEN_VAZIO_NOT_REQUESTED"
+    }
     report = {
         "schema": "RMR-HARDWARE-BUILD-TOPOLOGY-V1",
         "surface_bits": SURFACE_BITS,
         "surface_mask": sum(1 << bit for bit in SURFACE_BITS.values()),
         "source": source,
         "compiler": compiler_snapshot(args.compiler),
-        "binary": binary_snapshot(Path(args.binary).resolve()) if args.binary else {
-            "state": "TOKEN_VAZIO_NOT_REQUESTED"
-        },
+        "binary": binary,
         "boundaries": [
             "SOURCE!=BUILD!=EXECUTION!=EVIDENCE!=CLAIM",
             "LOGICAL_IO_OPS!=PHYSICAL_STORAGE_IOPS",
@@ -330,6 +348,8 @@ def main() -> int:
         f"symbol_overlap_candidates={overlap_count}"
     )
     print("logical_io_ops != physical_storage_iops")
+    if binary.get("gnu_stack_executable") is not None:
+        print(f"gnu_stack_executable={str(binary['gnu_stack_executable']).lower()}")
     for symbol, paths in sorted(source["conditional_provider_candidates"].items()):
         print(f"conditional_provider={symbol} paths={','.join(paths)}")
     for symbol, paths in sorted(source["source_symbol_overlap_candidates"].items()):
@@ -340,6 +360,10 @@ def main() -> int:
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         print(f"json={out}")
+
+    if binary.get("gnu_stack_executable") is True:
+        print("error: executable GNU_STACK detected", file=sys.stderr)
+        return 4
 
     return 0
 
