@@ -177,8 +177,13 @@ endif()
 add_executable(rmr-blake3-bench benchmark_framework/core/blake3_bench.c)
 target_compile_features(rmr-blake3-bench PRIVATE c_std_11)
 target_link_libraries(rmr-blake3-bench PRIVATE BLAKE3::blake3)
+
+add_executable(rmr-blake3-size-bench benchmark_framework/core/blake3_size_bench.c)
+target_compile_features(rmr-blake3-size-bench PRIVATE c_std_11)
+target_link_libraries(rmr-blake3-size-bench PRIVATE BLAKE3::blake3)
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
   target_compile_options(rmr-blake3-bench PRIVATE -O3 -Wall -Wextra -Wpedantic)
+  target_compile_options(rmr-blake3-size-bench PRIVATE -O3 -Wall -Wextra -Wpedantic)
 endif()
 
 if(UNIX)

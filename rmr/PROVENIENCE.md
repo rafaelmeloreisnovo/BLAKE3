@@ -306,3 +306,20 @@ usos de segurança. A aceleração BLAKE3 por SSE/AVX/NEON/WASM não é atribuí
 às demais primitivas; algoritmo, provider e arquitetura permanecem domínios
 separados. Provider cross-architecture fica `TOKEN_VAZIO_PROVIDER_TOOLCHAIN`
 sem toolchain/OpenSSL do alvo.
+
+
+### Atualização 2026-09-23 (SIMPERF + legal transition docs)
+
+Criado `rmr/benchmark_framework/simperf/` como simulador analítico calibrável
+de performance. Os cinco perfis são arquétipos de hardware, não claims sobre
+CPUs comerciais específicas. Toda projeção é `ANALOGY_ESTIMATE` e requer
+receipt físico para promoção.
+
+Criado `rmr/legal/` para separar estado jurídico atual, transição de licença,
+rascunho pesquisa/comercial, protocolo de auditoria/enforcement e checklist
+INPI. Esses documentos NÃO alteram `rmr/LICENSE_RMR`; a licença atual continua
+permissiva até mudança prospectiva explícita e revisão humana/jurídica.
+
+A segunda expansão crypto adiciona SHA3-256, BLAKE2b-512, HMAC-SHA512, X25519
+e PBKDF2-HMAC-SHA256, levando o runtime a 15 algoritmos. A matriz cartesiana
+passa a 9 perfis arquiteturais x 15 algoritmos = 135 células.

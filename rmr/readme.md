@@ -131,3 +131,14 @@ dois AEADs sem confundir primitive, provider e arquitetura. O contrato cruza
 x86-32/x86-64/ARMv7/AArch64/WASM32/RISC-V/PPC; os KATs provider-backed são
 promovidos somente na arquitetura onde OpenSSL 3 foi realmente ligado e
 executado.
+
+
+## RMR SIMPERF + legal boundary — 2026-09-23
+
+`rmr/benchmark_framework/simperf/` modela performance por tamanho usando
+medições oficiais como âncora, cinco perfis de hardware e intervalos de
+incerteza. Simulação nunca é promovida automaticamente a benchmark físico.
+
+`rmr/legal/` documenta a transição pretendida de pesquisa livre/uso comercial
+restrito sem afirmar retroatividade: o `LICENSE_RMR` atual permanece vigente
+até ativação prospectiva válida. Upstream BLAKE3 mantém suas licenças próprias.

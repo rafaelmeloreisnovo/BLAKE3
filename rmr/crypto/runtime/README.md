@@ -31,18 +31,34 @@ C API. The additional primitives are delegated to OpenSSL 3 provider APIs.
 - HKDF-SHA256;
 - Ed25519;
 - ChaCha20-Poly1305;
-- AES-256-GCM.
+- AES-256-GCM;
+- SHA3-256;
+- BLAKE2b-512;
+- HMAC-SHA512;
+- X25519;
+- PBKDF2-HMAC-SHA256.
 
 MD5 and SHA-1 are present for interoperability/regression work. Their presence
 does not promote them for new security-sensitive designs.
 
-## Three additional primitives
+## Three initial additional primitives
 
 The three added beyond the requested hash/MAC/signature set are:
 
 1. HKDF-SHA256 — key derivation;
 2. ChaCha20-Poly1305 — AEAD;
 3. AES-256-GCM — AEAD.
+
+## Five additional primitives — second expansion
+
+1. SHA3-256 — modern SHA-3 hash;
+2. BLAKE2b-512 — independent high-speed hash family;
+3. HMAC-SHA512 — wider HMAC profile;
+4. X25519 — key agreement;
+5. PBKDF2-HMAC-SHA256 — password-based derivation/interoperability.
+
+These five are provider-backed and must pass their own KAT/provider gate. They
+do not inherit a BLAKE3 architecture result.
 
 ## BLAKE3 architecture map
 
@@ -97,7 +113,12 @@ the provider and is not inferred from the BLAKE3 SIMD backend.
 - RFC 5869 HKDF-SHA256 test case 1;
 - RFC 8032 Ed25519 test 1, including negative verification;
 - AES-256-GCM fixed known-answer vector;
-- RFC 8439 ChaCha20-Poly1305 AEAD vector.
+- RFC 8439 ChaCha20-Poly1305 AEAD vector;
+- SHA3-256 "abc";
+- RFC 7693 BLAKE2b-512 "abc";
+- RFC 4231 HMAC-SHA512;
+- RFC 7748 X25519 public/shared-secret vectors;
+- PBKDF2-HMAC-SHA256 fixed interoperability vector.
 
 ## Validation
 

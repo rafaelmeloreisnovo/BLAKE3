@@ -11,11 +11,16 @@ const char *rmr_crypto_algorithm_name(rmr_crypto_algorithm algorithm) {
     case RMR_CRYPTO_SHA1: return "SHA-1";
     case RMR_CRYPTO_SHA256: return "SHA-256";
     case RMR_CRYPTO_SHA512: return "SHA-512";
+    case RMR_CRYPTO_SHA3_256: return "SHA3-256";
+    case RMR_CRYPTO_BLAKE2B_512: return "BLAKE2b-512";
     case RMR_CRYPTO_HMAC_SHA256: return "HMAC-SHA256";
+    case RMR_CRYPTO_HMAC_SHA512: return "HMAC-SHA512";
     case RMR_CRYPTO_HKDF_SHA256: return "HKDF-SHA256";
     case RMR_CRYPTO_ED25519: return "Ed25519";
     case RMR_CRYPTO_CHACHA20_POLY1305: return "ChaCha20-Poly1305";
     case RMR_CRYPTO_AES_256_GCM: return "AES-256-GCM";
+    case RMR_CRYPTO_X25519: return "X25519";
+    case RMR_CRYPTO_PBKDF2_HMAC_SHA256: return "PBKDF2-HMAC-SHA256";
     default: return "UNKNOWN";
   }
 }

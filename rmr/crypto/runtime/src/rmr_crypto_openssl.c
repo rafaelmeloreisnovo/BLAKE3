@@ -20,6 +20,8 @@ static const EVP_MD *rmr_digest_for(rmr_crypto_algorithm algorithm) {
     case RMR_CRYPTO_SHA1: return EVP_sha1();
     case RMR_CRYPTO_SHA256: return EVP_sha256();
     case RMR_CRYPTO_SHA512: return EVP_sha512();
+    case RMR_CRYPTO_SHA3_256: return EVP_sha3_256();
+    case RMR_CRYPTO_BLAKE2B_512: return EVP_blake2b512();
     default: return NULL;
   }
 }
@@ -54,16 +56,19 @@ int rmr_crypto_digest(rmr_crypto_algorithm algorithm,
   return 0;
 }
 
-int rmr_crypto_hmac_sha256(const uint8_t *key, size_t key_len,
-                           const uint8_t *input, size_t input_len,
-                           uint8_t out[32]) {
+static int rmr_crypto_hmac_named(const char *digest_name,
+                                 const uint8_t *key, size_t key_len,
+                                 const uint8_t *input, size_t input_len,
+                                 uint8_t *out, size_t out_cap,
+                                 size_t expected_len) {
   EVP_MAC *mac = NULL;
   EVP_MAC_CTX *ctx = NULL;
   OSSL_PARAM params[2];
   size_t out_len = 0u;
   int ok = -1;
 
-  if (out == NULL || (key == NULL && key_len != 0u) ||
+  if (digest_name == NULL || out == NULL || out_cap < expected_len ||
+      (key == NULL && key_len != 0u) ||
       (input == NULL && input_len != 0u)) {
     return -1;
   }
@@ -79,7 +84,7 @@ int rmr_crypto_hmac_sha256(const uint8_t *key, size_t key_len,
   }
 
   params[0] = OSSL_PARAM_construct_utf8_string(
-      OSSL_MAC_PARAM_DIGEST, (char *)"SHA256", 0);
+      OSSL_MAC_PARAM_DIGEST, (char *)digest_name, 0);
   params[1] = OSSL_PARAM_construct_end();
 
   if (EVP_MAC_init(ctx, key, key_len, params) != 1) {
@@ -88,7 +93,8 @@ int rmr_crypto_hmac_sha256(const uint8_t *key, size_t key_len,
   if (input_len != 0u && EVP_MAC_update(ctx, input, input_len) != 1) {
     goto done;
   }
-  if (EVP_MAC_final(ctx, out, &out_len, 32u) != 1 || out_len != 32u) {
+  if (EVP_MAC_final(ctx, out, &out_len, out_cap) != 1 ||
+      out_len != expected_len) {
     goto done;
   }
 
@@ -98,6 +104,20 @@ done:
   EVP_MAC_CTX_free(ctx);
   EVP_MAC_free(mac);
   return ok;
+}
+
+int rmr_crypto_hmac_sha256(const uint8_t *key, size_t key_len,
+                           const uint8_t *input, size_t input_len,
+                           uint8_t out[32]) {
+  return rmr_crypto_hmac_named(
+      "SHA256", key, key_len, input, input_len, out, 32u, 32u);
+}
+
+int rmr_crypto_hmac_sha512(const uint8_t *key, size_t key_len,
+                           const uint8_t *input, size_t input_len,
+                           uint8_t out[64]) {
+  return rmr_crypto_hmac_named(
+      "SHA512", key, key_len, input, input_len, out, 64u, 64u);
 }
 
 int rmr_crypto_hkdf_sha256(const uint8_t *ikm, size_t ikm_len,
@@ -252,6 +272,92 @@ int rmr_crypto_ed25519_verify(const uint8_t public_key[32],
   EVP_PKEY_free(pkey);
 
   return rc == 1 ? 0 : (rc == 0 ? 1 : -1);
+}
+
+int rmr_crypto_x25519_public_from_private(const uint8_t private_key[32],
+                                          uint8_t public_key[32]) {
+  EVP_PKEY *pkey = NULL;
+  size_t n = 32u;
+  int ok = -1;
+
+  if (private_key == NULL || public_key == NULL) {
+    return -1;
+  }
+
+  pkey = EVP_PKEY_new_raw_private_key(
+      EVP_PKEY_X25519, NULL, private_key, 32u);
+  if (pkey == NULL) {
+    return -1;
+  }
+
+  if (EVP_PKEY_get_raw_public_key(pkey, public_key, &n) == 1 && n == 32u) {
+    ok = 0;
+  }
+
+  EVP_PKEY_free(pkey);
+  return ok;
+}
+
+int rmr_crypto_x25519_shared_secret(const uint8_t private_key[32],
+                                    const uint8_t peer_public_key[32],
+                                    uint8_t shared_secret[32]) {
+  EVP_PKEY *priv = NULL;
+  EVP_PKEY *peer = NULL;
+  EVP_PKEY_CTX *ctx = NULL;
+  size_t n = 32u;
+  int ok = -1;
+
+  if (private_key == NULL || peer_public_key == NULL || shared_secret == NULL) {
+    return -1;
+  }
+
+  priv = EVP_PKEY_new_raw_private_key(
+      EVP_PKEY_X25519, NULL, private_key, 32u);
+  peer = EVP_PKEY_new_raw_public_key(
+      EVP_PKEY_X25519, NULL, peer_public_key, 32u);
+  if (priv == NULL || peer == NULL) {
+    goto done;
+  }
+
+  ctx = EVP_PKEY_CTX_new(priv, NULL);
+  if (ctx == NULL ||
+      EVP_PKEY_derive_init(ctx) != 1 ||
+      EVP_PKEY_derive_set_peer(ctx, peer) != 1 ||
+      EVP_PKEY_derive(ctx, shared_secret, &n) != 1 ||
+      n != 32u) {
+    goto done;
+  }
+
+  ok = 0;
+
+done:
+  EVP_PKEY_CTX_free(ctx);
+  EVP_PKEY_free(peer);
+  EVP_PKEY_free(priv);
+  return ok;
+}
+
+int rmr_crypto_pbkdf2_hmac_sha256(const uint8_t *password, size_t password_len,
+                                  const uint8_t *salt, size_t salt_len,
+                                  uint32_t iterations,
+                                  uint8_t *out, size_t out_len) {
+  if ((password == NULL && password_len != 0u) ||
+      (salt == NULL && salt_len != 0u) ||
+      out == NULL || iterations == 0u ||
+      password_len > INT_MAX || salt_len > INT_MAX ||
+      out_len > INT_MAX || iterations > (uint32_t)INT_MAX) {
+    return -1;
+  }
+
+  return PKCS5_PBKDF2_HMAC(
+      (const char *)password,
+      (int)password_len,
+      salt,
+      (int)salt_len,
+      (int)iterations,
+      EVP_sha256(),
+      (int)out_len,
+      out) == 1 ? 0 : -1;
 }
 
 static const EVP_CIPHER *rmr_cipher_for(rmr_crypto_algorithm algorithm) {
