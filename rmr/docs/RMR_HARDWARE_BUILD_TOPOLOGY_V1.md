@@ -18,6 +18,7 @@ instead of one undifferentiated "optimization" claim.
 preprocessor != compiler != linker != binary
 source symbol != linked symbol != runtime pointer
 logical I/O operation != physical storage IOPS
+IO != IOPS
 comment != executable behavior
 warning != failure
 void boundary != missing semantics
@@ -25,7 +26,7 @@ SIMD != multicore != thread count
 SOURCE != BUILD != EXECUTION != EVIDENCE != CLAIM
 ```
 
-## 12-bit surface topology
+## 15-bit surface topology
 
 ```text
 bit  0 PREPROCESSOR  conditional compilation, macros, include graph
@@ -40,6 +41,9 @@ bit  8 COMMENT       comment density/annotation surface
 bit  9 WARNING       warning directives/diagnostic markers
 bit 10 MODULE        parent/child include and directory relationships
 bit 11 OVERLAP       bit-mask overlap and duplicate-symbol candidates
+bit 12 CONDITION     if/switch/ternary and conditional-control markers
+bit 13 COLOR         presentation markers only; never authoritative state
+bit 14 IOPS          physical IOPS evidence surface, distinct from logical I/O
 ```
 
 The bit mask is a routing/indexing device. A set bit means the audit surface is
