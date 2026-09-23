@@ -1,6 +1,6 @@
 <!--
-Copyright (c) 2024-2026 Rafael Melo Reis
-Documentation draft; does not modify rmr/LICENSE_RMR.
+Copyright (c) 2024–2026 Rafael Melo Reis
+Licensed under LICENSE_RMR.
 -->
 
 # RMR legal transition plan — Brazil
