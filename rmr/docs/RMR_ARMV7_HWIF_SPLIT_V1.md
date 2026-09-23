@@ -56,5 +56,10 @@ fallbacks unless the privileged backend is explicitly selected.
 3. ARMv7 Linux user;
 4. ARMv7 privileged.
 
-The matrix proves compile/link topology only. Physical ARMv7 execution remains
-TOKEN_VAZIO until a device receipt exists.
+No unavailable linker is simulated or inferred.
+
+The matrix proves cross-architecture compilation plus object-level symbol
+closure. Native x86_64 linking is exercised by the CMake self-test. The current
+CI runner does not expose a cross linker, therefore cross-executable linking is
+`TOKEN_VAZIO_RUNNER_NO_LINKER`. Physical ARMv7 execution remains TOKEN_VAZIO
+until a device receipt exists.
