@@ -122,3 +122,27 @@ PR_HEAD validation != MASTER_PUSH validation
 MERGE != VALIDATION
 MASTER_PUSH_SUCCESS = exact-master CI evidence
 ```
+
+
+## Report completeness semantics
+
+Report generation and validation completeness are separate states.
+
+```text
+REPORT_GENERATION=PASS
+does not imply
+VALIDATION_STATE=COMPLETE
+```
+
+The aggregators emit:
+
+- `COMPLETE` — all required CI axes are present;
+- `COMPLETE_WITH_REVIEW` — all required axes executed, but at least one
+  requires review;
+- `PARTIAL` — one or more required axes are missing.
+
+Physical ARM/IOPS and independent third-party reproduction remain separate
+TOKEN_VAZIO gates and do not get silently converted into CI completeness.
+
+The selftest `rmr/validation/tests/test_report_completeness.py` verifies both
+complete and deliberately incomplete synthetic artifact sets.
