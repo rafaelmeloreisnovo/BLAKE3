@@ -250,6 +250,8 @@ jobs:
           pattern: upstream-v3-*
           path: artifacts
           merge-multiple: false
+      - name: Validation completeness selftest
+        run: python3 rmr/validation/tests/test_report_completeness.py
       - name: Generate aggregated V3 receipt
         run: |
           mkdir -p final
