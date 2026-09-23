@@ -371,3 +371,15 @@ Registrados:
 O ledger preserva resultados observados por run/SHA e separa receipts históricos
 do exact-master atual. Paridade, regressões, FAIL e TOKEN_VAZIO permanecem
 append-only; nenhum resultado histórico é promovido automaticamente após merge.
+
+
+### Atualização 2026-09-23 (physical telemetry V4)
+
+O executor físico `rmr/tools/run_physical_upstream_compare_v3.sh` passou a
+registrar contexto de frequência, governor, memória e thermal zones antes/depois
+do benchmark quando essas superfícies são expostas pelo kernel.
+
+O analisador `rmr/validation/analyze_physical_telemetry.py` produz delta
+machine-readable sem coletar serial/identificador único. Telemetria ausente
+permanece TOKEN_VAZIO e variação térmica/frequência não é promovida
+automaticamente a causalidade de performance.
