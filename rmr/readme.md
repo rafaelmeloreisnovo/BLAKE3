@@ -144,9 +144,10 @@ restrito sem afirmar retroatividade: o `LICENSE_RMR` atual permanece vigente
 até ativação prospectiva válida. Upstream BLAKE3 mantém suas licenças próprias.
 
 
-## RMR Full Validation Matrix — 2026-09-23
+## Upstream comprehensive validation V3 — 2026-09-23
 
-A campanha `rmr/validation/` mede upstream vs fork em correção, sanitizers,
-ablação causal, SIMD, Rust/LTO, b3sum, binário/linker/símbolos e contratos
-cross-arch. O workflow agrega receipts sem transformar `TOKEN_VAZIO` físico
-em PASS por inferência.
+A suíte `rmr/upstream_validation/` compara o BLAKE3 oficial e o fork em
+correção, performance por tamanho, backends SIMD, oneTBB, Rust/b3sum,
+sanitizers, ABI/ELF, install/pkg-config, cross-architecture e integração RMR.
+Resultados são receipts por superfície; não existe promoção automática para
+uma alegação genérica de superioridade.
