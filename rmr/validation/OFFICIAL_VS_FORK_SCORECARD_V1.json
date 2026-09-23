@@ -1,0 +1,148 @@
+{
+  "_meta": {
+    "copyright": "Copyright (c) 2024-2026 Rafael Melo Reis",
+    "license": "Licensed under LICENSE_RMR.",
+    "schema": "RMR-BLAKE3-OFFICIAL-VS-FORK-SCORECARD-V1",
+    "claim_allowed": false,
+    "captured_at": "2026-09-23"
+  },
+  "official": {
+    "repository": "BLAKE3-team/BLAKE3",
+    "commit": "6aab490a26124663329dfd3961b8469f8fdb158b"
+  },
+  "fork": {
+    "repository": "rafaelmeloreisnovo/BLAKE3",
+    "commit": "749629193bf796f0ce278a66eb5b76bbf884a15e"
+  },
+  "history_relation": {
+    "state": "DIVERGED",
+    "ahead_by": 695,
+    "behind_by": 28,
+    "note": "history divergence is not a performance claim"
+  },
+  "surfaces": [
+    {
+      "id": "C-CORE",
+      "official": "reference implementation",
+      "fork": "modified core",
+      "state": "PARITY_OR_NOISE_NOT_SEPARATED",
+      "evidence": "multi-size common-harness paired runs",
+      "interpretation": "no broad x86-64 C-core throughput superiority established"
+    },
+    {
+      "id": "C-SOURCE-DELTA",
+      "official": "baseline dispatch/API",
+      "fork": "BLAKE3_LIKELY, BLAKE3_RESTRICT and related source changes",
+      "state": "IMPLEMENTED_MEASURED",
+      "evidence": "ablation deltas observed sub-1% on prior runner",
+      "interpretation": "source changes are real; broad causal speedup not established"
+    },
+    {
+      "id": "SIMD-BACKENDS",
+      "official": "portable/SSE2/SSE4.1/AVX2/AVX512/NEON/WASM as applicable",
+      "fork": "same upstream families plus RMR backend instrumentation",
+      "state": "PASS",
+      "evidence": "fork backend matrix; AVX2 about 6.07x portable at 1 MiB on one x86 runner",
+      "interpretation": "backend ISA gain, not fork-over-upstream gain"
+    },
+    {
+      "id": "ARMV7-NEON",
+      "official": "NEON implementation available",
+      "fork": "NEON path + physical historical receipt",
+      "state": "PASS_HISTORICAL_DEVICE",
+      "evidence": "132.313 MiB/s portable vs 163.450 MiB/s NEON",
+      "delta_percent": 23.53,
+      "interpretation": "fork NEON over fork portable on recorded ARMv7 device"
+    },
+    {
+      "id": "ABI-ELF",
+      "official": "baseline public ABI",
+      "fork": "public ABI retained",
+      "state": "PASS",
+      "evidence": "0 extra global symbols, 0 missing upstream symbols, GNU stack non-executable"
+    },
+    {
+      "id": "BINARY-SIZE",
+      "official": "libblake3.a 99830 bytes on prior runner",
+      "fork": "libblake3.a 99990 bytes on same prior runner",
+      "state": "OBSERVED",
+      "delta_bytes": 160,
+      "interpretation": "small archive-size increase; benchmark executable size equal in prior receipt"
+    },
+    {
+      "id": "RUST-LTO",
+      "official": "upstream release profile",
+      "fork": "LTO + codegen-units=1 profile changes",
+      "state": "PENDING_EXACT_MASTER_V3",
+      "evidence": "dedicated V3 executor exists"
+    },
+    {
+      "id": "B3SUM-CLI",
+      "official": "upstream CLI",
+      "fork": "buffering and implementation changes",
+      "state": "PENDING_EXACT_MASTER_V3",
+      "evidence": "dedicated V3 executor exists"
+    },
+    {
+      "id": "TBB",
+      "official": "official optional TBB path",
+      "fork": "fork optional TBB path",
+      "state": "PENDING_EXACT_MASTER_V3",
+      "evidence": "dedicated V3 executor exists"
+    },
+    {
+      "id": "CROSS-ARCH",
+      "official": "upstream source portability",
+      "fork": "RMR compile-contract matrix",
+      "state": "PASS_COMPILE_CONTRACT",
+      "evidence": "x86_64,x86_32,ARMv7,AArch64,WASM32,RISC-V64,PPC64LE = 7/7",
+      "interpretation": "compile contract does not equal physical execution"
+    },
+    {
+      "id": "RMR-SYSTEM",
+      "official": "not an upstream goal",
+      "fork": "HWIF, topology, SIMPERF, crypto runtime, receipts, provenance, audit",
+      "state": "IMPLEMENTED",
+      "interpretation": "system-level extension, not primitive throughput evidence"
+    },
+    {
+      "id": "ARMV7-CURRENT-OFFICIAL-VS-FORK",
+      "state": "TOKEN_VAZIO_PHYSICAL",
+      "evidence": "device-bound runner exists"
+    },
+    {
+      "id": "AARCH64-CURRENT-OFFICIAL-VS-FORK",
+      "state": "TOKEN_VAZIO_PHYSICAL",
+      "evidence": "device-bound runner exists"
+    },
+    {
+      "id": "PHYSICAL-IOPS",
+      "state": "TOKEN_VAZIO_PHYSICAL"
+    },
+    {
+      "id": "INDEPENDENT-THIRD-PARTY",
+      "state": "TOKEN_VAZIO"
+    }
+  ],
+  "overall": {
+    "core_c": "PARITY_ON_OBSERVED_X86_RUNNERS",
+    "repository_scope": "FORK_SUBSTANTIALLY_EXTENDED",
+    "universal_performance_superiority": "NOT_ESTABLISHED",
+    "next_priority": [
+      "Rust/LTO exact-master",
+      "b3sum exact-master",
+      "TBB exact-master",
+      "ARMv7 current physical official-vs-fork",
+      "AArch64 current physical official-vs-fork",
+      "RMR end-to-end pipeline"
+    ]
+  },
+  "boundaries": [
+    "DIVERGED_HISTORY!=PERFORMANCE_SUPERIORITY",
+    "SIMD_BACKEND_GAIN!=FORK_GAIN",
+    "CORE_GAIN!=CLI_GAIN",
+    "X86_GAIN!=ARM_GAIN",
+    "SYSTEM_EXTENSION!=PRIMITIVE_SPEEDUP",
+    "SOURCE!=BUILD!=EXECUTION!=EVIDENCE!=CLAIM"
+  ]
+}
