@@ -1,6 +1,6 @@
 <!--
-Copyright (c) 2024-2026 Rafael Melo Reis
-Documentation/audit protocol; not legal advice.
+Copyright (c) 2024–2026 Rafael Melo Reis
+Licensed under LICENSE_RMR.
 -->
 
 # RMR enforcement + audit protocol — Brazil
