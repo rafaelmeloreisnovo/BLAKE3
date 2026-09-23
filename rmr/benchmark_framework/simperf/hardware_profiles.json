@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "copyright": "Copyright (c) 2024-2026 Rafael Melo Reis",
+    "license": "Licensed under LICENSE_RMR.",
+    "schema": "RMR-SIMPERF-HARDWARE-PROFILES-V1",
+    "claim_allowed": false,
+    "profiles_are_archetypes_not_product_claims": true
+  },
+  "profiles": [
+    {
+      "id": "armv7-neon-mobile",
+      "architecture": "armv7",
+      "backend": "NEON-128",
+      "clock_ghz": 1.8,
+      "vector_bytes": 16,
+      "issue_factor": 2.0,
+      "memory_gbps": 6.0,
+      "memory_efficiency": 0.65,
+      "startup_ns": 65.0,
+      "relative_uncertainty": 0.35,
+      "comment": "Archetype for constrained ARMv7 NEON phones; calibrate from device receipt before claims."
+    },
+    {
+      "id": "aarch64-neon-efficiency",
+      "architecture": "aarch64",
+      "backend": "NEON-128",
+      "clock_ghz": 2.0,
+      "vector_bytes": 16,
+      "issue_factor": 2.2,
+      "memory_gbps": 15.0,
+      "memory_efficiency": 0.70,
+      "startup_ns": 45.0,
+      "relative_uncertainty": 0.28,
+      "comment": "Efficiency-oriented AArch64 archetype; not tied to one commercial SoC."
+    },
+    {
+      "id": "aarch64-neon-performance",
+      "architecture": "aarch64",
+      "backend": "NEON-128",
+      "clock_ghz": 3.0,
+      "vector_bytes": 16,
+      "issue_factor": 4.0,
+      "memory_gbps": 45.0,
+      "memory_efficiency": 0.75,
+      "startup_ns": 30.0,
+      "relative_uncertainty": 0.22,
+      "comment": "High-performance AArch64 archetype; calibrated ratios should replace priors."
+    },
+    {
+      "id": "x86_64-avx2-desktop",
+      "architecture": "x86_64",
+      "backend": "AVX2-256",
+      "clock_ghz": 4.0,
+      "vector_bytes": 32,
+      "issue_factor": 4.0,
+      "memory_gbps": 55.0,
+      "memory_efficiency": 0.78,
+      "startup_ns": 25.0,
+      "relative_uncertainty": 0.18,
+      "comment": "Desktop-class AVX2 archetype; official measurement remains calibration source."
+    },
+    {
+      "id": "x86_64-avx512-server",
+      "architecture": "x86_64",
+      "backend": "AVX512-512",
+      "clock_ghz": 3.2,
+      "vector_bytes": 64,
+      "issue_factor": 5.0,
+      "memory_gbps": 100.0,
+      "memory_efficiency": 0.80,
+      "startup_ns": 30.0,
+      "relative_uncertainty": 0.22,
+      "comment": "Server-class AVX-512 archetype; frequency/downclock behavior must be calibrated."
+    }
+  ]
+}
