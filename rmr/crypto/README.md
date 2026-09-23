@@ -210,7 +210,12 @@ Primitivas expostas:
 - HKDF-SHA256;
 - Ed25519;
 - ChaCha20-Poly1305;
-- AES-256-GCM.
+- AES-256-GCM;
+- SHA3-256;
+- BLAKE2b-512;
+- HMAC-SHA512;
+- X25519;
+- PBKDF2-HMAC-SHA256.
 
 O provider adicional atual é OpenSSL 3. A presença de um backend SIMD BLAKE3
 não é usada como evidência de aceleração das outras primitivas.
