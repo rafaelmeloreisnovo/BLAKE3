@@ -26,20 +26,34 @@ rmr_write_common_environment "$OUT/environment.txt" "$OFFICIAL_COMMIT"
   echo "cargo=$(cargo --version)"
 } >>"$OUT/environment.txt"
 
-cargo test --manifest-path "$OFFICIAL_ROOT/Cargo.toml" -p blake3 --lib   >"$OUT/official-blake3-test.log" 2>&1
-cargo test --manifest-path "$FORK_ROOT/Cargo.toml" -p blake3 --lib   >"$OUT/fork-blake3-test.log" 2>&1
-cargo test --manifest-path "$OFFICIAL_ROOT/Cargo.toml" -p b3sum   >"$OUT/official-b3sum-test.log" 2>&1
-cargo test --manifest-path "$FORK_ROOT/Cargo.toml" -p b3sum   >"$OUT/fork-b3sum-test.log" 2>&1
+run_logged() {
+  local stage="$1" log="$2"
+  shift 2
+  if "$@" >"$log" 2>&1; then
+    echo "RMR_RUST_STAGE=$stage PASS"
+  else
+    rc=$?
+    echo "RMR_RUST_STAGE=$stage FAIL rc=$rc" >&2
+    echo "----- $log -----" >&2
+    tail -n 240 "$log" >&2 || true
+    exit "$rc"
+  fi
+}
+
+run_logged official-blake3-test "$OUT/official-blake3-test.log"   cargo test --manifest-path "$OFFICIAL_ROOT/Cargo.toml" -p blake3 --lib
+run_logged fork-blake3-test "$OUT/fork-blake3-test.log"   cargo test --manifest-path "$FORK_ROOT/Cargo.toml" -p blake3 --lib
+run_logged official-b3sum-test "$OUT/official-b3sum-test.log"   cargo test --manifest-path "$OFFICIAL_ROOT/Cargo.toml" -p b3sum
+run_logged fork-b3sum-test "$OUT/fork-b3sum-test.log"   cargo test --manifest-path "$FORK_ROOT/Cargo.toml" -p b3sum
 
 mkdir -p "$OFFICIAL_ROOT/examples" "$FORK_ROOT/examples"
 cp "$ROOT/upstream_validation/rust_hash_bench.rs" "$OFFICIAL_ROOT/examples/rmr_v3_hash_bench.rs"
 cp "$ROOT/upstream_validation/rust_hash_bench.rs" "$FORK_ROOT/examples/rmr_v3_hash_bench.rs"
 
-CARGO_TARGET_DIR="$WORK/target-rust-official"   cargo build --manifest-path "$OFFICIAL_ROOT/Cargo.toml" --release   --example rmr_v3_hash_bench >"$OUT/official-rust-harness-build.log" 2>&1
+CARGO_TARGET_DIR="$WORK/target-rust-official" run_logged official-rust-harness-build "$OUT/official-rust-harness-build.log"   cargo build --manifest-path "$OFFICIAL_ROOT/Cargo.toml" --release --example rmr_v3_hash_bench
 
-CARGO_TARGET_DIR="$WORK/target-rust-fork"   cargo build --manifest-path "$FORK_ROOT/Cargo.toml" --release   --example rmr_v3_hash_bench >"$OUT/fork-rust-harness-build.log" 2>&1
+CARGO_TARGET_DIR="$WORK/target-rust-fork" run_logged fork-rust-harness-build "$OUT/fork-rust-harness-build.log"   cargo build --manifest-path "$FORK_ROOT/Cargo.toml" --release --example rmr_v3_hash_bench
 
-CARGO_TARGET_DIR="$WORK/target-rust-fork-ablated" CARGO_PROFILE_RELEASE_LTO=false CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16   cargo build --manifest-path "$FORK_ROOT/Cargo.toml" --release   --example rmr_v3_hash_bench >"$OUT/fork-rust-harness-ablated-build.log" 2>&1
+CARGO_TARGET_DIR="$WORK/target-rust-fork-ablated" CARGO_PROFILE_RELEASE_LTO=false CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16   run_logged fork-rust-harness-ablated-build "$OUT/fork-rust-harness-ablated-build.log"   cargo build --manifest-path "$FORK_ROOT/Cargo.toml" --release --example rmr_v3_hash_bench
 
 RUST_OFFICIAL="$WORK/target-rust-official/release/examples/rmr_v3_hash_bench"
 RUST_FORK="$WORK/target-rust-fork/release/examples/rmr_v3_hash_bench"
@@ -89,9 +103,9 @@ print("RMR_RUST_LIBRARY_V3=PASS")
 for r in out: print(r)
 PY
 
-CARGO_TARGET_DIR="$WORK/target-official"   cargo build --manifest-path "$OFFICIAL_ROOT/Cargo.toml" --release -p b3sum   >"$OUT/official-release-build.log" 2>&1
-CARGO_TARGET_DIR="$WORK/target-fork"   cargo build --manifest-path "$FORK_ROOT/Cargo.toml" --release -p b3sum   >"$OUT/fork-release-build.log" 2>&1
-CARGO_TARGET_DIR="$WORK/target-fork-ablated" CARGO_PROFILE_RELEASE_LTO=false CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16   cargo build --manifest-path "$FORK_ROOT/Cargo.toml" --release -p b3sum   >"$OUT/fork-ablated-build.log" 2>&1
+CARGO_TARGET_DIR="$WORK/target-official" run_logged official-release-build "$OUT/official-release-build.log"   cargo build --manifest-path "$OFFICIAL_ROOT/Cargo.toml" --release -p b3sum
+CARGO_TARGET_DIR="$WORK/target-fork" run_logged fork-release-build "$OUT/fork-release-build.log"   cargo build --manifest-path "$FORK_ROOT/Cargo.toml" --release -p b3sum
+CARGO_TARGET_DIR="$WORK/target-fork-ablated" CARGO_PROFILE_RELEASE_LTO=false CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16   run_logged fork-ablated-build "$OUT/fork-ablated-build.log"   cargo build --manifest-path "$FORK_ROOT/Cargo.toml" --release -p b3sum
 
 OFFICIAL_BIN="$WORK/target-official/release/b3sum"
 FORK_BIN="$WORK/target-fork/release/b3sum"
