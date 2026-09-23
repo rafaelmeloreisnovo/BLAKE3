@@ -67,25 +67,26 @@ jobs:
           TARGET_MIB: "96"
           RESULT_ROOT: rmr/validation/output/upstream-v2
         run: bash rmr/tools/orchestrate_blake3_compare_v2.sh
-      - name: Source ablation matrix
+      - name: Source ablation matrix V3
         env:
           CC: clang
           ROUNDS: "7"
           TARGET_MIB: "48"
-        run: bash rmr/tools/run_c_ablation_matrix.sh
-      - name: SIMD backend matrix
+        run: bash rmr/tools/run_c_ablation_v3.sh
+      - name: Official-vs-fork backend matrix V3
         env:
           CC: clang
+          CXX: clang++
           ROUNDS: "5"
           TARGET_MIB: "48"
-        run: bash rmr/tools/run_simd_backend_matrix.sh
+        run: bash rmr/tools/benchmark_backends_v3.sh
       - uses: actions/upload-artifact@v4
         with:
           name: rmr-full-c-performance
           path: |
             rmr/validation/output/upstream-v2/**
-            rmr/validation/output/c-ablation/**
-            rmr/validation/output/simd-matrix/**
+            rmr/benchmark_framework/output/upstream-v3-ablation/**
+            rmr/benchmark_framework/output/upstream-v3-backends/**
 
   rust-cli:
     runs-on: ubuntu-latest
@@ -99,15 +100,15 @@ jobs:
         run: |
           rustc --version
           cargo --version
-      - name: Run Rust/LTO/b3sum validation
+      - name: Run Rust/LTO/b3sum validation V3
         env:
           ROUNDS: "5"
           TARGET_MIB: "48"
-        run: bash rmr/tools/run_rust_cli_validation.sh
+        run: bash rmr/tools/benchmark_rust_cli_v3.sh
       - uses: actions/upload-artifact@v4
         with:
           name: rmr-full-rust-cli
-          path: rmr/validation/output/rust-cli/**
+          path: rmr/benchmark_framework/output/upstream-v3-rust/**
 
   binary-cross:
     runs-on: ubuntu-latest
