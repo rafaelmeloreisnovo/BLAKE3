@@ -150,7 +150,7 @@
 //! of the same input.
 
 use crate::platform::Platform;
-use crate::{CVWords, Hasher, CHUNK_LEN, IV, KEY_LEN, OUT_LEN};
+use crate::{CHUNK_LEN, CVWords, Hasher, IV, KEY_LEN, OUT_LEN};
 
 /// Extension methods for [`Hasher`]. This is the main entrypoint to the `hazmat` module.
 pub trait HasherExt {
@@ -397,15 +397,16 @@ fn test_left_subtree_len() {
 /// See the [module level examples](index.html#examples).
 #[derive(Copy, Clone, Debug)]
 pub enum Mode<'a> {
-    /// Corresponding to [`hash`](crate::hash)
+    /// The default [`hash`][crate::hash] mode. Subtrees must be hashed with [`Hasher::new`].
     Hash,
 
-    /// Corresponding to [`keyed_hash`](crate::hash)
+    /// The [`keyed_hash`][crate::keyed_hash] mode. Subtrees must be hashed with
+    /// [`Hasher::new_keyed`].
     KeyedHash(&'a [u8; KEY_LEN]),
 
-    /// Corresponding to [`derive_key`](crate::hash)
-    ///
-    /// The [`ContextKey`] comes from [`hash_derive_key_context`].
+    /// The [`derive_key`][crate::derive_key] mode. Subtrees must be hashed with either
+    /// [`Hasher::new_derive_key`] or [`Hasher::new_from_context_key`]. The [`ContextKey`] comes
+    /// from [`hash_derive_key_context`].
     DeriveKeyMaterial(&'a ContextKey),
 }
 
@@ -455,7 +456,6 @@ fn merge_subtrees_inner(
 /// [`Hasher::finalize_non_root`](HasherExt::finalize_non_root) or other calls to
 /// `merge_subtrees_non_root`. "Chaining value" is the academic term for a non-root or non-final
 /// hash.
-#[inline]
 pub fn merge_subtrees_non_root(
     left_child: &ChainingValue,
     right_child: &ChainingValue,
@@ -474,7 +474,6 @@ pub fn merge_subtrees_non_root(
 /// Note that inputs of [`CHUNK_LEN`] or less don't produce any parent nodes and can't be hashed
 /// using this function. In that case you must get the root hash from [`Hasher::finalize`] (or just
 /// [`blake3::hash`](crate::hash)).
-#[inline]
 pub fn merge_subtrees_root(
     left_child: &ChainingValue,
     right_child: &ChainingValue,
@@ -525,7 +524,6 @@ pub fn merge_subtrees_root(
 /// hasher.finalize_xof().fill(&mut expected);
 /// assert_eq!(output_bytes, expected);
 /// ```
-#[inline]
 pub fn merge_subtrees_root_xof(
     left_child: &ChainingValue,
     right_child: &ChainingValue,
@@ -559,7 +557,6 @@ pub type ContextKey = [u8; KEY_LEN];
 ///
 /// assert_eq!(derived_key, blake3::derive_key("foo", b"bar"));
 /// ```
-#[inline]
 pub fn hash_derive_key_context(context: &str) -> ContextKey {
     crate::hash_all_at_once::<crate::join::SerialJoin>(
         context.as_bytes(),

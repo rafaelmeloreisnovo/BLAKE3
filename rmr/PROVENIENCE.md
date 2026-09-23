@@ -382,3 +382,18 @@ Estados globais: COMPLETE, COMPLETE_WITH_REVIEW e PARTIAL.
 Adicionado `rmr/validation/tests/test_report_completeness.py` para garantir
 que a ausência deliberada de um eixo obrigatório resulte em PARTIAL e nunca
 seja mascarada como validação integral.
+
+### μWRITE — upstream 1.8.7 synchronization branch
+
+`μID=MU-BLAKE3-UPSTREAM-1.8.7-20260923T100830Z`  
+`ts=2026-09-23T10:08:30Z`  
+`source/ref=BLAKE3-team/BLAKE3@6aab490a26124663329dfd3961b8469f8fdb158b`  
+`parent=141f8065e2c3845978cff7aabb6eeadebc155d30`  
+`kind=UPSTREAM_BASELINE_SYNC`  
+`Δsummary=39 upstream paths synchronized to 1.8.7; 35 clean imports; semantic preservation in Cargo.toml, README.md, c/CMakeLists.txt and c/blake3.h; sync commit=774ba7ec9639a79132a6992e35f16035707f58d9`  
+`routes=P/C/R/I/E/A; L=version-lineage; O=upstream-vs-fork; T=build+runtime`  
+`evidence=source/tree/commit materialized; execution gates pending`  
+`gap=CI exact-head; common-harness rerun; physical ARMv7/AArch64; independent reproduction`  
+`next=open draft PR and require full-validation/comprehensive gates`  
+`claim_allowed=false`
+

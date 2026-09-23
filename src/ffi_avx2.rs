@@ -1,10 +1,9 @@
-use crate::{CVWords, IncrementCounter, BLOCK_LEN, OUT_LEN};
+use crate::{BLOCK_LEN, CVWords, IncrementCounter, OUT_LEN};
 
 // Note that there is no AVX2 implementation of compress_in_place or
 // compress_xof.
 
 // Unsafe because this may only be called on platforms supporting AVX2.
-#[inline]
 pub unsafe fn hash_many<const N: usize>(
     inputs: &[&[u8; N]],
     key: &CVWords,
@@ -36,7 +35,7 @@ pub unsafe fn hash_many<const N: usize>(
 }
 
 pub mod ffi {
-    extern "C" {
+    unsafe extern "C" {
         pub fn blake3_hash_many_avx2(
             inputs: *const *const u8,
             num_inputs: usize,

@@ -1,7 +1,5 @@
-use crate::{CVBytes, CVWords, IncrementCounter, BLOCK_LEN, CHUNK_LEN, OUT_LEN};
-use arrayref::array_ref;
+use crate::{BLOCK_LEN, CHUNK_LEN, CVBytes, CVWords, IncrementCounter, OUT_LEN};
 use arrayvec::ArrayVec;
-use core::usize;
 use rand::prelude::*;
 
 // Interesting input lengths to run tests on.
@@ -133,7 +131,11 @@ pub fn test_hash_many_fn(
         // First hash chunks.
         let mut chunks = ArrayVec::<&[u8; CHUNK_LEN], NUM_INPUTS>::new();
         for i in 0..NUM_INPUTS {
-            chunks.push(array_ref!(input_buf, i * CHUNK_LEN, CHUNK_LEN));
+            chunks.push(
+                (&input_buf[i * CHUNK_LEN..][..CHUNK_LEN])
+                    .try_into()
+                    .unwrap(),
+            );
         }
         let mut portable_chunks_out = [0; NUM_INPUTS * OUT_LEN];
         crate::portable::hash_many(
@@ -172,7 +174,11 @@ pub fn test_hash_many_fn(
         // Then hash parents.
         let mut parents = ArrayVec::<&[u8; 2 * OUT_LEN], NUM_INPUTS>::new();
         for i in 0..NUM_INPUTS {
-            parents.push(array_ref!(input_buf, i * 2 * OUT_LEN, 2 * OUT_LEN));
+            parents.push(
+                (&input_buf[i * 2 * OUT_LEN..][..2 * OUT_LEN])
+                    .try_into()
+                    .unwrap(),
+            );
         }
         let mut portable_parents_out = [0; NUM_INPUTS * OUT_LEN];
         crate::portable::hash_many(
@@ -350,18 +356,27 @@ fn test_compare_reference_impl() {
 
             // all at once
             let test_out = crate::hash(input);
-            assert_eq!(test_out, *array_ref!(expected_out, 0, 32));
+            assert_eq!(
+                test_out,
+                *<&[u8; 32]>::try_from(&expected_out[..32]).unwrap()
+            );
             // incremental
             let mut hasher = crate::Hasher::new();
             hasher.update(input);
-            assert_eq!(hasher.finalize(), *array_ref!(expected_out, 0, 32));
+            assert_eq!(
+                hasher.finalize(),
+                *<&[u8; 32]>::try_from(&expected_out[..32]).unwrap()
+            );
             assert_eq!(hasher.finalize(), test_out);
             // incremental (rayon)
             #[cfg(feature = "rayon")]
             {
                 let mut hasher = crate::Hasher::new();
                 hasher.update_rayon(input);
-                assert_eq!(hasher.finalize(), *array_ref!(expected_out, 0, 32));
+                assert_eq!(
+                    hasher.finalize(),
+                    *<&[u8; 32]>::try_from(&expected_out[..32]).unwrap()
+                );
                 assert_eq!(hasher.finalize(), test_out);
             }
             // xof
@@ -379,18 +394,27 @@ fn test_compare_reference_impl() {
 
             // all at once
             let test_out = crate::keyed_hash(&TEST_KEY, input);
-            assert_eq!(test_out, *array_ref!(expected_out, 0, 32));
+            assert_eq!(
+                test_out,
+                *<&[u8; 32]>::try_from(&expected_out[..32]).unwrap()
+            );
             // incremental
             let mut hasher = crate::Hasher::new_keyed(&TEST_KEY);
             hasher.update(input);
-            assert_eq!(hasher.finalize(), *array_ref!(expected_out, 0, 32));
+            assert_eq!(
+                hasher.finalize(),
+                *<&[u8; 32]>::try_from(&expected_out[..32]).unwrap()
+            );
             assert_eq!(hasher.finalize(), test_out);
             // incremental (rayon)
             #[cfg(feature = "rayon")]
             {
                 let mut hasher = crate::Hasher::new_keyed(&TEST_KEY);
                 hasher.update_rayon(input);
-                assert_eq!(hasher.finalize(), *array_ref!(expected_out, 0, 32));
+                assert_eq!(
+                    hasher.finalize(),
+                    *<&[u8; 32]>::try_from(&expected_out[..32]).unwrap()
+                );
                 assert_eq!(hasher.finalize(), test_out);
             }
             // xof
@@ -413,15 +437,27 @@ fn test_compare_reference_impl() {
             // incremental
             let mut hasher = crate::Hasher::new_derive_key(context);
             hasher.update(input);
-            assert_eq!(hasher.finalize(), *array_ref!(expected_out, 0, 32));
-            assert_eq!(hasher.finalize(), *array_ref!(test_out, 0, 32));
+            assert_eq!(
+                hasher.finalize(),
+                *<&[u8; 32]>::try_from(&expected_out[..32]).unwrap()
+            );
+            assert_eq!(
+                hasher.finalize(),
+                *<&[u8; 32]>::try_from(&test_out[..32]).unwrap()
+            );
             // incremental (rayon)
             #[cfg(feature = "rayon")]
             {
                 let mut hasher = crate::Hasher::new_derive_key(context);
                 hasher.update_rayon(input);
-                assert_eq!(hasher.finalize(), *array_ref!(expected_out, 0, 32));
-                assert_eq!(hasher.finalize(), *array_ref!(test_out, 0, 32));
+                assert_eq!(
+                    hasher.finalize(),
+                    *<&[u8; 32]>::try_from(&expected_out[..32]).unwrap()
+                );
+                assert_eq!(
+                    hasher.finalize(),
+                    *<&[u8; 32]>::try_from(&test_out[..32]).unwrap()
+                );
             }
             // xof
             let mut extended = [0; OUT];
@@ -524,7 +560,7 @@ fn test_fuzz_hasher() {
     let num_tests = if cfg!(debug_assertions) { 100 } else { 10_000 };
 
     // Use a fixed RNG seed for reproducibility.
-    let mut rng = rand_chacha::ChaCha8Rng::from_seed([1; 32]);
+    let mut rng = chacha20::ChaCha8Rng::from_seed([1; 32]);
     for _num_test in 0..num_tests {
         #[cfg(feature = "std")]
         dbg!(_num_test);
@@ -555,7 +591,7 @@ fn test_fuzz_xof() {
     let num_tests = if cfg!(debug_assertions) { 100 } else { 2500 };
 
     // Use a fixed RNG seed for reproducibility.
-    let mut rng = rand_chacha::ChaCha8Rng::from_seed([1; 32]);
+    let mut rng = chacha20::ChaCha8Rng::from_seed([1; 32]);
     for _num_test in 0..num_tests {
         #[cfg(feature = "std")]
         dbg!(_num_test);
@@ -773,6 +809,17 @@ const fn test_hash_const_conversions() {
     _ = hash.as_bytes();
 }
 
+#[test]
+fn test_block_buffer_alignment() {
+    // ChunkState.buf and Output.block are Aligned64 so that wide vector stores
+    // into them (e.g. from memcpy) can store-to-load forward regardless of
+    // stack layout. See the comment on Aligned64 in lib.rs, the measurements in
+    // https://github.com/zooko/bench-hashes/issues/2, and the before/after
+    // benchmarks in https://github.com/BLAKE3-team/BLAKE3/pull/582.
+    assert_eq!(64, core::mem::align_of::<crate::Aligned64>());
+    assert_eq!(0, core::mem::offset_of!(crate::Aligned64, 0));
+}
+
 #[cfg(feature = "zeroize")]
 #[test]
 fn test_zeroize() {
@@ -786,7 +833,7 @@ fn test_zeroize() {
         chunk_state: crate::ChunkState {
             cv: [42; 8],
             chunk_counter: 42,
-            buf: [42; 64],
+            buf: crate::Aligned64([42; 64]),
             buf_len: 42,
             blocks_compressed: 42,
             flags: 42,
@@ -814,7 +861,7 @@ fn test_zeroize() {
     let mut output_reader = crate::OutputReader {
         inner: crate::Output {
             input_chaining_value: [42; 8],
-            block: [42; 64],
+            block: crate::Aligned64([42; 64]),
             counter: 42,
             block_len: 42,
             flags: 42,
@@ -915,9 +962,6 @@ fn test_mmap() -> Result<(), std::io::Error> {
 fn test_mmap_virtual_file() -> Result<(), std::io::Error> {
     // Virtual files like /proc/version can't be mmapped, because their contents don't actually
     // exist anywhere in memory. Make sure we fall back to regular file IO in these cases.
-    // Currently this is handled with a length check, where the assumption is that virtual files
-    // will always report length 0. If that assumption ever breaks, hopefully this test will catch
-    // it.
     let virtual_filepath = "/proc/version";
     let mut mmap_hasher = crate::Hasher::new();
     // We'll fail right here if the fallback doesn't work.

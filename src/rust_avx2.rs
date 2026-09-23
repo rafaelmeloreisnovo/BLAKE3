@@ -4,9 +4,8 @@ use core::arch::x86::*;
 use core::arch::x86_64::*;
 
 use crate::{
-    counter_high, counter_low, CVWords, IncrementCounter, BLOCK_LEN, IV, MSG_SCHEDULE, OUT_LEN,
+    BLOCK_LEN, CVWords, IV, IncrementCounter, MSG_SCHEDULE, OUT_LEN, counter_high, counter_low,
 };
-use arrayref::{array_mut_ref, mut_array_refs};
 
 pub const DEGREE: usize = 8;
 
@@ -276,9 +275,9 @@ unsafe fn transpose_msg_vecs(inputs: &[*const u8; DEGREE], block_offset: usize) 
                 _MM_HINT_T0,
             );
         }
-        let squares = mut_array_refs!(&mut vecs, DEGREE, DEGREE);
-        transpose_vecs(squares.0);
-        transpose_vecs(squares.1);
+        let (square0, square1) = vecs.split_at_mut(DEGREE);
+        transpose_vecs(square0.try_into().unwrap());
+        transpose_vecs(square1.try_into().unwrap());
         vecs
     }
 }
@@ -312,7 +311,6 @@ unsafe fn load_counters(counter: u64, increment_counter: IncrementCounter) -> (_
     }
 }
 
-#[inline]
 #[target_feature(enable = "avx2")]
 pub unsafe fn hash8(
     inputs: &[*const u8; DEGREE],
@@ -401,7 +399,6 @@ pub unsafe fn hash8(
 }
 
 #[target_feature(enable = "avx2")]
-#[inline]
 pub unsafe fn hash_many<const N: usize>(
     mut inputs: &[&[u8; N]],
     key: &CVWords,
@@ -429,7 +426,7 @@ pub unsafe fn hash_many<const N: usize>(
                 flags,
                 flags_start,
                 flags_end,
-                array_mut_ref!(out, 0, DEGREE * OUT_LEN),
+                (&mut out[..DEGREE * OUT_LEN]).try_into().unwrap(),
             );
         }
         if increment_counter.yes() {

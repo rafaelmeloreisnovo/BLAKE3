@@ -17,10 +17,9 @@
 use core::arch::wasm32::*;
 
 use crate::{
-    counter_high, counter_low, CVBytes, CVWords, IncrementCounter, BLOCK_LEN, IV, MSG_SCHEDULE,
-    OUT_LEN,
+    BLOCK_LEN, CVBytes, CVWords, IV, IncrementCounter, MSG_SCHEDULE, OUT_LEN, counter_high,
+    counter_low,
 };
-use arrayref::{array_mut_ref, array_ref, mut_array_refs};
 
 pub const DEGREE: usize = 4;
 
@@ -56,16 +55,16 @@ fn set4(a: u32, b: u32, c: u32, d: u32) -> v128 {
     i32x4(a as i32, b as i32, c as i32, d as i32)
 }
 
-// These rotations are the "simple/shifts version". For the
-// "complicated/shuffles version", see
-// https://github.com/sneves/blake2-avx2/blob/b3723921f668df09ece52dcd225a36d4a4eea1d9/blake2s-common.h#L63-L66.
-// For a discussion of the tradeoffs, see
-// https://github.com/sneves/blake2-avx2/pull/5. Due to an LLVM bug
-// (https://bugs.llvm.org/show_bug.cgi?id=44379), this version performs better
-// on recent x86 chips.
+// rot16 and rot8 use i8x16_shuffle (1 WASM instruction) instead of
+// shift+OR (3 instructions) since they are byte-aligned rotations.
+// rot12 and rot7 are not byte-aligned, so they still use shift+OR.
+// For the x86 "shuffles vs shifts" discussion, see
+// https://github.com/sneves/blake2-avx2/pull/5. On x86, shifts can be
+// faster due to an LLVM bug (https://bugs.llvm.org/show_bug.cgi?id=44379),
+// but on WASM SIMD targets, i8x16_shuffle is ~20% faster for rot8/rot16.
 #[inline(always)]
 fn rot16(a: v128) -> v128 {
-    v128_or(u32x4_shr(a, 16), u32x4_shl(a, 32 - 16))
+    i8x16_shuffle::<2, 3, 0, 1, 6, 7, 4, 5, 10, 11, 8, 9, 14, 15, 12, 13>(a, a)
 }
 
 #[inline(always)]
@@ -75,7 +74,7 @@ fn rot12(a: v128) -> v128 {
 
 #[inline(always)]
 fn rot8(a: v128) -> v128 {
-    v128_or(u32x4_shr(a, 8), u32x4_shl(a, 32 - 8))
+    i8x16_shuffle::<1, 2, 3, 0, 5, 6, 7, 4, 9, 10, 11, 8, 13, 14, 15, 12>(a, a)
 }
 
 #[inline(always)]
@@ -358,7 +357,6 @@ fn compress_pre(
 }
 
 #[target_feature(enable = "simd128")]
-#[inline]
 pub fn compress_in_place(
     cv: &mut CVWords,
     block: &[u8; BLOCK_LEN],
@@ -376,7 +374,6 @@ pub fn compress_in_place(
 }
 
 #[target_feature(enable = "simd128")]
-#[inline]
 pub fn compress_xof(
     cv: &CVWords,
     block: &[u8; BLOCK_LEN],
@@ -557,11 +554,13 @@ unsafe fn transpose_msg_vecs(inputs: &[*const u8; DEGREE], block_offset: usize) 
             loadu(inputs[3].add(block_offset + 3 * 4 * DEGREE)),
         ]
     };
-    let squares = mut_array_refs!(&mut vecs, DEGREE, DEGREE, DEGREE, DEGREE);
-    transpose_vecs(squares.0);
-    transpose_vecs(squares.1);
-    transpose_vecs(squares.2);
-    transpose_vecs(squares.3);
+    let (square0, rest) = vecs.split_at_mut(DEGREE);
+    let (square1, rest) = rest.split_at_mut(DEGREE);
+    let (square2, square3) = rest.split_at_mut(DEGREE);
+    transpose_vecs(square0.try_into().unwrap());
+    transpose_vecs(square1.try_into().unwrap());
+    transpose_vecs(square2.try_into().unwrap());
+    transpose_vecs(square3.try_into().unwrap());
     vecs
 }
 
@@ -585,7 +584,6 @@ fn load_counters(counter: u64, increment_counter: IncrementCounter) -> (v128, v1
 }
 
 #[target_feature(enable = "simd128")]
-#[inline]
 pub unsafe fn hash4(
     inputs: &[*const u8; DEGREE],
     blocks: usize,
@@ -659,9 +657,9 @@ pub unsafe fn hash4(
         block_flags = flags;
     }
 
-    let squares = mut_array_refs!(&mut h_vecs, DEGREE, DEGREE);
-    transpose_vecs(squares.0);
-    transpose_vecs(squares.1);
+    let (square0, square1) = h_vecs.split_at_mut(DEGREE);
+    transpose_vecs(square0.try_into().unwrap());
+    transpose_vecs(square1.try_into().unwrap());
     // The first four vecs now contain the first half of each output, and the
     // second four vecs contain the second half of each output.
     unsafe {
@@ -677,7 +675,6 @@ pub unsafe fn hash4(
 }
 
 #[target_feature(enable = "simd128")]
-#[inline(always)]
 unsafe fn hash1<const N: usize>(
     input: &[u8; N],
     key: &CVWords,
@@ -697,7 +694,7 @@ unsafe fn hash1<const N: usize>(
         }
         compress_in_place(
             &mut cv,
-            array_ref!(slice, 0, BLOCK_LEN),
+            (&slice[..BLOCK_LEN]).try_into().unwrap(),
             BLOCK_LEN as u8,
             counter,
             block_flags,
@@ -709,7 +706,6 @@ unsafe fn hash1<const N: usize>(
 }
 
 #[target_feature(enable = "simd128")]
-#[inline]
 pub unsafe fn hash_many<const N: usize>(
     mut inputs: &[&[u8; N]],
     key: &CVWords,
@@ -737,7 +733,7 @@ pub unsafe fn hash_many<const N: usize>(
                 flags,
                 flags_start,
                 flags_end,
-                array_mut_ref!(out, 0, DEGREE * OUT_LEN),
+                (&mut out[..DEGREE * OUT_LEN]).try_into().unwrap(),
             );
         }
         if increment_counter.yes() {
@@ -755,7 +751,7 @@ pub unsafe fn hash_many<const N: usize>(
                 flags,
                 flags_start,
                 flags_end,
-                array_mut_ref!(output, 0, OUT_LEN),
+                (&mut output[..OUT_LEN]).try_into().unwrap(),
             );
         }
         if increment_counter.yes() {

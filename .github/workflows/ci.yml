@@ -20,10 +20,11 @@ jobs:
       fail-fast: false
       matrix:
         target: [
-          { "os": "ubuntu-latest",  "toolchain": "x86_64-unknown-linux-gnu", "name": "Linux GNU" },
-          { "os": "macOS-latest",   "toolchain": "aarch64-apple-darwin",     "name": "macOS" },
-          { "os": "windows-latest", "toolchain": "x86_64-pc-windows-msvc",   "name": "Windows MSVC" },
-          { "os": "windows-latest", "toolchain": "x86_64-pc-windows-gnu",    "name": "Windows GNU" }
+          { "os": "ubuntu-latest",    "toolchain": "x86_64-unknown-linux-gnu",  "name": "Linux GNU" },
+          { "os": "ubuntu-24.04-arm", "toolchain": "aarch64-unknown-linux-gnu", "name": "Linux GNU (arm64)" },
+          { "os": "macOS-latest",     "toolchain": "aarch64-apple-darwin",      "name": "macOS" },
+          { "os": "windows-latest",   "toolchain": "x86_64-pc-windows-msvc",    "name": "Windows MSVC" },
+          { "os": "windows-latest",   "toolchain": "x86_64-pc-windows-gnu",     "name": "Windows GNU" }
         ]
         channel: ["stable", "beta", "nightly"]
 
@@ -53,6 +54,11 @@ jobs:
     - run: cargo test --features=mmap,rayon,traits-preview,serde,zeroize
     # no_std tests.
     - run: cargo test --no-default-features
+    - name: Make sure enabling LTO via CFLAGS doesn't break the build.
+      run: cargo build --tests --features prefer_intrinsics
+      if: matrix.target.toolchain != 'x86_64-pc-windows-msvc'
+      env:
+        CFLAGS: -flto
 
     # A matrix of different test settings:
     # - debug vs release
@@ -155,7 +161,7 @@ jobs:
     # https://github.com/rust-lang/libs-team/issues/72.
     # This test target is here so that we notice if we accidentally bump
     # the MSRV, but it's not a promise that we won't bump it.
-    - uses: dtolnay/rust-toolchain@1.80.1
+    - uses: dtolnay/rust-toolchain@1.85.1
     - run: cargo build --features=mmap,rayon,traits-preview,serde,zeroize
 
   b3sum_tests:
@@ -165,10 +171,11 @@ jobs:
       fail-fast: false
       matrix:
         target: [
-          { "os": "ubuntu-latest",  "toolchain": "x86_64-unknown-linux-gnu", "name": "Linux GNU" },
-          { "os": "macOS-latest",   "toolchain": "aarch64-apple-darwin",      "name": "macOS" },
-          { "os": "windows-latest", "toolchain": "x86_64-pc-windows-msvc",   "name": "Windows MSVC" },
-          { "os": "windows-latest", "toolchain": "x86_64-pc-windows-gnu",    "name": "Windows GNU" }
+          { "os": "ubuntu-latest",    "toolchain": "x86_64-unknown-linux-gnu",  "name": "Linux GNU" },
+          { "os": "ubuntu-24.04-arm", "toolchain": "aarch64-unknown-linux-gnu", "name": "Linux GNU (arm64)" },
+          { "os": "macOS-latest",     "toolchain": "aarch64-apple-darwin",      "name": "macOS" },
+          { "os": "windows-latest",   "toolchain": "x86_64-pc-windows-msvc",    "name": "Windows MSVC" },
+          { "os": "windows-latest",   "toolchain": "x86_64-pc-windows-gnu",     "name": "Windows GNU" }
         ]
         channel: ["stable", "beta", "nightly"]
 
@@ -183,6 +190,12 @@ jobs:
       working-directory: ./b3sum
     - name: test b3sum --no-default-features
       run: cargo test --no-default-features
+      working-directory: ./b3sum
+    - name: Make sure enabling LTO via CFLAGS doesn't break the build.
+      run: cargo build --features prefer_intrinsics
+      if: matrix.target.toolchain != 'x86_64-pc-windows-msvc'
+      env:
+        CFLAGS: -flto
       working-directory: ./b3sum
 
   cross_tests:
@@ -431,7 +444,7 @@ jobs:
           sudo apt-get install libtbb-dev libtbb12
       - name: CMake generation, build, install
         run: |
-          ${{ matrix.os != 'windows-latest' || '& "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Common7/Tools/Launch-VsDevShell.ps1" -Arch amd64 -SkipAutomaticLocation' }}
+          ${{ matrix.os != 'windows-latest' || '$vs_install_path = & "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath; & "$vs_install_path/Common7/Tools/Launch-VsDevShell.ps1" -Arch amd64 -SkipAutomaticLocation' }}
           cmake -S c -B c/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/target -DCMAKE_C_COMPILER=${{ matrix.toolchain.cc }} -DCMAKE_CXX_COMPILER=${{ matrix.toolchain.cxx }} -DBLAKE3_USE_TBB=${{ matrix.use_tbb }} -DBLAKE3_FETCH_TBB=${{ matrix.os == 'windows-latest' && 'YES' || 'NO' }} -DBLAKE3_EXAMPLES=ON
           cmake --build c/build --target install
 

@@ -1,7 +1,6 @@
-use crate::{CVWords, IncrementCounter, BLOCK_LEN, OUT_LEN};
+use crate::{BLOCK_LEN, CVWords, IncrementCounter, OUT_LEN};
 
 // Unsafe because this may only be called on platforms supporting SSE4.1.
-#[inline]
 pub unsafe fn compress_in_place(
     cv: &mut CVWords,
     block: &[u8; BLOCK_LEN],
@@ -21,7 +20,6 @@ pub unsafe fn compress_in_place(
 }
 
 // Unsafe because this may only be called on platforms supporting SSE4.1.
-#[inline]
 pub unsafe fn compress_xof(
     cv: &CVWords,
     block: &[u8; BLOCK_LEN],
@@ -44,7 +42,6 @@ pub unsafe fn compress_xof(
 }
 
 // Unsafe because this may only be called on platforms supporting SSE4.1.
-#[inline]
 pub unsafe fn hash_many<const N: usize>(
     inputs: &[&[u8; N]],
     key: &CVWords,
@@ -76,7 +73,7 @@ pub unsafe fn hash_many<const N: usize>(
 }
 
 pub mod ffi {
-    extern "C" {
+    unsafe extern "C" {
         pub fn blake3_compress_in_place_sse41(
             cv: *mut u32,
             block: *const u8,

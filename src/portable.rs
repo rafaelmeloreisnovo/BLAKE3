@@ -1,8 +1,7 @@
 use crate::{
-    counter_high, counter_low, CVBytes, CVWords, IncrementCounter, BLOCK_LEN, IV, MSG_SCHEDULE,
-    OUT_LEN,
+    BLOCK_LEN, CVBytes, CVWords, IV, IncrementCounter, MSG_SCHEDULE, OUT_LEN, counter_high,
+    counter_low,
 };
-use arrayref::{array_mut_ref, array_ref};
 
 #[inline(always)]
 fn g(state: &mut [u32; 16], a: usize, b: usize, c: usize, d: usize, x: u32, y: u32) {
@@ -74,7 +73,6 @@ fn compress_pre(
     state
 }
 
-#[inline]
 pub fn compress_in_place(
     cv: &mut CVWords,
     block: &[u8; BLOCK_LEN],
@@ -94,7 +92,6 @@ pub fn compress_in_place(
     cv[7] = state[7] ^ state[15];
 }
 
-#[inline]
 pub fn compress_xof(
     cv: &CVWords,
     block: &[u8; BLOCK_LEN],
@@ -122,7 +119,6 @@ pub fn compress_xof(
     crate::platform::le_bytes_from_words_64(&state)
 }
 
-#[inline]
 pub fn hash1<const N: usize>(
     input: &[u8; N],
     key: &CVWords,
@@ -142,7 +138,7 @@ pub fn hash1<const N: usize>(
         }
         compress_in_place(
             &mut cv,
-            array_ref!(slice, 0, BLOCK_LEN),
+            (&slice[..BLOCK_LEN]).try_into().unwrap(),
             BLOCK_LEN as u8,
             counter,
             block_flags,
@@ -153,7 +149,6 @@ pub fn hash1<const N: usize>(
     *out = crate::platform::le_bytes_from_words_32(&cv);
 }
 
-#[inline]
 pub fn hash_many<const N: usize>(
     inputs: &[&[u8; N]],
     key: &CVWords,
@@ -173,7 +168,7 @@ pub fn hash_many<const N: usize>(
             flags,
             flags_start,
             flags_end,
-            array_mut_ref!(output, 0, OUT_LEN),
+            (&mut output[..OUT_LEN]).try_into().unwrap(),
         );
         if increment_counter.yes() {
             counter += 1;

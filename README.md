@@ -3,6 +3,7 @@
 **Estado:** `REFERENCE`  
 **Proprietário lógico:** `security-maintainer`  
 **Repositório:** [`rafaelmeloreisnovo/BLAKE3`](https://github.com/rafaelmeloreisnovo/BLAKE3)
+**Upstream compatibility baseline:** `BLAKE3-team/BLAKE3@6aab490a26124663329dfd3961b8469f8fdb158b` (`1.8.7`)  
 
 This repository is a fork/distribution of the BLAKE3 implementation. It is not affiliated with the official BLAKE3 team.
 
