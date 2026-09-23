@@ -191,15 +191,10 @@ jobs:
         with:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - name: Install cross compilers
+      - name: Install cross compiler
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            clang gcc gcc-multilib \
-            gcc-arm-linux-gnueabihf \
-            gcc-aarch64-linux-gnu \
-            gcc-riscv64-linux-gnu \
-            gcc-powerpc64le-linux-gnu
+          sudo apt-get install -y clang
           rustup target add wasm32-unknown-unknown
       - name: Cross architecture compile matrix
         run: bash rmr/tools/build_cross_arch_blake3_v3.sh
@@ -219,7 +214,7 @@ jobs:
       - name: Install RMR dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang cmake ninja-build libssl-dev binutils
+          sudo apt-get install -y clang lld cmake ninja-build libssl-dev binutils
       - name: Full RMR integration
         run: bash rmr/tools/validate_rmr_integration_v3.sh
       - uses: actions/upload-artifact@v4

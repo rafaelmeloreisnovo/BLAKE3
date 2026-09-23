@@ -37,7 +37,7 @@ build_side() {
       local line mib digest
       line="$("$build/tbb-bench" "$size" "$iters")"
       mib="$(printf '%s\n' "$line" | awk -F, '$1=="TBB_RESULT"{for(i=1;i<=NF;i++) if($i ~ /^mib_s=/){split($i,a,"=");print a[2]}}')"
-      digest="$(printf '%s\n' "$line" | awk -F'digest= '{print $2}')"
+      digest="$(printf '%s\n' "$line" | awk -F'digest=' '{print $2}')"
       printf '%s,%s,%s,%s,%s\n' "$side" "$size" "$r" "$mib" "$digest" >>"$OUT/results.csv"
     done
   done
