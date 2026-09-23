@@ -35,6 +35,9 @@ SURFACE_BITS = {
     "WARNING": 9,
     "MODULE": 10,
     "OVERLAP": 11,
+    "CONDITION": 12,
+    "COLOR": 13,
+    "IOPS": 14,
 }
 
 FUNC_RE = re.compile(
@@ -48,6 +51,9 @@ POINTER_DECL_RE = re.compile(
     r"[A-Za-z_]\w*_t|struct\s+[A-Za-z_]\w*)\s*\*"
 )
 LOOP_RE = re.compile(r"\b(?:for|while)\s*\(|\bdo\b")
+CONDITION_RE = re.compile(r"\b(?:if|switch)\s*\(|\?[^:\n]+:")
+COLOR_RE = re.compile(r"\bcolor\b|ANSI|\\x1b\[", re.IGNORECASE)
+IOPS_RE = re.compile(r"\biops\b", re.IGNORECASE)
 PREPROCESSOR_RE = re.compile(r"^\s*#\s*[A-Za-z_]+", re.MULTILINE)
 WARNING_RE = re.compile(r"#\s*warning\b|#\s*pragma\b[^\n]*diagnostic|(?<!\w)-W[A-Za-z0-9_-]+")
 VOID_RE = re.compile(r"\bvoid\b")
@@ -107,6 +113,9 @@ def scan_source(root: Path) -> dict:
             "void_tokens": len(VOID_RE.findall(text)),
             "void_pointer_boundaries": len(VOID_PTR_RE.findall(text)),
             "loop_tokens": len(LOOP_RE.findall(text)),
+            "condition_tokens": len(CONDITION_RE.findall(text)),
+            "color_markers": len(COLOR_RE.findall(text)),
+            "iops_markers": len(IOPS_RE.findall(text)),
             "pointer_decl_candidates": len(POINTER_DECL_RE.findall(text)),
             "pointer_member_access": text.count("->"),
             "preprocessor_directives": len(PREPROCESSOR_RE.findall(text)),
@@ -276,6 +285,7 @@ def main() -> int:
             "COMMENT!=EXECUTION",
             "WARNING!=FAILURE",
             "COLOR!=STATE",
+            "IO!=IOPS",
         ],
     }
 
@@ -290,6 +300,7 @@ def main() -> int:
     print(
         f"files={source['totals'].get('files', 0)} "
         f"loops={source['totals'].get('loop_tokens', 0)} "
+        f"conditions={source['totals'].get('condition_tokens', 0)} "
         f"void*={source['totals'].get('void_pointer_boundaries', 0)} "
         f"pointer_candidates={source['totals'].get('pointer_decl_candidates', 0)} "
         f"warning_markers={source['totals'].get('warning_markers', 0)} "
