@@ -4,10 +4,9 @@ use core::arch::x86::*;
 use core::arch::x86_64::*;
 
 use crate::{
-    counter_high, counter_low, CVBytes, CVWords, IncrementCounter, BLOCK_LEN, IV, MSG_SCHEDULE,
-    OUT_LEN,
+    BLOCK_LEN, CVBytes, CVWords, IV, IncrementCounter, MSG_SCHEDULE, OUT_LEN, counter_high,
+    counter_low,
 };
-use arrayref::{array_mut_ref, array_ref, mut_array_refs};
 
 pub const DEGREE: usize = 4;
 
@@ -334,7 +333,6 @@ unsafe fn compress_pre(
 }
 
 #[target_feature(enable = "sse4.1")]
-#[inline]
 pub unsafe fn compress_in_place(
     cv: &mut CVWords,
     block: &[u8; BLOCK_LEN],
@@ -350,7 +348,6 @@ pub unsafe fn compress_in_place(
 }
 
 #[target_feature(enable = "sse4.1")]
-#[inline]
 pub unsafe fn compress_xof(
     cv: &CVWords,
     block: &[u8; BLOCK_LEN],
@@ -539,11 +536,13 @@ unsafe fn transpose_msg_vecs(inputs: &[*const u8; DEGREE], block_offset: usize) 
                 _MM_HINT_T0,
             );
         }
-        let squares = mut_array_refs!(&mut vecs, DEGREE, DEGREE, DEGREE, DEGREE);
-        transpose_vecs(squares.0);
-        transpose_vecs(squares.1);
-        transpose_vecs(squares.2);
-        transpose_vecs(squares.3);
+        let (square0, rest) = vecs.split_at_mut(DEGREE);
+        let (square1, rest) = rest.split_at_mut(DEGREE);
+        let (square2, square3) = rest.split_at_mut(DEGREE);
+        transpose_vecs(square0.try_into().unwrap());
+        transpose_vecs(square1.try_into().unwrap());
+        transpose_vecs(square2.try_into().unwrap());
+        transpose_vecs(square3.try_into().unwrap());
         vecs
     }
 }
@@ -570,7 +569,6 @@ unsafe fn load_counters(counter: u64, increment_counter: IncrementCounter) -> (_
 }
 
 #[target_feature(enable = "sse4.1")]
-#[inline]
 pub unsafe fn hash4(
     inputs: &[*const u8; DEGREE],
     blocks: usize,
@@ -645,9 +643,9 @@ pub unsafe fn hash4(
             block_flags = flags;
         }
 
-        let squares = mut_array_refs!(&mut h_vecs, DEGREE, DEGREE);
-        transpose_vecs(squares.0);
-        transpose_vecs(squares.1);
+        let (square0, square1) = h_vecs.split_at_mut(DEGREE);
+        transpose_vecs(square0.try_into().unwrap());
+        transpose_vecs(square1.try_into().unwrap());
         // The first four vecs now contain the first half of each output, and the
         // second four vecs contain the second half of each output.
         storeu(h_vecs[0], out.as_mut_ptr().add(0 * 4 * DEGREE));
@@ -662,7 +660,6 @@ pub unsafe fn hash4(
 }
 
 #[target_feature(enable = "sse4.1")]
-#[inline(always)]
 unsafe fn hash1<const N: usize>(
     input: &[u8; N],
     key: &CVWords,
@@ -683,7 +680,7 @@ unsafe fn hash1<const N: usize>(
         unsafe {
             compress_in_place(
                 &mut cv,
-                array_ref!(slice, 0, BLOCK_LEN),
+                (&slice[..BLOCK_LEN]).try_into().unwrap(),
                 BLOCK_LEN as u8,
                 counter,
                 block_flags,
@@ -696,7 +693,6 @@ unsafe fn hash1<const N: usize>(
 }
 
 #[target_feature(enable = "sse4.1")]
-#[inline]
 pub unsafe fn hash_many<const N: usize>(
     mut inputs: &[&[u8; N]],
     key: &CVWords,
@@ -724,7 +720,7 @@ pub unsafe fn hash_many<const N: usize>(
                 flags,
                 flags_start,
                 flags_end,
-                array_mut_ref!(out, 0, DEGREE * OUT_LEN),
+                (&mut out[..DEGREE * OUT_LEN]).try_into().unwrap(),
             );
         }
         if increment_counter.yes() {
@@ -742,7 +738,7 @@ pub unsafe fn hash_many<const N: usize>(
                 flags,
                 flags_start,
                 flags_end,
-                array_mut_ref!(output, 0, OUT_LEN),
+                (&mut output[..OUT_LEN]).try_into().unwrap(),
             );
         }
         if increment_counter.yes() {
