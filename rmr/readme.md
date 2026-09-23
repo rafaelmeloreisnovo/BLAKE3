@@ -142,3 +142,11 @@ incerteza. Simulação nunca é promovida automaticamente a benchmark físico.
 `rmr/legal/` documenta a transição pretendida de pesquisa livre/uso comercial
 restrito sem afirmar retroatividade: o `LICENSE_RMR` atual permanece vigente
 até ativação prospectiva válida. Upstream BLAKE3 mantém suas licenças próprias.
+
+
+## RMR Full Validation Matrix — 2026-09-23
+
+A campanha `rmr/validation/` mede upstream vs fork em correção, sanitizers,
+ablação causal, SIMD, Rust/LTO, b3sum, binário/linker/símbolos e contratos
+cross-arch. O workflow agrega receipts sem transformar `TOKEN_VAZIO` físico
+em PASS por inferência.

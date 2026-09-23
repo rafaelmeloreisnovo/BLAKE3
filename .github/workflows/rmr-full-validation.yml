@@ -1,0 +1,155 @@
+name: RMR full validation matrix
+
+on:
+  pull_request:
+    paths:
+      - "c/**"
+      - "Cargo.toml"
+      - "build.rs"
+      - "b3sum/**"
+      - "rmr/**"
+      - ".github/workflows/rmr-full-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rmr-full-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  c-correctness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Install C tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build build-essential
+      - name: Run C KAT + ASan/UBSan
+        run: bash rmr/tools/run_c_correctness_sanitizers.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rmr-full-c-correctness
+          path: rmr/validation/output/c-sanitizers/**
+
+  c-performance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Install C tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build build-essential
+      - name: Current upstream vs fork V2
+        env:
+          CC: clang
+          CXX: clang++
+          ROUNDS: "9"
+          TARGET_MIB: "96"
+          RESULT_ROOT: rmr/validation/output/upstream-v2
+        run: bash rmr/tools/orchestrate_blake3_compare_v2.sh
+      - name: Source ablation matrix
+        env:
+          CC: clang
+          ROUNDS: "7"
+          TARGET_MIB: "48"
+        run: bash rmr/tools/run_c_ablation_matrix.sh
+      - name: SIMD backend matrix
+        env:
+          CC: clang
+          ROUNDS: "5"
+          TARGET_MIB: "48"
+        run: bash rmr/tools/run_simd_backend_matrix.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rmr-full-c-performance
+          path: |
+            rmr/validation/output/upstream-v2/**
+            rmr/validation/output/c-ablation/**
+            rmr/validation/output/simd-matrix/**
+
+  rust-cli:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Record Rust toolchain
+        run: |
+          rustc --version
+          cargo --version
+      - name: Run Rust/LTO/b3sum validation
+        env:
+          ROUNDS: "5"
+          TARGET_MIB: "48"
+        run: bash rmr/tools/run_rust_cli_validation.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rmr-full-rust-cli
+          path: rmr/validation/output/rust-cli/**
+
+  binary-cross:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Install binary tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build binutils build-essential
+      - name: Binary/symbol/linker audit
+        env:
+          CC: clang
+        run: bash rmr/tools/run_binary_surface_audit.sh
+      - name: BLAKE3 public ABI cross-architecture contracts
+        env:
+          CC: clang
+        run: sh rmr/tools/run_cross_arch_blake3_contract.sh
+      - name: Existing HWIF cross matrix
+        run: sh rmr/hwif/build/build_cross_matrix.sh
+      - name: Existing crypto contract matrix
+        run: sh rmr/crypto/runtime/build/build_contract_matrix.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rmr-full-binary-cross
+          path: |
+            rmr/validation/output/binary-audit/**
+            rmr/validation/output/cross-arch/**
+
+  aggregate:
+    if: always()
+    needs: [c-correctness, c-performance, rust-cli, binary-cross]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: rmr-full-*
+          path: artifacts
+          merge-multiple: false
+      - name: Generate full receipt
+        run: |
+          mkdir -p final
+          python3 rmr/validation/generate_full_validation_report.py             --artifacts artifacts             --json-out final/RMR_FULL_VALIDATION_RECEIPT_V1.json             --md-out final/RMR_FULL_VALIDATION_RECEIPT_V1.md
+          cat final/RMR_FULL_VALIDATION_RECEIPT_V1.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rmr-full-validation-receipt
+          path: final/**
