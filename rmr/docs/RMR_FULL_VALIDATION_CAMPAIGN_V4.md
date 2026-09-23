@@ -103,3 +103,22 @@ RUST_LTO @ exact build profile
 ```
 
 Everything else remains parity, FAIL, REVIEW or TOKEN_VAZIO as observed.
+
+
+## Exact-master gate
+
+The two canonical campaign workflows run on both pull requests and pushes to
+`master`:
+
+- `.github/workflows/rmr-full-validation.yml`;
+- `.github/workflows/rmr-upstream-comprehensive-v3.yml`.
+
+This prevents a fast merge from leaving the comprehensive validation in a
+pre-job `pending` state. The post-merge push becomes the canonical exact-master
+execution receipt.
+
+```text
+PR_HEAD validation != MASTER_PUSH validation
+MERGE != VALIDATION
+MASTER_PUSH_SUCCESS = exact-master CI evidence
+```
