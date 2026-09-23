@@ -43,3 +43,5 @@ rmr_hwif_armv7_priv_backend_probe:
     mov r1, #0
     bx lr
 .size rmr_hwif_armv7_priv_backend_probe, .-rmr_hwif_armv7_priv_backend_probe
+
+.section .note.GNU-stack,"",%progbits
