@@ -382,3 +382,15 @@ Estados globais: COMPLETE, COMPLETE_WITH_REVIEW e PARTIAL.
 Adicionado `rmr/validation/tests/test_report_completeness.py` para garantir
 que a ausência deliberada de um eixo obrigatório resulte em PARTIAL e nunca
 seja mascarada como validação integral.
+
+
+### Atualização 2026-09-23 (Official vs Fork Scorecard V1)
+
+Registrados:
+- `rmr/validation/OFFICIAL_VS_FORK_SCORECARD_V1.json`;
+- `rmr/docs/RMR_BLAKE3_OFFICIAL_VS_FORK_SCORECARD_V1.md`.
+
+O scorecard separa divergência histórica, diferença de código, ganho de backend,
+paridade do core, extensões sistêmicas RMR e gaps físicos. Nenhum estado
+`TOKEN_VAZIO` é promovido por analogia e nenhuma divergência de commits é
+tratada como evidência de superioridade de performance.
