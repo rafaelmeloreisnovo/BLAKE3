@@ -184,6 +184,8 @@ python3 "$ROOT/rmr/benchmark_framework/simperf/analyze_blake3_compare_v2.py" \
 
 snapshot_runtime after
 
+python3 "$ROOT/rmr/validation/analyze_physical_telemetry.py"   --before "$OUT/telemetry-before.txt"   --after "$OUT/telemetry-after.txt"   --out "$OUT/telemetry-delta.json"   | tee "$OUT/telemetry-analysis.txt"
+
 {
   echo "schema=RMR-PHYSICAL-UPSTREAM-COMPARE-V3"
   echo "observed_at_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
