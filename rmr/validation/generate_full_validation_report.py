@@ -168,12 +168,18 @@ def main() -> int:
         if row["axis"] in required_ci_axes and row["state"] == "REVIEW"
     ]
     execution_complete = not missing_required
+    validation_state = (
+        "PARTIAL" if missing_required
+        else "COMPLETE_WITH_REVIEW" if review_required
+        else "COMPLETE"
+    )
 
     result = {
         "schema": "RMR-BLAKE3-FULL-VALIDATION-RECEIPT-V2",
         "claim_allowed": False,
         "report_generation_state": "PASS",
         "execution_complete": execution_complete,
+        "validation_state": validation_state,
         "missing_required_axes": missing_required,
         "review_required_axes": review_required,
         "axes": axes,
@@ -192,7 +198,7 @@ def main() -> int:
     )
 
     lines = [
-        "# RMR BLAKE3 Full Validation Receipt V1",
+        "# RMR BLAKE3 Full Validation Receipt V2",
         "",
         "SOURCE != BUILD != EXECUTION != EVIDENCE != CLAIM",
         "",
@@ -207,6 +213,7 @@ def main() -> int:
         "",
         "",
         f"CI execution complete: {str(execution_complete).lower()}",
+        f"Validation state: {validation_state}",
         f"Missing required axes: {', '.join(missing_required) if missing_required else 'none'}",
         f"Review-required axes: {', '.join(review_required) if review_required else 'none'}",
         "",
@@ -218,6 +225,7 @@ def main() -> int:
 
     print("RMR_FULL_VALIDATION_REPORT_GENERATION=PASS")
     print("RMR_FULL_VALIDATION_EXECUTION_COMPLETE=" + ("true" if execution_complete else "false"))
+    print("RMR_FULL_VALIDATION_STATE=" + validation_state)
     if missing_required:
         print("missing_required_axes=" + ",".join(missing_required))
     if review_required:
