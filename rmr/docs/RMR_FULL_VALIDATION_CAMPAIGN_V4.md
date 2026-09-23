@@ -105,27 +105,20 @@ RUST_LTO @ exact build profile
 Everything else remains parity, FAIL, REVIEW or TOKEN_VAZIO as observed.
 
 
-## Device-bound execution route
+## Exact-master gate
 
-The canonical physical official-vs-fork runner is:
+The two canonical campaign workflows run on both pull requests and pushes to
+`master`:
 
-`rmr/tools/run_physical_upstream_compare_v3.sh`
+- `.github/workflows/rmr-full-validation.yml`;
+- `.github/workflows/rmr-upstream-comprehensive-v3.yml`.
 
-It supports x86-64, ARMv7 and AArch64 profiles and records the exact official
-and fork commits, compiler, CMake version, architecture profile, flags,
-message sizes, paired alternating rounds, raw throughput, digest equivalence,
-bootstrap classification and SHA-256 receipts.
-
-The runner uses the same benchmark source for both implementations. On ARMv7
-it selects the NEON contract; on AArch64 it selects the NEON contract; on
-x86-64 it uses the normal AMD64 assembly/dispatch route.
-
-Until the script actually exits successfully on a target device:
+This prevents a fast merge from leaving the comprehensive validation in a
+pre-job `pending` state. The post-merge push becomes the canonical exact-master
+execution receipt.
 
 ```text
-DEVICE_UPSTREAM_COMPARE = TOKEN_VAZIO_PHYSICAL
-ARMV7_PHYSICAL = TOKEN_VAZIO_PHYSICAL
-AARCH64_PHYSICAL = TOKEN_VAZIO_PHYSICAL
+PR_HEAD validation != MASTER_PUSH validation
+MERGE != VALIDATION
+MASTER_PUSH_SUCCESS = exact-master CI evidence
 ```
-
-Cross compilation and SIMPERF are never substituted for this receipt.
