@@ -277,3 +277,32 @@ Artefatos autorais:
 A matriz cross-arch prova compilação + fechamento de símbolos; link nativo é testado separadamente e link cross-executável permanece TOKEN_VAZIO sem linker no runner. IOPS de CI é smoke do
 instrumento e não claim de armazenamento físico. Queue depth >1 permanece
 `TOKEN_VAZIO_V1` até implementação assíncrona real.
+
+
+### Atualização 2026-09-23 (crypto runtime matrix V1)
+
+Criado `rmr/crypto/runtime/` como camada autoral de integração operacional,
+sem reimplementar ou renomear BLAKE3. A função BLAKE3 usa a API pública
+upstream existente. As demais primitivas usam provider OpenSSL 3 quando
+disponível.
+
+Artefatos autorais:
+- `rmr/crypto/runtime/include/rmr_crypto_runtime.h`;
+- `rmr/crypto/runtime/src/rmr_crypto_common.c`;
+- `rmr/crypto/runtime/src/rmr_crypto_blake3.c`;
+- `rmr/crypto/runtime/src/rmr_crypto_openssl.c`;
+- `rmr/crypto/runtime/tests/rmr_crypto_runtime_selftest.c`;
+- `rmr/crypto/runtime/registry.json`;
+- `rmr/crypto/runtime/tools/validate_runtime_registry.py`;
+- `rmr/crypto/runtime/build/build_contract_matrix.sh`;
+- `rmr/crypto/runtime/README.md`;
+- `.github/workflows/rmr-crypto-runtime.yml`.
+
+Primitivas: BLAKE3, MD5, SHA-1, SHA-256, SHA-512, HMAC-SHA256,
+HKDF-SHA256, Ed25519, ChaCha20-Poly1305 e AES-256-GCM.
+
+MD5 e SHA-1 permanecem `compatibility_only` e não são promovidos para novos
+usos de segurança. A aceleração BLAKE3 por SSE/AVX/NEON/WASM não é atribuída
+às demais primitivas; algoritmo, provider e arquitetura permanecem domínios
+separados. Provider cross-architecture fica `TOKEN_VAZIO_PROVIDER_TOOLCHAIN`
+sem toolchain/OpenSSL do alvo.
