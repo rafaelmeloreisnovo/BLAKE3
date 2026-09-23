@@ -60,6 +60,32 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
   target_compile_options(pai PRIVATE -Wall -Wextra)
 endif()
 
+if(RMR_BUILD_TOPOLOGY)
+  add_library(rmr-topology STATIC
+    topology/src/rmr_topology.c
+  )
+  target_compile_features(rmr-topology PUBLIC c_std_11)
+  target_include_directories(rmr-topology PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/topology/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+  )
+  if(RMR_STRICT_WARNINGS AND CMAKE_C_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+    target_compile_options(rmr-topology PRIVATE
+      -Wall
+      -Wextra
+      -Wpedantic
+      -Wshadow
+      -Wpointer-arith
+      -Wcast-align
+      -Wstrict-prototypes
+      -Wmissing-prototypes
+      -Wformat=2
+      -Wundef
+      -Wwrite-strings
+    )
+  endif()
+endif()
+
 add_executable(rmr-blake3-bench benchmark_framework/core/blake3_bench.c)
 target_compile_features(rmr-blake3-bench PRIVATE c_std_11)
 target_link_libraries(rmr-blake3-bench PRIVATE BLAKE3::blake3)
