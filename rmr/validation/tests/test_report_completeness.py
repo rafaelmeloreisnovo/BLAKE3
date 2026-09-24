@@ -146,12 +146,30 @@ def main() -> int:
         assert cross_partial["execution_complete"] is False
         assert "CROSS-ARCH" in cross_partial["missing_required_axes"]
 
+        make_full(full)
+        binary_path = full / "binary.json"
+        binary = json.loads(binary_path.read_text(encoding="utf-8"))
+        binary["strict_warning_state"] = "REVIEW_LEGACY_OR_TOOLCHAIN"
+        write_json(binary_path, binary)
+        binary_review = run_report(FULL, full, base / "full-binary-review-out")
+        assert binary_review["validation_state"] == "COMPLETE_WITH_REVIEW"
+        assert "BINARY" in binary_review["review_required_axes"]
+
         comp = base / "comp"
         comp.mkdir()
         make_comp(comp)
         c_complete = run_report(COMP, comp, base / "comp-out")
         assert c_complete["execution_complete"] is True
         assert c_complete["validation_state"] == "COMPLETE"
+
+        abi_path = comp / "abi.json"
+        abi = json.loads(abi_path.read_text(encoding="utf-8"))
+        abi["public_abi_probe_equal"] = False
+        write_json(abi_path, abi)
+        abi_review = run_report(COMP, comp, base / "comp-abi-review-out")
+        assert abi_review["validation_state"] == "COMPLETE_WITH_REVIEW"
+        assert "ABI-ELF" in abi_review["review_required_axes"]
+        make_comp(comp)
 
         (comp / "integration.txt").unlink()
         c_partial = run_report(COMP, comp, base / "comp-partial-out")
