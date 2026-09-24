@@ -4,6 +4,11 @@ on:
   pull_request:
     paths:
       - "rmr/crypto/runtime/**"
+      - "rmr/crypto/algorithms/**"
+      - "rmr/upstream_validation/common.sh"
+      - "rmr/tools/orchestrate_blake3_compare.sh"
+      - "rmr/tools/orchestrate_blake3_compare_v2.sh"
+      - ".github/workflows/rmr-upstream-comprehensive-v3.yml"
       - "rmr/CMakeLists.txt"
       - ".github/workflows/rmr-crypto-runtime.yml"
   push:
@@ -11,6 +16,11 @@ on:
       - master
     paths:
       - "rmr/crypto/runtime/**"
+      - "rmr/crypto/algorithms/**"
+      - "rmr/upstream_validation/common.sh"
+      - "rmr/tools/orchestrate_blake3_compare.sh"
+      - "rmr/tools/orchestrate_blake3_compare_v2.sh"
+      - ".github/workflows/rmr-upstream-comprehensive-v3.yml"
       - "rmr/CMakeLists.txt"
       - ".github/workflows/rmr-crypto-runtime.yml"
 

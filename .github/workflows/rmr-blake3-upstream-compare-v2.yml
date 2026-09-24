@@ -7,6 +7,8 @@ on:
       - "rmr/benchmark_framework/core/blake3_size_bench.c"
       - "rmr/benchmark_framework/simperf/analyze_blake3_compare_v2.py"
       - "rmr/tools/orchestrate_blake3_compare_v2.sh"
+      - "rmr/upstream_validation/common.sh"
+      - "rmr/crypto/runtime/tools/validate_source_authority.py"
       - ".github/workflows/rmr-blake3-upstream-compare-v2.yml"
   push:
     branches:
@@ -16,6 +18,8 @@ on:
       - "rmr/benchmark_framework/core/blake3_size_bench.c"
       - "rmr/benchmark_framework/simperf/analyze_blake3_compare_v2.py"
       - "rmr/tools/orchestrate_blake3_compare_v2.sh"
+      - "rmr/upstream_validation/common.sh"
+      - "rmr/crypto/runtime/tools/validate_source_authority.py"
       - ".github/workflows/rmr-blake3-upstream-compare-v2.yml"
   workflow_dispatch:
 
