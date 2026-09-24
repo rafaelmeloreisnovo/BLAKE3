@@ -45,8 +45,20 @@ def run_report(script: Path, artifacts: Path, out: Path) -> dict:
 
 
 def make_full(root: Path) -> None:
-    (root / "san/transcript.txt").parent.mkdir(parents=True, exist_ok=True)
-    (root / "san/transcript.txt").write_text("PASS\n", encoding="utf-8")
+    (root / "aaa/receipt.txt").parent.mkdir(parents=True, exist_ok=True)
+    (root / "aaa/receipt.txt").write_text(
+        "RMR_UNRELATED_RECEIPT=PASS\n", encoding="utf-8"
+    )
+    (root / "aaa/status.csv").write_text(
+        "kind,value\nunrelated,PASS\n", encoding="utf-8"
+    )
+    (root / "san/receipt.txt").parent.mkdir(parents=True, exist_ok=True)
+    (root / "san/receipt.txt").write_text(
+        "C_KAT_ASAN_UBSAN=PASS\n"
+        "C_INTRINSICS_AND_ASM_VECTORS=PASS\n"
+        "claim_allowed=false\n",
+        encoding="utf-8",
+    )
     write_json(root / "core.json", {
         "schema": "RMR-BLAKE3-UPSTREAM-COMPARE-V2",
         "analysis": [{"classification": "PARITY_OR_NOISE_NOT_SEPARATED"}],
@@ -124,12 +136,40 @@ def main() -> int:
         assert partial["validation_state"] == "PARTIAL"
         assert "B3SUM" in partial["missing_required_axes"]
 
+        make_full(full)
+        with (full / "status.csv").open("w", newline="", encoding="utf-8") as f:
+            w = csv.writer(f)
+            w.writerow(["profile", "state", "target"])
+            w.writerow(["x86_64", "PASS", "x86_64-none-elf"])
+            w.writerow(["armv7", "TOKEN_VAZIO_TOOLCHAIN", "armv7a-none-eabi"])
+        cross_partial = run_report(FULL, full, base / "full-cross-partial-out")
+        assert cross_partial["execution_complete"] is False
+        assert "CROSS-ARCH" in cross_partial["missing_required_axes"]
+
+        make_full(full)
+        binary_path = full / "binary.json"
+        binary = json.loads(binary_path.read_text(encoding="utf-8"))
+        binary["strict_warning_state"] = "REVIEW_LEGACY_OR_TOOLCHAIN"
+        write_json(binary_path, binary)
+        binary_review = run_report(FULL, full, base / "full-binary-review-out")
+        assert binary_review["validation_state"] == "COMPLETE_WITH_REVIEW"
+        assert "BINARY" in binary_review["review_required_axes"]
+
         comp = base / "comp"
         comp.mkdir()
         make_comp(comp)
         c_complete = run_report(COMP, comp, base / "comp-out")
         assert c_complete["execution_complete"] is True
         assert c_complete["validation_state"] == "COMPLETE"
+
+        abi_path = comp / "abi.json"
+        abi = json.loads(abi_path.read_text(encoding="utf-8"))
+        abi["public_abi_probe_equal"] = False
+        write_json(abi_path, abi)
+        abi_review = run_report(COMP, comp, base / "comp-abi-review-out")
+        assert abi_review["validation_state"] == "COMPLETE_WITH_REVIEW"
+        assert "ABI-ELF" in abi_review["review_required_axes"]
+        make_comp(comp)
 
         (comp / "integration.txt").unlink()
         c_partial = run_report(COMP, comp, base / "comp-partial-out")

@@ -15,5 +15,8 @@ mkdir -p "$OUT"
   CC="${CC:-clang}" make -f Makefile.testing test_asm
 ) >"$OUT/transcript.txt" 2>&1
 
-echo "C_KAT_ASAN_UBSAN=PASS"
-echo "C_INTRINSICS_AND_ASM_VECTORS=PASS"
+{
+  echo "C_KAT_ASAN_UBSAN=PASS"
+  echo "C_INTRINSICS_AND_ASM_VECTORS=PASS"
+  echo "claim_allowed=false"
+} | tee "$OUT/receipt.txt"

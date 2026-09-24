@@ -41,18 +41,21 @@ jobs:
             pkg-config --modversion openssl
             python3 --version
             cmake --version | head -n 1
-          } | tee build/rmr-crypto/environment.txt
+          } > build/rmr-crypto/environment.txt
+          cat build/rmr-crypto/environment.txt
 
       - name: Validate registry and BLAKE3 architecture evidence
         run: |
           python3 -m py_compile rmr/crypto/runtime/tools/validate_runtime_registry.py
           python3 rmr/crypto/runtime/tools/validate_runtime_registry.py \
-            | tee build/rmr-crypto/registry-validation.txt
+            > build/rmr-crypto/registry-validation.txt
+          cat build/rmr-crypto/registry-validation.txt
 
       - name: Compile provider-neutral architecture matrix
         run: |
           sh rmr/crypto/runtime/build/build_contract_matrix.sh \
-            | tee build/rmr-crypto/contract-matrix.txt
+            > build/rmr-crypto/contract-matrix.txt
+          cat build/rmr-crypto/contract-matrix.txt
 
       - name: Configure
         run: >

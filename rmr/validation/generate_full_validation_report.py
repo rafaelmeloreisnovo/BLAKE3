@@ -39,12 +39,22 @@ def main() -> int:
             "evidence": str(evidence) if evidence else None,
         })
 
-    sanitizers = next(root.rglob("transcript.txt"), None)
+    sanitizer_receipt = None
+    for candidate in root.rglob("receipt.txt"):
+        text = candidate.read_text(encoding="utf-8", errors="replace")
+        if (
+            "C_KAT_ASAN_UBSAN=PASS" in text
+            and "C_INTRINSICS_AND_ASM_VECTORS=PASS" in text
+        ):
+            sanitizer_receipt = candidate
+            break
+    sanitizer_pass = sanitizer_receipt is not None
     add(
         "C-KAT-SAN",
-        "PASS" if sanitizers else "TOKEN_VAZIO_NOT_FOUND",
-        "C known-answer vectors under ASan/UBSan for intrinsics and assembly.",
-        sanitizers,
+        "PASS" if sanitizer_pass else "TOKEN_VAZIO_NOT_FOUND",
+        "C known-answer vectors under ASan/UBSan for intrinsics and assembly."
+        if sanitizer_pass else "No explicit sanitizer PASS receipt.",
+        sanitizer_receipt,
     )
 
     p, upstream = find_schema(root, "RMR-BLAKE3-UPSTREAM-COMPARE-V2")
@@ -105,28 +115,48 @@ def main() -> int:
 
     p, binary = find_schema(root, "RMR-BINARY-SURFACE-AUDIT-V1")
     if binary:
+        missing = binary.get("fork_missing_vs_upstream", [])
+        extra = binary.get("fork_extra_global_symbols", [])
         state = "PASS" if (
             binary.get("public_api_contract") == "PASS"
             and binary.get("fork_gnu_stack_gate") == "PASS"
+            and binary.get("strict_warning_state") == "PASS"
+            and not missing
+            and not extra
         ) else "REVIEW"
         add(
             "BINARY",
             state,
             f"public_api={binary.get('public_api_contract')} "
             f"gnu_stack={binary.get('fork_gnu_stack_gate')} "
-            f"warnings={binary.get('strict_warning_state')}",
+            f"warnings={binary.get('strict_warning_state')} "
+            f"missing={len(missing)} extra={len(extra)}",
             p,
         )
     else:
         add("BINARY", "TOKEN_VAZIO_NOT_FOUND", "No binary audit receipt.")
 
-    cross_csv = next(root.rglob("status.csv"), None)
+    cross_csv = None
+    rows = []
+    for candidate in root.rglob("status.csv"):
+        try:
+            candidate_rows = list(csv.DictReader(candidate.open(encoding="utf-8")))
+        except Exception:
+            continue
+        if (
+            candidate_rows
+            and {"profile", "state", "target"}.issubset(candidate_rows[0])
+        ):
+            cross_csv = candidate
+            rows = candidate_rows
+            break
     if cross_csv:
-        rows = list(csv.DictReader(cross_csv.open(encoding="utf-8")))
+        states = [r.get("state", "") for r in rows]
+        cross_pass = bool(rows) and all(state == "PASS" for state in states)
         add(
             "CROSS-ARCH",
-            "PASS",
-            "; ".join(f"{r['profile']}={r['state']}" for r in rows),
+            "PASS" if cross_pass else "TOKEN_VAZIO_TOOLCHAIN",
+            "; ".join(f"{r.get('profile')}={r.get('state')}" for r in rows),
             cross_csv,
         )
     else:

@@ -66,9 +66,11 @@ jobs:
         run: |
           mkdir -p build/rmr-simperf/receipts
           build/rmr-simperf/rmr-blake3-size-bench rmr 64 16 \
-            | tee build/rmr-simperf/receipts/size-64.txt
+            > build/rmr-simperf/receipts/size-64.txt
+          cat build/rmr-simperf/receipts/size-64.txt
           build/rmr-simperf/rmr-blake3-size-bench rmr 1048576 4 \
-            | tee build/rmr-simperf/receipts/size-1048576.txt
+            > build/rmr-simperf/receipts/size-1048576.txt
+          cat build/rmr-simperf/receipts/size-1048576.txt
           cp rmr/benchmark_framework/simperf/hardware_profiles.json \
             build/rmr-simperf/receipts/hardware_profiles.json
           {
