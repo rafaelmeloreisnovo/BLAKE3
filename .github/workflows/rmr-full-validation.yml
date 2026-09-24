@@ -45,6 +45,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: rmr-full-c-correctness
+          if-no-files-found: error
           path: rmr/validation/output/c-sanitizers/**
 
   c-performance:
@@ -83,6 +84,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: rmr-full-c-performance
+          if-no-files-found: error
           path: |
             rmr/validation/output/upstream-v2/**
             rmr/benchmark_framework/output/upstream-v3-ablation/**
@@ -108,6 +110,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: rmr-full-rust-cli
+          if-no-files-found: error
           path: rmr/benchmark_framework/output/upstream-v3-rust/**
 
   binary-cross:
@@ -137,6 +140,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: rmr-full-binary-cross
+          if-no-files-found: error
           path: |
             rmr/validation/output/binary-audit/**
             rmr/validation/output/cross-arch/**
@@ -165,4 +169,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: rmr-full-validation-receipt
+          if-no-files-found: error
           path: final/**
