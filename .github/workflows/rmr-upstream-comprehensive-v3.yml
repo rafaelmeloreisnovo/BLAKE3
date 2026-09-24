@@ -269,6 +269,18 @@ jobs:
           name: upstream-v3-final-receipt
           if-no-files-found: error
           path: final/**
+      - name: Enforce complete comprehensive evidence
+        run: |
+          python3 - <<'PY'
+          import json
+          p = "final/RMR_UPSTREAM_COMPREHENSIVE_V3.json"
+          d = json.load(open(p, encoding="utf-8"))
+          assert d["execution_complete"] is True, d.get("missing_required_axes")
+          assert d["validation_state"] == "COMPLETE", d.get("validation_state")
+          assert not d.get("review_required_axes"), d.get("review_required_axes")
+          assert d["claim_allowed"] is False
+          print("RMR_UPSTREAM_COMPREHENSIVE_EVIDENCE_GATE=PASS")
+          PY
       - name: Gate summary
         env:
           SOURCE: ${{ needs.source.result }}
