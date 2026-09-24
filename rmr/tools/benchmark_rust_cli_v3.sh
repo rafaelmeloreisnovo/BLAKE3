@@ -8,7 +8,7 @@ source "$ROOT/upstream_validation/common.sh"
 for t in git cargo rustc python3 dd sha256sum stat; do rmr_need "$t"; done
 
 WORK="${WORK_ROOT:-$ROOT/.rmr-work/upstream-v3-rust}"
-OUT="${RESULT_ROOT:-$ROOT/rmr/benchmark_framework/output/upstream-v3-rust}"
+OUT="${RESULT_ROOT:-$ROOT/benchmark_framework/output/upstream-v3-rust}"
 OFFICIAL_ROOT="$WORK/official"
 FORK_ROOT="$WORK/fork"
 ROUNDS="${ROUNDS:-5}"
