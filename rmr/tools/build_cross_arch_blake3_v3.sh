@@ -8,7 +8,7 @@ source "$ROOT/upstream_validation/common.sh"
 for t in git python3 cargo rustc clang; do rmr_need "$t"; done
 
 WORK="${WORK_ROOT:-$ROOT/.rmr-work/upstream-v3-cross}"
-OUT="${RESULT_ROOT:-$ROOT/rmr/benchmark_framework/output/upstream-v3-cross}"
+OUT="${RESULT_ROOT:-$ROOT/benchmark_framework/output/upstream-v3-cross}"
 OFFICIAL_ROOT="$WORK/official"
 rm -rf "$OUT" "$WORK/obj"
 mkdir -p "$WORK/obj" "$OUT"
