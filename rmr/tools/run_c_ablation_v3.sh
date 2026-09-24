@@ -8,7 +8,7 @@ source "$ROOT/upstream_validation/common.sh"
 for t in git cmake "${CC:-clang}" python3; do rmr_need "$t"; done
 
 WORK="${WORK_ROOT:-$ROOT/.rmr-work/upstream-v3-ablation}"
-OUT="${RESULT_ROOT:-$ROOT/rmr/benchmark_framework/output/upstream-v3-ablation}"
+OUT="${RESULT_ROOT:-$ROOT/benchmark_framework/output/upstream-v3-ablation}"
 OFFICIAL_ROOT="$WORK/official"
 ROUNDS="${ROUNDS:-7}"
 TARGET_MIB="${TARGET_MIB:-64}"
