@@ -11,7 +11,7 @@ for t in git cmake "${CC:-clang}" "${CXX:-clang++}" ctest pkg-config diff; do
 done
 
 WORK="${WORK_ROOT:-$ROOT/.rmr-work/upstream-v3-quality}"
-OUT="${RESULT_ROOT:-$ROOT/rmr/benchmark_framework/output/upstream-v3-quality}"
+OUT="${RESULT_ROOT:-$ROOT/benchmark_framework/output/upstream-v3-quality}"
 OFFICIAL_ROOT="$WORK/official"
 rm -rf "$WORK/build-"* "$OUT"
 mkdir -p "$WORK" "$OUT"
