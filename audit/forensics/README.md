@@ -16,6 +16,8 @@
 | Artefato | Função |
 |---|---|
 | [`BLAKE3_FORENSIC_MANIFESTO_NONNEGOTIABLE_V1_20260924.md`](BLAKE3_FORENSIC_MANIFESTO_NONNEGOTIABLE_V1_20260924.md) | Contrato forense atual: último ZERO integral, snapshot 89/108 + 19 deltas, performance favorável/adversa, autoria, claim gates e invariantes inegociáveis. |
+| [`BLAKE3_CLOSED_PR_INPUT_PROVENANCE_LEDGER_V1_20260924.md`](BLAKE3_CLOSED_PR_INPUT_PROVENANCE_LEDGER_V1_20260924.md) | Ledger factual de PRs closed/non-merged, atores de fechamento, rotas alternativas de integração, issues como insumos e automação explicitamente registrada. |
+| [`BLAKE3_SECURITY_COLLISION_COORDINATION_EVIDENCE_V1_20260924.md`](BLAKE3_SECURITY_COLLISION_COORDINATION_EVIDENCE_V1_20260924.md) | Auditoria factual de coordenação em segurança, colisões e tree hashing: concentração de manutenção, coautores, documentação, forks externos, referências e limites de claim. |
 | [`BLAKE3_FORENSIC_TIMELINE_2019_2026.md`](BLAKE3_FORENSIC_TIMELINE_2019_2026.md) | Cronologia verificada de erros, reversões, experimentos abortados, uso de IA e auditorias. |
 | [`BLAKE3_ERROR_REVERT_ABORT_MATRIX.md`](BLAKE3_ERROR_REVERT_ABORT_MATRIX.md) | Matriz técnica: origem, descoberta, correção, impacto, lacunas e classificação. |
 | [`BLAKE3_AI_PROVENANCE_AND_GOVERNANCE.md`](BLAKE3_AI_PROVENANCE_AND_GOVERNANCE.md) | Auditoria de Claude, Codex, Copilot, autoria Git, receipts e assimetria de governança. |
