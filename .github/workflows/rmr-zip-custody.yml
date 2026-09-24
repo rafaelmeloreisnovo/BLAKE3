@@ -28,7 +28,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: rmr-zip-custody-${{ github.workflow }}-${{ github.ref }}
+  group: rmr-zip-custody-${{ github.workflow }}-${{ github.ref }}-${{ github.event.pull_request.head.sha || github.sha }}
   cancel-in-progress: true
 
 jobs:
