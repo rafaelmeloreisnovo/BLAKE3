@@ -39,12 +39,20 @@ def main() -> int:
             "evidence": str(evidence) if evidence else None,
         })
 
-    sanitizers = next(root.rglob("transcript.txt"), None)
+    sanitizer_receipt = next(root.rglob("receipt.txt"), None)
+    sanitizer_pass = False
+    if sanitizer_receipt:
+        text = sanitizer_receipt.read_text(encoding="utf-8", errors="replace")
+        sanitizer_pass = (
+            "C_KAT_ASAN_UBSAN=PASS" in text
+            and "C_INTRINSICS_AND_ASM_VECTORS=PASS" in text
+        )
     add(
         "C-KAT-SAN",
-        "PASS" if sanitizers else "TOKEN_VAZIO_NOT_FOUND",
-        "C known-answer vectors under ASan/UBSan for intrinsics and assembly.",
-        sanitizers,
+        "PASS" if sanitizer_pass else "TOKEN_VAZIO_NOT_FOUND",
+        "C known-answer vectors under ASan/UBSan for intrinsics and assembly."
+        if sanitizer_pass else "No explicit sanitizer PASS receipt.",
+        sanitizer_receipt,
     )
 
     p, upstream = find_schema(root, "RMR-BLAKE3-UPSTREAM-COMPARE-V2")
@@ -123,10 +131,12 @@ def main() -> int:
     cross_csv = next(root.rglob("status.csv"), None)
     if cross_csv:
         rows = list(csv.DictReader(cross_csv.open(encoding="utf-8")))
+        states = [r.get("state", "") for r in rows]
+        cross_pass = bool(rows) and all(state == "PASS" for state in states)
         add(
             "CROSS-ARCH",
-            "PASS",
-            "; ".join(f"{r['profile']}={r['state']}" for r in rows),
+            "PASS" if cross_pass else "TOKEN_VAZIO_TOOLCHAIN",
+            "; ".join(f"{r.get('profile')}={r.get('state')}" for r in rows),
             cross_csv,
         )
     else:
