@@ -27,7 +27,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: rmr-full-validation-global
+  group: rmr-full-validation-global-${{ github.event.pull_request.head.sha || github.sha }}
   cancel-in-progress: true
 
 jobs:

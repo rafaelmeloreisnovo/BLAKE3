@@ -22,7 +22,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: rmr-blake3-repro-${{ github.workflow }}-${{ github.ref }}
+  group: rmr-blake3-repro-${{ github.workflow }}-${{ github.ref }}-${{ github.event.pull_request.head.sha || github.sha }}
   cancel-in-progress: true
 
 jobs:
