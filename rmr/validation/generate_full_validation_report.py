@@ -115,16 +115,22 @@ def main() -> int:
 
     p, binary = find_schema(root, "RMR-BINARY-SURFACE-AUDIT-V1")
     if binary:
+        missing = binary.get("fork_missing_vs_upstream", [])
+        extra = binary.get("fork_extra_global_symbols", [])
         state = "PASS" if (
             binary.get("public_api_contract") == "PASS"
             and binary.get("fork_gnu_stack_gate") == "PASS"
+            and binary.get("strict_warning_state") == "PASS"
+            and not missing
+            and not extra
         ) else "REVIEW"
         add(
             "BINARY",
             state,
             f"public_api={binary.get('public_api_contract')} "
             f"gnu_stack={binary.get('fork_gnu_stack_gate')} "
-            f"warnings={binary.get('strict_warning_state')}",
+            f"warnings={binary.get('strict_warning_state')} "
+            f"missing={len(missing)} extra={len(extra)}",
             p,
         )
     else:
