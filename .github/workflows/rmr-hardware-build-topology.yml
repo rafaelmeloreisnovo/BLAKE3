@@ -48,7 +48,8 @@ jobs:
         run: |
           mkdir -p build/rmr-topology
           sh rmr/hwif/build/build_cross_matrix.sh \
-            | tee build/rmr-topology/hwif-cross-matrix.txt
+            > build/rmr-topology/hwif-cross-matrix.txt
+          cat build/rmr-topology/hwif-cross-matrix.txt
 
       - name: Run bounded IOPS smoke receipts
         run: |
