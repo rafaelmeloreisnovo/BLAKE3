@@ -1,0 +1,56 @@
+{
+  "schema": "RMR-CRYPTO-V3-INDEPENDENT-PROVIDER-KAT-V1",
+  "generated_at_utc": "2026-09-24T11:00:00Z",
+  "repo": "rafaelmeloreisnovo/BLAKE3",
+  "pr": 146,
+  "repo_head_at_crosscheck": "a66a370551705368c49f3c71210bb68ea002b887",
+  "scope": "independent minimal provider/vector cross-check for five V3 digests",
+  "repository_compile_execution": false,
+  "provider_vector_crosscheck": true,
+  "environment": {
+    "execution_class": "OpenAI container",
+    "openssl": "OpenSSL 3.5.5 27 Jan 2026",
+    "compiler_contract": "cc -Wall -Wextra -Werror ... -lcrypto"
+  },
+  "harness": {
+    "source_sha256": "18cbd2e71dc46e82f229fb7697ed5b0706a5935b73c2194d041c30dbe3407f4d",
+    "binary_sha256": "8b062dce5585a0e462ec6af1790696c74263762d055d1eaa6361a453b0a59aec",
+    "output_sha256": "5ffd7ff0d29bc755a9859b09f266b90866b11f5f8bb3a9ccaece834c0c747604"
+  },
+  "results": [
+    {
+      "algorithm": "sha512-224",
+      "state": "PASS",
+      "digest": "4634270f707b6a54daae7530460842e20e37ed265ceee9a43e8924aa"
+    },
+    {
+      "algorithm": "sha512-256",
+      "state": "PASS",
+      "digest": "53048e2681941ef99b2e29b76b4c7dabe4c2d0c634fc6d46e0e2f13107e7af23"
+    },
+    {
+      "algorithm": "sha3-224",
+      "state": "PASS",
+      "digest": "e642824c3f8cf24ad09234ee7d3c766fc9a3a5168d0c94ad73b46fdf"
+    },
+    {
+      "algorithm": "sha3-384",
+      "state": "PASS",
+      "digest": "ec01498288516fc926459f58e2c6ad8df9b473cb0fc08c2596da7cf0e49be4b298d88cea927ac7f539f1edf228376d25"
+    },
+    {
+      "algorithm": "sm3",
+      "state": "PASS",
+      "digest": "66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0"
+    }
+  ],
+  "boundaries": [
+    "CROSSCHECK_PASS!=REPOSITORY_CI_PASS",
+    "NATIVE_PROVIDER_PASS!=CROSS_ARCH_PASS",
+    "REGISTERED_CELL!=PHYSICAL_EXECUTION_RECEIPT",
+    "SOURCE!=BUILD!=EXECUTION!=EVIDENCE!=CLAIM"
+  ],
+  "cross_arch_execution": "TOKEN_VAZIO",
+  "repository_ci": "PENDING",
+  "claim_allowed": false
+}
