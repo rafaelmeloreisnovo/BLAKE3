@@ -21,6 +21,9 @@
 | [`BLAKE3_CHAIN_OF_CUSTODY_ISSUES_PRS_V1_20260924.md`](BLAKE3_CHAIN_OF_CUSTODY_ISSUES_PRS_V1_20260924.md) | Cadeia de custódia factual de 18 issues de segurança/colisão/árvore, comentários-âncora, grandes PRs, PRs closed/non-merged, SHAs e arestas issue→PR→commit→release. |
 | [`BLAKE3_CHAIN_OF_CUSTODY_INDEX_V1_20260924.tsv`](BLAKE3_CHAIN_OF_CUSTODY_INDEX_V1_20260924.tsv) | Índice tabular legível por máquina com atores, estados, timestamps, SHAs, escala das PRs, URLs-fonte e notas de custódia. |
 | [`../receipts/BLAKE3_CHAIN_OF_CUSTODY_RECEIPT_V1_20260924.txt`](../receipts/BLAKE3_CHAIN_OF_CUSTODY_RECEIPT_V1_20260924.txt) | Receipt da materialização: base master, branch head, Git blob SHAs, tamanhos, escopo e limitações explícitas. |
+| [`BLAKE3_FORENSIC_SUCCESSOR_PROTOCOL_V1_20260924.md`](BLAKE3_FORENSIC_SUCCESSOR_PROTOCOL_V1_20260924.md) | Protocolo que torna snapshots forenses append-only: achado novo cria sucessor/correção, nunca sobrescreve fotografia versionada. |
+| [`BLAKE3_SESSION_RETROALIMENTATION_V1_20260924.md`](BLAKE3_SESSION_RETROALIMENTATION_V1_20260924.md) | Retroalimentação consolidada desta sessão, ligando PR #148 → #150 → #151 e preservando fatos, gaps e próximo nó de sucessão. |
+| [`../receipts/BLAKE3_SESSION_RETRO_SUCCESSOR_RECEIPT_V1_20260924.txt`](../receipts/BLAKE3_SESSION_RETRO_SUCCESSOR_RECEIPT_V1_20260924.txt) | Receipt do snapshot terminal da sessão e de seu protocolo de sucessão. |
 | [`BLAKE3_FORENSIC_TIMELINE_2019_2026.md`](BLAKE3_FORENSIC_TIMELINE_2019_2026.md) | Cronologia verificada de erros, reversões, experimentos abortados, uso de IA e auditorias. |
 | [`BLAKE3_ERROR_REVERT_ABORT_MATRIX.md`](BLAKE3_ERROR_REVERT_ABORT_MATRIX.md) | Matriz técnica: origem, descoberta, correção, impacto, lacunas e classificação. |
 | [`BLAKE3_AI_PROVENANCE_AND_GOVERNANCE.md`](BLAKE3_AI_PROVENANCE_AND_GOVERNANCE.md) | Auditoria de Claude, Codex, Copilot, autoria Git, receipts e assimetria de governança. |
