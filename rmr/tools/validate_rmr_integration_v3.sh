@@ -4,7 +4,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-OUT="${RESULT_ROOT:-$ROOT/rmr/benchmark_framework/output/upstream-v3-rmr-integration}"
+OUT="${RESULT_ROOT:-$ROOT/benchmark_framework/output/upstream-v3-rmr-integration}"
 rm -rf "$OUT"; mkdir -p "$OUT"
 
 python3 "$ROOT/upstream_validation/validate_surfaces.py" | tee "$OUT/surface-registry.txt"
