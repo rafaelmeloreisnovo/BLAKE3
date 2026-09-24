@@ -3,6 +3,7 @@ name: RMR SIMPERF
 on:
   pull_request:
     paths:
+      - "c/**"
       - "rmr/benchmark_framework/simperf/**"
       - "rmr/benchmark_framework/core/blake3_size_bench.c"
       - "rmr/CMakeLists.txt"
@@ -11,6 +12,7 @@ on:
     branches:
       - master
     paths:
+      - "c/**"
       - "rmr/benchmark_framework/simperf/**"
       - "rmr/benchmark_framework/core/blake3_size_bench.c"
       - "rmr/CMakeLists.txt"
