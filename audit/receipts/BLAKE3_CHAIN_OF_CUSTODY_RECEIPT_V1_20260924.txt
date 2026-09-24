@@ -1,0 +1,32 @@
+BLAKE3_CHAIN_OF_CUSTODY_RECEIPT_V1
+date=2026-09-24
+repository=rafaelmeloreisnovo/BLAKE3
+upstream=BLAKE3-team/BLAKE3
+base_master=90596266ae201a5b183895adbab02ad88087ff81
+branch=docs/blake3-chain-of-custody-v1-20260924
+branch_head_before_receipt=55d3dff50a49d64749adb72ad760578fd04f9a32
+
+artifact_1=audit/forensics/BLAKE3_CHAIN_OF_CUSTODY_ISSUES_PRS_V1_20260924.md
+artifact_1_git_blob_sha=8ec70aec8b80a08628e873245cac10cd809e6c0c
+artifact_1_bytes=21452
+
+artifact_2=audit/forensics/BLAKE3_CHAIN_OF_CUSTODY_INDEX_V1_20260924.tsv
+artifact_2_git_blob_sha=a8244c4e0c58aba7b23593c05fc4e2f359bc0457
+artifact_2_bytes=12057
+
+artifact_3=audit/forensics/README.md
+artifact_3_git_blob_sha=dc1f9759ad1c8a99885d5edfea16cf9fb7daedfa
+
+scope_issues=18
+scope_issue_topics=collision|security|tree_hashing|xof|derive_key|output_length|domain_separation
+scope_prs=major_and_closed_successor_chains
+source_identity=GitHub canonical URLs + issue/PR numbers + Git SHAs + event actors + comment IDs
+comment_timestamp_limitation=connector did not expose created_at for every comment record; missing timestamps were not invented
+body_edit_history=TOKEN_VAZIO unless independently archived
+deleted_content=TOKEN_VAZIO
+private_coordination=TOKEN_VAZIO
+motive=TOKEN_VAZIO
+
+integrity_rule=SOURCE != ARTEFATO != EXECUCAO != EVIDENCIA != CLAIM
+absence_rule=TOKEN_VAZIO != 0
+mutation_rule=append-only successor; no silent rewrite of prior forensic snapshots
