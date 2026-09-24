@@ -39,14 +39,16 @@ def main() -> int:
             "evidence": str(evidence) if evidence else None,
         })
 
-    sanitizer_receipt = next(root.rglob("receipt.txt"), None)
-    sanitizer_pass = False
-    if sanitizer_receipt:
-        text = sanitizer_receipt.read_text(encoding="utf-8", errors="replace")
-        sanitizer_pass = (
+    sanitizer_receipt = None
+    for candidate in root.rglob("receipt.txt"):
+        text = candidate.read_text(encoding="utf-8", errors="replace")
+        if (
             "C_KAT_ASAN_UBSAN=PASS" in text
             and "C_INTRINSICS_AND_ASM_VECTORS=PASS" in text
-        )
+        ):
+            sanitizer_receipt = candidate
+            break
+    sanitizer_pass = sanitizer_receipt is not None
     add(
         "C-KAT-SAN",
         "PASS" if sanitizer_pass else "TOKEN_VAZIO_NOT_FOUND",
@@ -128,9 +130,21 @@ def main() -> int:
     else:
         add("BINARY", "TOKEN_VAZIO_NOT_FOUND", "No binary audit receipt.")
 
-    cross_csv = next(root.rglob("status.csv"), None)
+    cross_csv = None
+    rows = []
+    for candidate in root.rglob("status.csv"):
+        try:
+            candidate_rows = list(csv.DictReader(candidate.open(encoding="utf-8")))
+        except Exception:
+            continue
+        if (
+            candidate_rows
+            and {"profile", "state", "target"}.issubset(candidate_rows[0])
+        ):
+            cross_csv = candidate
+            rows = candidate_rows
+            break
     if cross_csv:
-        rows = list(csv.DictReader(cross_csv.open(encoding="utf-8")))
         states = [r.get("state", "") for r in rows]
         cross_pass = bool(rows) and all(state == "PASS" for state in states)
         add(
