@@ -14,6 +14,8 @@ on:
       - "rmr/CMakeLists.txt"
       - ".github/workflows/rmr-crypto-runtime.yml"
 
+  workflow_dispatch:
+
 permissions:
   contents: read
 
@@ -25,20 +27,32 @@ jobs:
   runtime:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
 
       - name: Record provider
         run: |
-          openssl version
-          pkg-config --modversion openssl
+          mkdir -p build/rmr-crypto
+          {
+            openssl version
+            printf 'openssl_pkg_config='
+            pkg-config --modversion openssl
+            python3 --version
+            cmake --version | head -n 1
+          } | tee build/rmr-crypto/environment.txt
 
       - name: Validate registry and BLAKE3 architecture evidence
         run: |
           python3 -m py_compile rmr/crypto/runtime/tools/validate_runtime_registry.py
-          python3 rmr/crypto/runtime/tools/validate_runtime_registry.py
+          python3 rmr/crypto/runtime/tools/validate_runtime_registry.py \
+            | tee build/rmr-crypto/registry-validation.txt
 
       - name: Compile provider-neutral architecture matrix
-        run: sh rmr/crypto/runtime/build/build_contract_matrix.sh
+        run: |
+          sh rmr/crypto/runtime/build/build_contract_matrix.sh \
+            | tee build/rmr-crypto/contract-matrix.txt
 
       - name: Configure
         run: >
@@ -71,4 +85,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rmr-crypto-runtime-matrix
-          path: build/rmr-crypto/rmr_crypto_runtime_matrix.json
+          if-no-files-found: error
+          path: |
+            build/rmr-crypto/rmr_crypto_runtime_matrix.json
+            build/rmr-crypto/environment.txt
+            build/rmr-crypto/registry-validation.txt
+            build/rmr-crypto/contract-matrix.txt

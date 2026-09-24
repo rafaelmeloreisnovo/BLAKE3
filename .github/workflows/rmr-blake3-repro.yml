@@ -6,12 +6,14 @@ name: RMR BLAKE3 Reproducibility Gate
 on:
   pull_request:
     paths:
+      - "c/**"
       - "rmr/**"
       - ".github/workflows/rmr-blake3-repro.yml"
   push:
     branches:
       - master
     paths:
+      - "c/**"
       - "rmr/**"
       - ".github/workflows/rmr-blake3-repro.yml"
   workflow_dispatch:
@@ -28,8 +30,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
 
       - name: Install build tools

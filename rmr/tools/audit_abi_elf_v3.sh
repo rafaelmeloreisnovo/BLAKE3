@@ -8,7 +8,7 @@ source "$ROOT/upstream_validation/common.sh"
 for t in git cmake "${CC:-clang}" nm readelf size diff comm sha256sum; do rmr_need "$t"; done
 
 WORK="${WORK_ROOT:-$ROOT/.rmr-work/upstream-v3-abi}"
-OUT="${RESULT_ROOT:-$ROOT/rmr/benchmark_framework/output/upstream-v3-abi}"
+OUT="${RESULT_ROOT:-$ROOT/benchmark_framework/output/upstream-v3-abi}"
 OFFICIAL_ROOT="$WORK/official"
 rm -rf "$OUT" "$WORK/build-"*
 mkdir -p "$WORK" "$OUT"

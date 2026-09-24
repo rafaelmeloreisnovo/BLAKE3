@@ -8,10 +8,35 @@ source "$ROOT/upstream_validation/common.sh"
 for t in git python3 cargo rustc clang; do rmr_need "$t"; done
 
 WORK="${WORK_ROOT:-$ROOT/.rmr-work/upstream-v3-cross}"
-OUT="${RESULT_ROOT:-$ROOT/rmr/benchmark_framework/output/upstream-v3-cross}"
+OUT="${RESULT_ROOT:-$ROOT/benchmark_framework/output/upstream-v3-cross}"
 OFFICIAL_ROOT="$WORK/official"
-rm -rf "$OUT" "$WORK/obj"
-mkdir -p "$WORK/obj" "$OUT"
+CLANG_RESOURCE_DIR="$(clang -print-resource-dir)"
+FREESTANDING_INCLUDE="$WORK/freestanding-include"
+rm -rf "$OUT" "$WORK/obj" "$FREESTANDING_INCLUDE"
+mkdir -p "$WORK/obj" "$OUT" "$FREESTANDING_INCLUDE"
+
+cat >"$FREESTANDING_INCLUDE/assert.h" <<'EOF'
+#ifndef RMR_FREESTANDING_ASSERT_H
+#define RMR_FREESTANDING_ASSERT_H
+#ifdef NDEBUG
+#define assert(expr) ((void)0)
+#else
+#define assert(expr) ((expr) ? (void)0 : __builtin_trap())
+#endif
+#endif
+EOF
+
+cat >"$FREESTANDING_INCLUDE/string.h" <<'EOF'
+#ifndef RMR_FREESTANDING_STRING_H
+#define RMR_FREESTANDING_STRING_H
+#include <stddef.h>
+void *memcpy(void *dest, const void *src, size_t n);
+void *memset(void *dest, int c, size_t n);
+size_t strlen(const char *s);
+#endif
+EOF
+
+FREESTANDING_CFLAGS=(-nostdinc -isystem "$FREESTANDING_INCLUDE" -isystem "$CLANG_RESOURCE_DIR/include")
 OFFICIAL_COMMIT="$(rmr_checkout_official "$OFFICIAL_ROOT")"
 rmr_write_common_environment "$OUT/environment.txt" "$OFFICIAL_COMMIT"
 printf 'side,target,profile,state\n' >"$OUT/matrix.csv"
@@ -22,11 +47,11 @@ compile_set() {
   mkdir -p "$dir"
   local defs="-DBLAKE3_USE_NEON=0 -DBLAKE3_NO_SSE2 -DBLAKE3_NO_SSE41 -DBLAKE3_NO_AVX2 -DBLAKE3_NO_AVX512"
   # shellcheck disable=SC2086
-  clang --target="$clang_target" $flags -std=c99 -O2 -ffreestanding -Wall -Wextra -Werror -I"$src/c" $defs     -c "$src/c/blake3.c" -o "$dir/blake3.o"
+  clang --target="$clang_target" "${FREESTANDING_CFLAGS[@]}" $flags -std=c99 -O2 -ffreestanding -Wall -Wextra -Werror -I"$src/c" $defs     -c "$src/c/blake3.c" -o "$dir/blake3.o"
   # shellcheck disable=SC2086
-  clang --target="$clang_target" $flags -std=c99 -O2 -ffreestanding -Wall -Wextra -Werror -I"$src/c" $defs     -c "$src/c/blake3_dispatch.c" -o "$dir/dispatch.o"
+  clang --target="$clang_target" "${FREESTANDING_CFLAGS[@]}" $flags -std=c99 -O2 -ffreestanding -Wall -Wextra -Werror -I"$src/c" $defs     -c "$src/c/blake3_dispatch.c" -o "$dir/dispatch.o"
   # shellcheck disable=SC2086
-  clang --target="$clang_target" $flags -std=c99 -O2 -ffreestanding -Wall -Wextra -Werror -I"$src/c" $defs     -c "$src/c/blake3_portable.c" -o "$dir/portable.o"
+  clang --target="$clang_target" "${FREESTANDING_CFLAGS[@]}" $flags -std=c99 -O2 -ffreestanding -Wall -Wextra -Werror -I"$src/c" $defs     -c "$src/c/blake3_portable.c" -o "$dir/portable.o"
   printf '%s,%s,%s,PASS\n' "$side" "$target" "$profile" >>"$OUT/matrix.csv"
 }
 
@@ -35,7 +60,7 @@ compile_neon() {
   local dir="$WORK/obj/$side-$target-neon"
   mkdir -p "$dir"
   # shellcheck disable=SC2086
-  clang --target="$clang_target" $flags -std=c99 -O2 -ffreestanding -Wall -Wextra -Werror -I"$src/c"     -DBLAKE3_USE_NEON=1 -c "$src/c/blake3_neon.c" -o "$dir/neon.o"
+  clang --target="$clang_target" "${FREESTANDING_CFLAGS[@]}" $flags -std=c99 -O2 -ffreestanding -Wall -Wextra -Werror -I"$src/c"     -DBLAKE3_USE_NEON=1 -c "$src/c/blake3_neon.c" -o "$dir/neon.o"
   printf '%s,%s,neon,PASS\n' "$side" "$target" >>"$OUT/matrix.csv"
 }
 
@@ -44,7 +69,7 @@ compile_contract() {
   local side="$1" src="$2" target_name="$3" clang_target="$4"
   local dir="$WORK/obj/$side-$target_name-contract"
   mkdir -p "$dir"
-  clang --target="$clang_target" -std=c11 -ffreestanding     -Wall -Wextra -Wpedantic -Werror -I"$src/c"     -c "$ROOT/upstream_validation/blake3_contract.c"     -o "$dir/contract.o"
+  clang --target="$clang_target" "${FREESTANDING_CFLAGS[@]}" -std=c11 -ffreestanding     -Wall -Wextra -Wpedantic -Werror -I"$src/c"     -c "$ROOT/upstream_validation/blake3_contract.c"     -o "$dir/contract.o"
   printf '%s,%s,public-api-contract,PASS\n' "$side" "$target_name" >>"$OUT/matrix.csv"
 }
 
@@ -52,10 +77,10 @@ compile_x86_intrinsics() {
   local side="$1" src="$2"
   local dir="$WORK/obj/$side-x86_32-simd"
   mkdir -p "$dir"
-  clang --target=i686-none-elf -std=c99 -O2 -ffreestanding -Wall -Wextra -Werror -I"$src/c" -msse2     -c "$src/c/blake3_sse2.c" -o "$dir/sse2.o"
-  clang --target=i686-none-elf -std=c99 -O2 -ffreestanding -Wall -Wextra -Werror -I"$src/c" -msse4.1     -c "$src/c/blake3_sse41.c" -o "$dir/sse41.o"
-  clang --target=i686-none-elf -std=c99 -O2 -ffreestanding -Wall -Wextra -Werror -I"$src/c" -mavx2     -c "$src/c/blake3_avx2.c" -o "$dir/avx2.o"
-  clang --target=i686-none-elf -std=c99 -O2 -ffreestanding -Wall -Wextra -Werror -I"$src/c" -mavx512f -mavx512vl     -c "$src/c/blake3_avx512.c" -o "$dir/avx512.o"
+  clang --target=i686-none-elf "${FREESTANDING_CFLAGS[@]}" -std=c99 -O2 -ffreestanding -Wall -Wextra -Werror -I"$src/c" -msse2     -c "$src/c/blake3_sse2.c" -o "$dir/sse2.o"
+  clang --target=i686-none-elf "${FREESTANDING_CFLAGS[@]}" -std=c99 -O2 -ffreestanding -Wall -Wextra -Werror -I"$src/c" -msse4.1     -c "$src/c/blake3_sse41.c" -o "$dir/sse41.o"
+  clang --target=i686-none-elf "${FREESTANDING_CFLAGS[@]}" -std=c99 -O2 -ffreestanding -Wall -Wextra -Werror -I"$src/c" -mavx2     -c "$src/c/blake3_avx2.c" -o "$dir/avx2.o"
+  clang --target=i686-none-elf "${FREESTANDING_CFLAGS[@]}" -std=c99 -O2 -ffreestanding -Wall -Wextra -Werror -I"$src/c" -mavx512f -mavx512vl     -c "$src/c/blake3_avx512.c" -o "$dir/avx512.o"
   printf '%s,x86_32,simd-intrinsics,PASS\n' "$side" >>"$OUT/matrix.csv"
 }
 

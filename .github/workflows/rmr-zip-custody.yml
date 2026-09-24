@@ -7,6 +7,7 @@ on:
   pull_request:
     paths:
       - ".github/workflows/rmr-zip-custody.yml"
+      - "tools/check_rmr_headers.py"
       - "rmr/PROVENIENCE.md"
       - "rmr/VISUAL_PROTOTYPE_CONTRACT.md"
       - "rmr/src/rmr_visual_prototype.c"
@@ -16,6 +17,7 @@ on:
       - master
     paths:
       - ".github/workflows/rmr-zip-custody.yml"
+      - "tools/check_rmr_headers.py"
       - "rmr/PROVENIENCE.md"
       - "rmr/VISUAL_PROTOTYPE_CONTRACT.md"
       - "rmr/src/rmr_visual_prototype.c"
@@ -39,6 +41,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
 
       - name: Set up Python
@@ -63,5 +66,8 @@ jobs:
       - name: Run forensic time contract tests
         run: python -m unittest -v rmr/crypto/tests/test_forensic_time_attest.py
 
-      - name: Verify RMR authorship headers
-        run: python tools/check_rmr_headers.py
+      - name: Verify ZIP custody authorship boundary
+        run: |
+          python tools/check_rmr_headers.py \
+            --root rmr/crypto \
+            --root rmr/PROVENIENCE.md

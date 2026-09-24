@@ -2,6 +2,10 @@
  * Copyright (c) 2024-2026 Rafael Melo Reis
  * Licensed under LICENSE_RMR.
  */
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200809L
+#endif
+
 #include "blake3.h"
 
 #include <stdint.h>

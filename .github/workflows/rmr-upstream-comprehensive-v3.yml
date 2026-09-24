@@ -7,6 +7,7 @@ on:
       - "src/**"
       - "b3sum/**"
       - "Cargo.toml"
+      - "build.rs"
       - "rmr/**"
       - ".github/workflows/rmr-upstream-comprehensive-v3.yml"
   push:
@@ -17,6 +18,7 @@ on:
       - "src/**"
       - "b3sum/**"
       - "Cargo.toml"
+      - "build.rs"
       - "rmr/**"
       - ".github/workflows/rmr-upstream-comprehensive-v3.yml"
   workflow_dispatch:
@@ -35,7 +37,7 @@ jobs:
   source:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -46,12 +48,13 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-source
+          if-no-files-found: error
           path: rmr/benchmark_framework/output/upstream-v3-source/**
 
   c-quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -67,13 +70,14 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-c-quality
+          if-no-files-found: error
           path: rmr/benchmark_framework/output/upstream-v3-quality/**
 
   core-performance:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -92,13 +96,14 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-core-performance
+          if-no-files-found: error
           path: rmr/benchmark_framework/output/comparisons-v2/**
 
   backends:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -122,6 +127,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-backends
+          if-no-files-found: error
           path: |
             rmr/benchmark_framework/output/upstream-v3-backends/**
             rmr/benchmark_framework/output/upstream-v3-ablation/**
@@ -129,7 +135,7 @@ jobs:
   abi-elf:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -145,12 +151,13 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-abi-elf
+          if-no-files-found: error
           path: rmr/benchmark_framework/output/upstream-v3-abi/**
 
   tbb:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -166,13 +173,14 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-tbb
+          if-no-files-found: error
           path: rmr/benchmark_framework/output/upstream-v3-tbb/**
 
   rust-cli:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -181,13 +189,14 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-rust-cli
+          if-no-files-found: error
           path: rmr/benchmark_framework/output/upstream-v3-rust/**
 
   cross-arch:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -201,13 +210,14 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-cross-arch
+          if-no-files-found: error
           path: rmr/benchmark_framework/output/upstream-v3-cross/**
 
   rmr-integration:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -220,6 +230,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-rmr-integration
+          if-no-files-found: error
           path: rmr/benchmark_framework/output/upstream-v3-rmr-integration/**
 
   summary:
@@ -236,7 +247,7 @@ jobs:
       - rmr-integration
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -258,7 +269,20 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-final-receipt
+          if-no-files-found: error
           path: final/**
+      - name: Enforce complete comprehensive evidence
+        run: |
+          python3 - <<'PY'
+          import json
+          p = "final/RMR_UPSTREAM_COMPREHENSIVE_V3.json"
+          d = json.load(open(p, encoding="utf-8"))
+          assert d["execution_complete"] is True, d.get("missing_required_axes")
+          assert d["validation_state"] == "COMPLETE", d.get("validation_state")
+          assert not d.get("review_required_axes"), d.get("review_required_axes")
+          assert d["claim_allowed"] is False
+          print("RMR_UPSTREAM_COMPREHENSIVE_EVIDENCE_GATE=PASS")
+          PY
       - name: Gate summary
         env:
           SOURCE: ${{ needs.source.result }}
