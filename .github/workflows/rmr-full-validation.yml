@@ -5,6 +5,7 @@ on:
     paths:
       - "c/**"
       - "Cargo.toml"
+      - "src/**"
       - "build.rs"
       - "b3sum/**"
       - "rmr/**"
@@ -15,6 +16,7 @@ on:
     paths:
       - "c/**"
       - "Cargo.toml"
+      - "src/**"
       - "build.rs"
       - "b3sum/**"
       - "rmr/**"
