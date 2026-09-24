@@ -27,7 +27,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: rmr-upstream-comprehensive-v3-global-${{ github.event.pull_request.head.sha || github.sha }}
+  group: rmr-upstream-comprehensive-v3-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 env:
