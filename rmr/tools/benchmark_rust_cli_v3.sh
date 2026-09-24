@@ -42,8 +42,8 @@ run_logged() {
 
 run_logged official-blake3-test "$OUT/official-blake3-test.log"   cargo test --manifest-path "$OFFICIAL_ROOT/Cargo.toml" -p blake3 --lib
 run_logged fork-blake3-test "$OUT/fork-blake3-test.log"   cargo test --manifest-path "$FORK_ROOT/Cargo.toml" -p blake3 --lib
-run_logged official-b3sum-test "$OUT/official-b3sum-test.log"   cargo test --manifest-path "$OFFICIAL_ROOT/Cargo.toml" -p b3sum
-run_logged fork-b3sum-test "$OUT/fork-b3sum-test.log"   cargo test --manifest-path "$FORK_ROOT/Cargo.toml" -p b3sum
+run_logged official-b3sum-test "$OUT/official-b3sum-test.log"   cargo test --manifest-path "$OFFICIAL_ROOT/b3sum/Cargo.toml"
+run_logged fork-b3sum-test "$OUT/fork-b3sum-test.log"   cargo test --manifest-path "$FORK_ROOT/b3sum/Cargo.toml"
 
 mkdir -p "$OFFICIAL_ROOT/examples" "$FORK_ROOT/examples"
 cp "$ROOT/upstream_validation/rust_hash_bench.rs" "$OFFICIAL_ROOT/examples/rmr_v3_hash_bench.rs"
@@ -103,9 +103,9 @@ print("RMR_RUST_LIBRARY_V3=PASS")
 for r in out: print(r)
 PY
 
-run_logged official-release-build "$OUT/official-release-build.log" env CARGO_TARGET_DIR="$WORK/target-official" cargo build --manifest-path "$OFFICIAL_ROOT/Cargo.toml" --release -p b3sum
-run_logged fork-release-build "$OUT/fork-release-build.log" env CARGO_TARGET_DIR="$WORK/target-fork" cargo build --manifest-path "$FORK_ROOT/Cargo.toml" --release -p b3sum
-run_logged fork-ablated-build "$OUT/fork-ablated-build.log" env CARGO_TARGET_DIR="$WORK/target-fork-ablated" CARGO_PROFILE_RELEASE_LTO=false CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16 cargo build --manifest-path "$FORK_ROOT/Cargo.toml" --release -p b3sum
+run_logged official-release-build "$OUT/official-release-build.log" env CARGO_TARGET_DIR="$WORK/target-official" cargo build --manifest-path "$OFFICIAL_ROOT/b3sum/Cargo.toml" --release
+run_logged fork-release-build "$OUT/fork-release-build.log" env CARGO_TARGET_DIR="$WORK/target-fork" cargo build --manifest-path "$FORK_ROOT/b3sum/Cargo.toml" --release
+run_logged fork-ablated-build "$OUT/fork-ablated-build.log" env CARGO_TARGET_DIR="$WORK/target-fork-ablated" CARGO_PROFILE_RELEASE_LTO=false CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16 cargo build --manifest-path "$FORK_ROOT/b3sum/Cargo.toml" --release
 
 OFFICIAL_BIN="$WORK/target-official/release/b3sum"
 FORK_BIN="$WORK/target-fork/release/b3sum"
