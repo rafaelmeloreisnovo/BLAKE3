@@ -8,7 +8,7 @@ source "$ROOT/upstream_validation/common.sh"
 for t in git cmake "${CC:-clang}" python3 awk; do rmr_need "$t"; done
 
 WORK="${WORK_ROOT:-$ROOT/.rmr-work/upstream-v3-backends}"
-OUT="${RESULT_ROOT:-$ROOT/rmr/benchmark_framework/output/upstream-v3-backends}"
+OUT="${RESULT_ROOT:-$ROOT/benchmark_framework/output/upstream-v3-backends}"
 OFFICIAL_ROOT="$WORK/official"
 ROUNDS="${ROUNDS:-5}"
 TARGET_MIB="${TARGET_MIB:-64}"
