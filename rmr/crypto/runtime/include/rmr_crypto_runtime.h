@@ -38,7 +38,12 @@ typedef enum {
   RMR_CRYPTO_SHAKE256,
   RMR_CRYPTO_BLAKE2S_256,
   RMR_CRYPTO_ED448,
-  RMR_CRYPTO_X448
+  RMR_CRYPTO_X448,
+  RMR_CRYPTO_SHA512_224,
+  RMR_CRYPTO_SHA512_256,
+  RMR_CRYPTO_SHA3_224,
+  RMR_CRYPTO_SHA3_384,
+  RMR_CRYPTO_SM3
 } rmr_crypto_algorithm;
 
 const char *rmr_crypto_algorithm_name(rmr_crypto_algorithm algorithm);

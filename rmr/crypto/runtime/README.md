@@ -44,7 +44,12 @@ C API. The additional primitives are delegated to OpenSSL 3 provider APIs.
 - SHAKE256;
 - BLAKE2s-256;
 - Ed448;
-- X448.
+- X448;
+- SHA-512/224;
+- SHA-512/256;
+- SHA3-224;
+- SHA3-384;
+- SM3.
 
 MD5 and SHA-1 are present for interoperability/regression work. Their presence
 does not promote them for new security-sensitive designs.
@@ -77,10 +82,19 @@ do not inherit a BLAKE3 architecture result.
 5. Ed448 — EdDSA signature profile;
 6. X448 — Curve448 key agreement.
 
-The target Cartesian registry is now 23 algorithms x 9 architecture profiles =
-207 registered cells. Only the native profile can become KAT_PASS_NATIVE in a
-single host run; provider execution on the other profiles remains TOKEN_VAZIO
-until separately observed.
+The V2 Cartesian registry contains 23 algorithms x 9 architecture profiles =
+207 registered cells.
+
+## Five additional primitives — fourth expansion
+
+1. SHA-512/224 and SHA-512/256 — SHA-512-derived SHA-2 variants with distinct IVs;
+2. SHA3-224 and SHA3-384 — remaining fixed-output SHA-3 sizes;
+3. SM3 — 256-bit hash retained as a standards/interoperability profile.
+
+The V3 target is 28 algorithms x 9 architecture profiles = 252 registered
+cells. Only the native profile can become KAT_PASS_NATIVE in a single host run;
+provider execution on the other profiles remains TOKEN_VAZIO until separately
+observed. SM3 presence is not a global algorithm recommendation.
 
 ## BLAKE3 architecture map
 
@@ -144,7 +158,9 @@ the provider and is not inferred from the BLAKE3 SIMD backend.
 - SHA-224/SHA-384/SHA3-512/BLAKE2s-256 "abc" KATs;
 - SHAKE128 (32-byte output) and SHAKE256 (64-byte output) "abc" KATs;
 - RFC 8032 Ed448 blank-message test vector plus negative verification;
-- RFC 7748 X448 public-key and shared-secret vectors.
+- RFC 7748 X448 public-key and shared-secret vectors;
+- SHA-512/224, SHA-512/256, SHA3-224 and SHA3-384 "abc" KATs;
+- SM3 "abc" standards/interoperability KAT.
 
 ## Validation
 
