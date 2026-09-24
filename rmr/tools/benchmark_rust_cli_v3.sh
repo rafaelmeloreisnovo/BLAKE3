@@ -104,7 +104,7 @@ for r in out: print(r)
 PY
 
 run_logged official-release-build "$OUT/official-release-build.log" env CARGO_TARGET_DIR="$WORK/target-official" cargo build --manifest-path "$OFFICIAL_ROOT/b3sum/Cargo.toml" --release
-run_logged fork-release-build "$OUT/fork-release-build.log" env CARGO_TARGET_DIR="$WORK/target-fork" cargo build --manifest-path "$FORK_ROOT/b3sum/Cargo.toml" --release
+run_logged fork-release-build "$OUT/fork-release-build.log" env CARGO_TARGET_DIR="$WORK/target-fork" CARGO_PROFILE_RELEASE_LTO=true CARGO_PROFILE_RELEASE_CODEGEN_UNITS=1 cargo build --manifest-path "$FORK_ROOT/b3sum/Cargo.toml" --release
 run_logged fork-ablated-build "$OUT/fork-ablated-build.log" env CARGO_TARGET_DIR="$WORK/target-fork-ablated" CARGO_PROFILE_RELEASE_LTO=false CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16 cargo build --manifest-path "$FORK_ROOT/b3sum/Cargo.toml" --release
 
 OFFICIAL_BIN="$WORK/target-official/release/b3sum"
