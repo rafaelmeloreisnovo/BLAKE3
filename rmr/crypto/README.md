@@ -238,7 +238,7 @@ sh rmr/crypto/runtime/build/build_contract_matrix.sh
 ```
 
 
-## 11. Diretório canônico por algoritmo
+## 13. Diretório canônico por algoritmo
 
 `rmr/crypto/algorithms/` fornece endereço estável para os 28 algoritmos de `runtime/registry.json`, sem duplicar implementações. A autoridade BLAKE3 está em `rmr/docs/RMR_BLAKE3_SOURCE_AUTHORITY_V1.md`; o inventário de superfícies soltas está em `rmr/docs/RMR_CRYPTO_SOURCE_SURFACE_INVENTORY_V1.md`.
 
