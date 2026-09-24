@@ -40,6 +40,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang cmake ninja-build
 
+      - name: Verify BLAKE3 source authority
+        run: python3 rmr/crypto/runtime/tools/validate_source_authority.py --out build/rmr-source-authority.json
+
       - name: Build RMR and run backend self-test
         run: |
           CC=clang CXX=clang++ ./rmr/tools/build_pai.sh
@@ -66,4 +69,5 @@ jobs:
             rmr/reports/RMR_ARTIFACTS_SHA256.txt
             rmr/reports/RMR_PIPELINE_REPORT.md
             rmr/reports/RMR_TEST_LOG.txt
+            build/rmr-source-authority.json
           if-no-files-found: error

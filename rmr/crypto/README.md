@@ -230,3 +230,10 @@ Validação:
 python3 rmr/crypto/runtime/tools/validate_runtime_registry.py
 sh rmr/crypto/runtime/build/build_contract_matrix.sh
 ```
+
+
+## 11. Diretório canônico por algoritmo
+
+`rmr/crypto/algorithms/` fornece endereço estável para os 15 algoritmos de `runtime/registry.json`, sem duplicar implementações. A autoridade BLAKE3 está em `rmr/docs/RMR_BLAKE3_SOURCE_AUTHORITY_V1.md`; o inventário de superfícies soltas está em `rmr/docs/RMR_CRYPTO_SOURCE_SURFACE_INVENTORY_V1.md`.
+
+Gates: `validate_algorithm_layout.py` e `validate_source_authority.py`.
