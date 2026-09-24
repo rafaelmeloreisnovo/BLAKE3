@@ -368,12 +368,48 @@
       "class": "key_agreement",
       "status": "IMPLEMENTED_PROVIDER",
       "security_use": "current"
+    },
+    {
+      "id": "sha512-224",
+      "provider": "OpenSSL-3-EVP",
+      "class": "hash",
+      "status": "IMPLEMENTED_PROVIDER",
+      "security_use": "current"
+    },
+    {
+      "id": "sha512-256",
+      "provider": "OpenSSL-3-EVP",
+      "class": "hash",
+      "status": "IMPLEMENTED_PROVIDER",
+      "security_use": "current"
+    },
+    {
+      "id": "sha3-224",
+      "provider": "OpenSSL-3-EVP",
+      "class": "hash",
+      "status": "IMPLEMENTED_PROVIDER",
+      "security_use": "current"
+    },
+    {
+      "id": "sha3-384",
+      "provider": "OpenSSL-3-EVP",
+      "class": "hash",
+      "status": "IMPLEMENTED_PROVIDER",
+      "security_use": "current"
+    },
+    {
+      "id": "sm3",
+      "provider": "OpenSSL-3-EVP",
+      "class": "hash",
+      "status": "IMPLEMENTED_PROVIDER",
+      "security_use": "standards_interoperability"
     }
   ],
   "boundaries": [
     "ALGORITHM!=PROVIDER!=ARCHITECTURE",
     "BLAKE3_BACKEND_PASS!=OPENSSL_PROVIDER_PASS",
     "MD5_SHA1_COMPATIBILITY!=NEW_SECURITY_RECOMMENDATION",
-    "COMPILE_CONTRACT!=LINK_PROVIDER!=EXECUTION!=EVIDENCE!=CLAIM"
+    "COMPILE_CONTRACT!=LINK_PROVIDER!=EXECUTION!=EVIDENCE!=CLAIM",
+    "SM3_INTEROPERABILITY!=GLOBAL_RECOMMENDATION"
   ]
 }

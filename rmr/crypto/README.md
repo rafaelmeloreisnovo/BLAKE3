@@ -215,7 +215,13 @@ Primitivas expostas:
 - BLAKE2b-512;
 - HMAC-SHA512;
 - X25519;
-- PBKDF2-HMAC-SHA256.
+- PBKDF2-HMAC-SHA256;
+- SHA-224, SHA-384, SHA-512/224 e SHA-512/256;
+- SHA3-224, SHA3-384 e SHA3-512;
+- SHAKE128 e SHAKE256;
+- BLAKE2s-256;
+- Ed448 e X448;
+- SM3 como perfil de interoperabilidade normativa.
 
 O provider adicional atual é OpenSSL 3. A presença de um backend SIMD BLAKE3
 não é usada como evidência de aceleração das outras primitivas.
@@ -234,6 +240,6 @@ sh rmr/crypto/runtime/build/build_contract_matrix.sh
 
 ## 11. Diretório canônico por algoritmo
 
-`rmr/crypto/algorithms/` fornece endereço estável para os 15 algoritmos de `runtime/registry.json`, sem duplicar implementações. A autoridade BLAKE3 está em `rmr/docs/RMR_BLAKE3_SOURCE_AUTHORITY_V1.md`; o inventário de superfícies soltas está em `rmr/docs/RMR_CRYPTO_SOURCE_SURFACE_INVENTORY_V1.md`.
+`rmr/crypto/algorithms/` fornece endereço estável para os 28 algoritmos de `runtime/registry.json`, sem duplicar implementações. A autoridade BLAKE3 está em `rmr/docs/RMR_BLAKE3_SOURCE_AUTHORITY_V1.md`; o inventário de superfícies soltas está em `rmr/docs/RMR_CRYPTO_SOURCE_SURFACE_INVENTORY_V1.md`.
 
 Gates: `validate_algorithm_layout.py` e `validate_source_authority.py`.

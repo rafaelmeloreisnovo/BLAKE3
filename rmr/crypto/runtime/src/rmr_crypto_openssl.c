@@ -26,6 +26,11 @@ static const EVP_MD *rmr_digest_for(rmr_crypto_algorithm algorithm) {
     case RMR_CRYPTO_SHA384: return EVP_sha384();
     case RMR_CRYPTO_SHA3_512: return EVP_sha3_512();
     case RMR_CRYPTO_BLAKE2S_256: return EVP_blake2s256();
+    case RMR_CRYPTO_SHA512_224: return EVP_sha512_224();
+    case RMR_CRYPTO_SHA512_256: return EVP_sha512_256();
+    case RMR_CRYPTO_SHA3_224: return EVP_sha3_224();
+    case RMR_CRYPTO_SHA3_384: return EVP_sha3_384();
+    case RMR_CRYPTO_SM3: return EVP_sm3();
     default: return NULL;
   }
 }

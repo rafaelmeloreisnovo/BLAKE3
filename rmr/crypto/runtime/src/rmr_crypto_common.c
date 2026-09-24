@@ -29,6 +29,11 @@ const char *rmr_crypto_algorithm_name(rmr_crypto_algorithm algorithm) {
     case RMR_CRYPTO_BLAKE2S_256: return "BLAKE2s-256";
     case RMR_CRYPTO_ED448: return "Ed448";
     case RMR_CRYPTO_X448: return "X448";
+    case RMR_CRYPTO_SHA512_224: return "SHA-512/224";
+    case RMR_CRYPTO_SHA512_256: return "SHA-512/256";
+    case RMR_CRYPTO_SHA3_224: return "SHA3-224";
+    case RMR_CRYPTO_SHA3_384: return "SHA3-384";
+    case RMR_CRYPTO_SM3: return "SM3";
     default: return "UNKNOWN";
   }
 }

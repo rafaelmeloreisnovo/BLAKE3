@@ -19,6 +19,7 @@ EXPECTED_ALG = {
     "sha3-256", "blake2b-512", "hmac-sha512", "x25519",
     "pbkdf2-hmac-sha256", "sha224", "sha384", "sha3-512",
     "shake128", "shake256", "blake2s-256", "ed448", "x448",
+    "sha512-224", "sha512-256", "sha3-224", "sha3-384", "sm3",
 }
 
 def fail(message: str) -> int:
@@ -56,6 +57,10 @@ def main() -> int:
     }
     if legacy != {"md5": "compatibility_only", "sha1": "compatibility_only"}:
         return fail("MD5/SHA-1 must stay compatibility_only")
+
+    sm3 = next((item for item in alg if item["id"] == "sm3"), None)
+    if sm3 is None or sm3.get("security_use") != "standards_interoperability":
+        return fail("SM3 must stay standards_interoperability")
 
     if any(
         item.get("provider", "").startswith("OpenSSL")

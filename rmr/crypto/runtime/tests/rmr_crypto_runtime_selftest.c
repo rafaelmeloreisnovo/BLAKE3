@@ -166,6 +166,40 @@ int main(void) {
     return 42;
   }
 
+  if (digest_kat(
+          RMR_CRYPTO_SHA512_224,
+          "4634270f707b6a54daae7530460842e20e37ed265ceee9a43e8924aa",
+          28u) != 0) {
+    return 56;
+  }
+  if (digest_kat(
+          RMR_CRYPTO_SHA512_256,
+          "53048e2681941ef99b2e29b76b4c7dabe4c2d0c634fc6d46e0e2f13107e7af23",
+          32u) != 0) {
+    return 57;
+  }
+  if (digest_kat(
+          RMR_CRYPTO_SHA3_224,
+          "e642824c3f8cf24ad09234ee7d3c766fc9a3a5168d0c94ad73b46fdf",
+          28u) != 0) {
+    return 58;
+  }
+  if (digest_kat(
+          RMR_CRYPTO_SHA3_384,
+          "ec01498288516fc926459f58e2c6ad8d"
+          "f9b473cb0fc08c2596da7cf0e49be4b2"
+          "98d88cea927ac7f539f1edf228376d25",
+          48u) != 0) {
+    return 59;
+  }
+  if (digest_kat(
+          RMR_CRYPTO_SM3,
+          "66c7f0f462eeedd9d1f2d46bdc10e4e"
+          "24167c4875cf2f7a2297da02b8f4ba8e0",
+          32u) != 0) {
+    return 60;
+  }
+
   if (rmr_crypto_hmac_sha256(
           hmac_key,
           sizeof(hmac_key),

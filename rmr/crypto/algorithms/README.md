@@ -5,7 +5,7 @@ Licensed under LICENSE_RMR.
 
 # RMR Crypto Algorithm Directory V1
 
-Stable directory addresses for the 23 algorithms registered for execution through
+Stable directory addresses for the 28 algorithms registered for execution through
 `rmr/crypto/runtime/registry.json`.
 
 | ID | Class | Provider | Security use |
@@ -33,8 +33,13 @@ Stable directory addresses for the 23 algorithms registered for execution throug
 | `blake2s-256` | hash | OpenSSL-3-EVP | current |
 | `ed448` | signature | OpenSSL-3-EVP_PKEY | current |
 | `x448` | key_agreement | OpenSSL-3-EVP_PKEY | current |
+| `sha512-224` | hash | OpenSSL-3-EVP | current |
+| `sha512-256` | hash | OpenSSL-3-EVP | current |
+| `sha3-224` | hash | OpenSSL-3-EVP | current |
+| `sha3-384` | hash | OpenSSL-3-EVP | current |
+| `sm3` | hash | OpenSSL-3-EVP | standards_interoperability |
 
-MD5 and SHA-1 remain `compatibility_only`.
+MD5 and SHA-1 remain `compatibility_only`. SM3 remains `standards_interoperability`; registration is not a global recommendation.
 
 SHA-256 has three distinct RMR surfaces:
 - `rmr/core/hash_sha256.c` — hosted/internal implementation;
