@@ -15,6 +15,10 @@
 
 | Artefato | Função |
 |---|---|
+| [`BLAKE3_EXPORT_CUSTODY_CANONICAL_FACTS_V1_20260924.md`](BLAKE3_EXPORT_CUSTODY_CANONICAL_FACTS_V1_20260924.md) | Fatos canônicos de export/custódia: e-mails autenticados, transição/coexistência `content ↔ estuary/content`, commitments NOVOexport e limites explícitos. |
+| [`BLAKE3_EXPORT_EMAIL_LEDGER_SANITIZED_V1_20260924.json`](BLAKE3_EXPORT_EMAIL_LEDGER_SANITIZED_V1_20260924.json) | Ledger público sanitizado de e-mails de exportação; IDs pessoais substituídos por SHA-256 e sem URLs assinadas ativas. |
+| [`BLAKE3_DRIVE_EVIDENCE_INDEX_V1_20260924.tsv`](BLAKE3_DRIVE_EVIDENCE_INDEX_V1_20260924.tsv) | Índice de commitments do Drive: custody index, RAW018, corpus 000..050, ALL_TOKEN e witness histórico. |
+| [`../receipts/BLAKE3_EXPORT_EVIDENCE_MULTIHASH_V1_20260924.txt`](../receipts/BLAKE3_EXPORT_EVIDENCE_MULTIHASH_V1_20260924.txt) | Receipt multi-hash: MD5/SHA-1 legados + SHA-2/SHA-3/BLAKE2/BLAKE3; Ed25519 permanece `TOKEN_VAZIO` sem chave canônica. |
 | [`BLAKE3_PR533_CANONICAL_FACTS_V1_20260924.md`](BLAKE3_PR533_CANONICAL_FACTS_V1_20260924.md) | Successor factual específico da PR #533: anterioridade, correspondência literal `u64::MAX`, controles Cygwin/seek, same-locus, controles negativos e limites de causalidade. |
 | [`BLAKE3_PR533_SUCCESSOR_LEDGER_V1_20260924.json`](BLAKE3_PR533_SUCCESSOR_LEDGER_V1_20260924.json) | Ledger legível por máquina com cada prova, SHA, data, relação técnica e estado causal. |
 | [`BLAKE3_PR533_HUNK_MATRIX_V1_20260924.tsv`](BLAKE3_PR533_HUNK_MATRIX_V1_20260924.tsv) | Matriz tabular source→successor: arquivo/locus, correspondência exata, crédito documentado e causalidade. |
