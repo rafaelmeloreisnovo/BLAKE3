@@ -46,6 +46,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-source
+          if-no-files-found: error
           path: rmr/benchmark_framework/output/upstream-v3-source/**
 
   c-quality:
@@ -67,6 +68,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-c-quality
+          if-no-files-found: error
           path: rmr/benchmark_framework/output/upstream-v3-quality/**
 
   core-performance:
@@ -92,6 +94,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-core-performance
+          if-no-files-found: error
           path: rmr/benchmark_framework/output/comparisons-v2/**
 
   backends:
@@ -122,6 +125,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-backends
+          if-no-files-found: error
           path: |
             rmr/benchmark_framework/output/upstream-v3-backends/**
             rmr/benchmark_framework/output/upstream-v3-ablation/**
@@ -145,6 +149,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-abi-elf
+          if-no-files-found: error
           path: rmr/benchmark_framework/output/upstream-v3-abi/**
 
   tbb:
@@ -166,6 +171,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-tbb
+          if-no-files-found: error
           path: rmr/benchmark_framework/output/upstream-v3-tbb/**
 
   rust-cli:
@@ -181,6 +187,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-rust-cli
+          if-no-files-found: error
           path: rmr/benchmark_framework/output/upstream-v3-rust/**
 
   cross-arch:
@@ -201,6 +208,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-cross-arch
+          if-no-files-found: error
           path: rmr/benchmark_framework/output/upstream-v3-cross/**
 
   rmr-integration:
@@ -220,6 +228,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-rmr-integration
+          if-no-files-found: error
           path: rmr/benchmark_framework/output/upstream-v3-rmr-integration/**
 
   summary:
@@ -258,6 +267,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: upstream-v3-final-receipt
+          if-no-files-found: error
           path: final/**
       - name: Gate summary
         env:
