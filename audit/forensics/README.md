@@ -25,6 +25,9 @@
 | [`BLAKE3_FORENSIC_MANIFESTO_NONNEGOTIABLE_V1_20260924.md`](BLAKE3_FORENSIC_MANIFESTO_NONNEGOTIABLE_V1_20260924.md) | Contrato forense-base: último ZERO integral, snapshot 89/108 + 19 deltas, performance favorável/adversa, autoria, claim gates e invariantes inegociáveis. |
 | [`BLAKE3_CLOSED_PR_INPUT_PROVENANCE_LEDGER_V1_20260924.md`](BLAKE3_CLOSED_PR_INPUT_PROVENANCE_LEDGER_V1_20260924.md) | Ledger factual de PRs closed/non-merged, atores de fechamento, rotas alternativas de integração, issues como insumos e automação explicitamente registrada. |
 | [`BLAKE3_SECURITY_COLLISION_COORDINATION_EVIDENCE_V1_20260924.md`](BLAKE3_SECURITY_COLLISION_COORDINATION_EVIDENCE_V1_20260924.md) | Auditoria factual de coordenação em segurança, colisões e tree hashing: concentração de manutenção, coautores, documentação, forks externos, referências e limites de claim. |
+| [`BLAKE3_CHAIN_OF_CUSTODY_ISSUES_PRS_V1_20260924.md`](BLAKE3_CHAIN_OF_CUSTODY_ISSUES_PRS_V1_20260924.md) | Cadeia de custódia factual de 18 issues de segurança/colisão/árvore, comentários-âncora, grandes PRs, PRs closed/non-merged, SHAs e arestas issue→PR→commit→release. |
+| [`BLAKE3_CHAIN_OF_CUSTODY_INDEX_V1_20260924.tsv`](BLAKE3_CHAIN_OF_CUSTODY_INDEX_V1_20260924.tsv) | Índice tabular legível por máquina com atores, estados, timestamps, SHAs, escala das PRs, URLs-fonte e notas de custódia. |
+| [`../receipts/BLAKE3_CHAIN_OF_CUSTODY_RECEIPT_V1_20260924.txt`](../receipts/BLAKE3_CHAIN_OF_CUSTODY_RECEIPT_V1_20260924.txt) | Receipt da materialização: base master, branch head, Git blob SHAs, tamanhos, escopo e limitações explícitas. |
 | [`BLAKE3_FORENSIC_TIMELINE_2019_2026.md`](BLAKE3_FORENSIC_TIMELINE_2019_2026.md) | Cronologia verificada de erros, reversões, experimentos abortados, uso de IA e auditorias. |
 | [`BLAKE3_ERROR_REVERT_ABORT_MATRIX.md`](BLAKE3_ERROR_REVERT_ABORT_MATRIX.md) | Matriz técnica: origem, descoberta, correção, impacto, lacunas e classificação. |
 | [`BLAKE3_AI_PROVENANCE_AND_GOVERNANCE.md`](BLAKE3_AI_PROVENANCE_AND_GOVERNANCE.md) | Auditoria de Claude, Codex, Copilot, autoria Git, receipts e assimetria de governança. |
@@ -80,6 +83,13 @@ CI PASS             != performance universal
 
 ```text
 história incompleta quando se olha somente o master: PROVADO
+erros graves que atravessaram releases/configurações: PROVADO
+arquiteturas e experiências abortadas reconstruíveis: PROVADO
+afirmações técnicas posteriormente revertidas: PROVADO
+código de IA defeituoso em PR pública: PROVADO
+código auxiliado por IA mesclado: PROVADO
+proveniência de IA e política pública insuficientes: EVIDENCIADO
+tratamento comunicacional desigual entre PRs: EVIDENCIADO
 PR closed/unmerged pode ter requisito/trabalho incorporado por outro caminho: PROVADO EM CASOS BLAKE3
 PR#533 anterior à mudança literal u64::MAX posterior: PROVADO
 identidade literal da linha u64::MAX no mesmo locus: PROVADO
@@ -94,4 +104,4 @@ botnet ou rede criminosa de plágio: NÃO DEMONSTRADA
 
 ## Limites
 
-Este material é auditoria técnica e documental, não laudo judicial. Não atribui crime, fraude, plágio, intenção, apropriação ilícita ou finalidade anticompetitiva sem evidência específica e suficiente. Todo novo achado deve ser anexado de forma `append-only`, com data, URL, SHA, diff, escopo e método de comparação.
+Este material é auditoria técnica e documental, não laudo judicial. Não atribui crime, fraude, plágio, intenção, apropriação ilícita ou finalidade anticompetitiva sem evidência específica e suficiente. Todo novo achado deve ser anexado de forma `append-only`, com data, URL, SHA, diff, ambiente, escopo, método de reprodução e método de comparação.
