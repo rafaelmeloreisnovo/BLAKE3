@@ -77,17 +77,22 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Valida cabeçalhos de licença RMR.')
     parser.add_argument('--strict-canonical', action='store_true',
                         help='Exige texto canônico (autor/anos/licença) no cabeçalho.')
+    parser.add_argument('--root', action='append', dest='roots', default=[],
+                        help='Limita a auditoria a um arquivo/diretório; pode ser repetido.')
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
     errors = []
+    roots = tuple(Path(x) for x in args.roots) if args.roots else ROOTS
 
-    for root in ROOTS:
+    for root in roots:
         if not root.exists():
+            errors.append(f'MISSING_ROOT: {root}')
             continue
-        for path in sorted(root.rglob('*')):
+        paths = [root] if root.is_file() else sorted(root.rglob('*'))
+        for path in paths:
             if not should_check(path):
                 continue
             text = path.read_text(encoding='utf-8', errors='ignore')
@@ -107,7 +112,7 @@ def main() -> int:
                 errors.append(f'NON_CANONICAL_HEADER: {path}')
 
     specific = Path('rmr/fix_geom_N_all_scopes.py')
-    if specific.exists():
+    if not args.roots and specific.exists():
         first = specific.read_text(encoding='utf-8', errors='ignore').splitlines()
         if not first or not first[0].startswith('#!'):
             errors.append(f'MISSING_SHEBANG: {specific}')
@@ -117,7 +122,8 @@ def main() -> int:
         return 1
 
     mode = 'strict canonical' if args.strict_canonical else 'compatible'
-    print(f'OK: header and shebang checks passed for rmr/ and tools/ ({mode} mode).')
+    scope = ', '.join(str(x) for x in roots)
+    print(f'OK: header checks passed for {scope} ({mode} mode).')
     return 0
 
 
