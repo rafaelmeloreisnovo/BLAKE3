@@ -3,8 +3,9 @@
 **Estado:** `AUDIT_EVIDENCE_SNAPSHOT`  
 **Repositório:** [`rafaelmeloreisnovo/BLAKE3`](https://github.com/rafaelmeloreisnovo/BLAKE3)  
 **Fonte primária analisada:** [`BLAKE3-team/BLAKE3`](https://github.com/BLAKE3-team/BLAKE3)  
-**Corte temporal da verificação:** `2026-08-03T08:41:00-03:00`  
-**Método:** histórico Git, commits, pull requests, issues, diffs, comentários públicos e matriz de claims.  
+**Corte temporal do snapshot histórico:** `2026-08-03T08:41:00-03:00`  
+**Successor forense atual:** `2026-09-24 / BLAKE3_FORENSIC_MANIFESTO_NONNEGOTIABLE_V1`  
+**Método:** histórico Git, commits, pull requests, issues, diffs, comparação tree/blob, comentários públicos, benchmarks e matriz de claims.  
 **Regra:** nenhum indício é promovido a acusação de dolo sem receipt independente.
 
 > Este diretório preserva fatos públicos verificáveis, hipóteses separadas e lacunas marcadas como `TOKEN_VAZIO`.  
@@ -14,6 +15,7 @@
 
 | Artefato | Função |
 |---|---|
+| [`BLAKE3_FORENSIC_MANIFESTO_NONNEGOTIABLE_V1_20260924.md`](BLAKE3_FORENSIC_MANIFESTO_NONNEGOTIABLE_V1_20260924.md) | Contrato forense atual: último ZERO integral, snapshot 89/108 + 19 deltas, performance favorável/adversa, autoria, claim gates e invariantes inegociáveis. |
 | [`BLAKE3_FORENSIC_TIMELINE_2019_2026.md`](BLAKE3_FORENSIC_TIMELINE_2019_2026.md) | Cronologia verificada de erros, reversões, experimentos abortados, uso de IA e auditorias. |
 | [`BLAKE3_ERROR_REVERT_ABORT_MATRIX.md`](BLAKE3_ERROR_REVERT_ABORT_MATRIX.md) | Matriz técnica: origem, descoberta, correção, impacto, lacunas e classificação. |
 | [`BLAKE3_AI_PROVENANCE_AND_GOVERNANCE.md`](BLAKE3_AI_PROVENANCE_AND_GOVERNANCE.md) | Auditoria de Claude, Codex, Copilot, autoria Git, receipts e assimetria de governança. |
@@ -21,7 +23,7 @@
 | [`BLAKE3_CLAIMS_LEDGER_20260803.json`](BLAKE3_CLAIMS_LEDGER_20260803.json) | Ledger legível por máquina com `PROVADO`, `EVIDENCIADO`, `HIPÓTESE`, `REFUTADO` e `TOKEN_VAZIO`. |
 | [`BLAKE3_EVIDENCE_LINKS_20260803.tsv`](BLAKE3_EVIDENCE_LINKS_20260803.tsv) | Índice tabular de links públicos, SHAs, datas e estados. |
 | [`BLAKE3_AUDIT_F_NEXT.md`](BLAKE3_AUDIT_F_NEXT.md) | Gates de reprodução, comparação binária, autoria, segurança e preservação futura. |
-| [`../receipts/BLAKE3_FORENSIC_SHA256SUMS_20260803.txt`](../receipts/BLAKE3_FORENSIC_SHA256SUMS_20260803.txt) | SHA-256 dos artefatos deste snapshot. |
+| [`../receipts/BLAKE3_FORENSIC_SHA256SUMS_20260803.txt`](../receipts/BLAKE3_FORENSIC_SHA256SUMS_20260803.txt) | SHA-256 dos artefatos do snapshot de 2026-08-03. |
 
 ## Vocabulário controlado
 
@@ -42,6 +44,9 @@ bot autorizado      != botnet
 código auxiliado IA != autoria exclusiva da IA
 declaração falsa    != falsificação deliberada
 uso de BLAKE3       != plágio dos autores do BLAKE3
+git ahead/behind    != igualdade de fonte
+cross-compile       != execução física
+CI PASS             != performance universal
 ```
 
 ## Resultado consolidado do snapshot
