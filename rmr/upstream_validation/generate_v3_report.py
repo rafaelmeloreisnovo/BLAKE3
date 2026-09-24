@@ -76,9 +76,17 @@ def main():
 
     p,d=find_schema(root,SCHEMAS["abi"])
     if d:
-        state="PASS" if d.get("gnu_stack",{}).get("fork")=="PASS_NON_EXECUTABLE" else "REVIEW"
+        missing=d.get("symbols_only_official",[])
+        extra=d.get("symbols_only_fork",[])
+        state="PASS" if (
+            d.get("gnu_stack",{}).get("fork")=="PASS_NON_EXECUTABLE"
+            and d.get("public_abi_probe_equal") is True
+            and not missing
+            and not extra
+        ) else "REVIEW"
         add("ABI-ELF",state,
-            f"abi_equal={d.get('public_abi_probe_equal')} symbols_fork_extra={len(d.get('symbols_only_fork',[]))}",p)
+            f"abi_equal={d.get('public_abi_probe_equal')} "
+            f"symbols_missing={len(missing)} symbols_fork_extra={len(extra)}",p)
     else:add("ABI-ELF","TOKEN_VAZIO_NOT_FOUND","receipt missing")
 
     p,d=find_schema(root,SCHEMAS["rustlib"])
