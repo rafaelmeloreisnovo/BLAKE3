@@ -45,8 +45,13 @@ def run_report(script: Path, artifacts: Path, out: Path) -> dict:
 
 
 def make_full(root: Path) -> None:
-    (root / "san/transcript.txt").parent.mkdir(parents=True, exist_ok=True)
-    (root / "san/transcript.txt").write_text("PASS\n", encoding="utf-8")
+    (root / "san/receipt.txt").parent.mkdir(parents=True, exist_ok=True)
+    (root / "san/receipt.txt").write_text(
+        "C_KAT_ASAN_UBSAN=PASS\n"
+        "C_INTRINSICS_AND_ASM_VECTORS=PASS\n"
+        "claim_allowed=false\n",
+        encoding="utf-8",
+    )
     write_json(root / "core.json", {
         "schema": "RMR-BLAKE3-UPSTREAM-COMPARE-V2",
         "analysis": [{"classification": "PARITY_OR_NOISE_NOT_SEPARATED"}],
@@ -123,6 +128,16 @@ def main() -> int:
         assert partial["execution_complete"] is False
         assert partial["validation_state"] == "PARTIAL"
         assert "B3SUM" in partial["missing_required_axes"]
+
+        make_full(full)
+        with (full / "status.csv").open("w", newline="", encoding="utf-8") as f:
+            w = csv.writer(f)
+            w.writerow(["profile", "state", "target"])
+            w.writerow(["x86_64", "PASS", "x86_64-none-elf"])
+            w.writerow(["armv7", "TOKEN_VAZIO_TOOLCHAIN", "armv7a-none-eabi"])
+        cross_partial = run_report(FULL, full, base / "full-cross-partial-out")
+        assert cross_partial["execution_complete"] is False
+        assert "CROSS-ARCH" in cross_partial["missing_required_axes"]
 
         comp = base / "comp"
         comp.mkdir()
