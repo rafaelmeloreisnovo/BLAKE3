@@ -6,7 +6,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$ROOT/upstream_validation/common.sh"
 for t in git python3 sha256sum; do rmr_need "$t"; done
 WORK="${WORK_ROOT:-$ROOT/.rmr-work/upstream-v3-source}"
-OUT="${RESULT_ROOT:-$ROOT/rmr/benchmark_framework/output/upstream-v3-source}"
+OUT="${RESULT_ROOT:-$ROOT/benchmark_framework/output/upstream-v3-source}"
 OFFICIAL_ROOT="$WORK/official"
 rm -rf "$OUT"; mkdir -p "$WORK" "$OUT"
 OFFICIAL_COMMIT="$(rmr_checkout_official "$OFFICIAL_ROOT")"
