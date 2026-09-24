@@ -7,6 +7,8 @@ on:
       - "rmr/benchmark_framework/core/blake3_size_bench.c"
       - "rmr/benchmark_framework/simperf/analyze_blake3_compare_v2.py"
       - "rmr/tools/orchestrate_blake3_compare_v2.sh"
+      - "rmr/upstream_validation/common.sh"
+      - "rmr/crypto/runtime/tools/validate_source_authority.py"
       - ".github/workflows/rmr-blake3-upstream-compare-v2.yml"
   push:
     branches:
@@ -16,6 +18,8 @@ on:
       - "rmr/benchmark_framework/core/blake3_size_bench.c"
       - "rmr/benchmark_framework/simperf/analyze_blake3_compare_v2.py"
       - "rmr/tools/orchestrate_blake3_compare_v2.sh"
+      - "rmr/upstream_validation/common.sh"
+      - "rmr/crypto/runtime/tools/validate_source_authority.py"
       - ".github/workflows/rmr-blake3-upstream-compare-v2.yml"
   workflow_dispatch:
 
@@ -41,6 +45,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang cmake ninja-build
 
+      - name: Verify official-vs-fork source authority
+        run: python3 rmr/crypto/runtime/tools/validate_source_authority.py --out build/rmr-source-authority.json
+
       - name: Compare current upstream vs fork core
         env:
           CC: clang
@@ -55,5 +62,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rmr-blake3-upstream-compare-v2
-          path: rmr/benchmark_framework/output/comparisons-v2/**
+          path: |
+            rmr/benchmark_framework/output/comparisons-v2/**
+            build/rmr-source-authority.json
           if-no-files-found: error

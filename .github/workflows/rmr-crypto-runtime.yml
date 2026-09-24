@@ -4,6 +4,11 @@ on:
   pull_request:
     paths:
       - "rmr/crypto/runtime/**"
+      - "rmr/crypto/algorithms/**"
+      - "rmr/upstream_validation/common.sh"
+      - "rmr/tools/orchestrate_blake3_compare.sh"
+      - "rmr/tools/orchestrate_blake3_compare_v2.sh"
+      - ".github/workflows/rmr-upstream-comprehensive-v3.yml"
       - "rmr/CMakeLists.txt"
       - ".github/workflows/rmr-crypto-runtime.yml"
   push:
@@ -11,6 +16,11 @@ on:
       - master
     paths:
       - "rmr/crypto/runtime/**"
+      - "rmr/crypto/algorithms/**"
+      - "rmr/upstream_validation/common.sh"
+      - "rmr/tools/orchestrate_blake3_compare.sh"
+      - "rmr/tools/orchestrate_blake3_compare_v2.sh"
+      - ".github/workflows/rmr-upstream-comprehensive-v3.yml"
       - "rmr/CMakeLists.txt"
       - ".github/workflows/rmr-crypto-runtime.yml"
 
@@ -50,6 +60,13 @@ jobs:
           python3 rmr/crypto/runtime/tools/validate_runtime_registry.py \
             > build/rmr-crypto/registry-validation.txt
           cat build/rmr-crypto/registry-validation.txt
+
+      - name: Validate algorithm layout and BLAKE3 source authority
+        run: |
+          python3 rmr/crypto/runtime/tools/validate_algorithm_layout.py --out build/rmr-crypto/algorithm-layout.json > build/rmr-crypto/algorithm-layout.txt
+          python3 rmr/crypto/runtime/tools/validate_source_authority.py --out build/rmr-crypto/source-authority.json > build/rmr-crypto/source-authority.txt
+          cat build/rmr-crypto/algorithm-layout.txt
+          cat build/rmr-crypto/source-authority.txt
 
       - name: Compile provider-neutral architecture matrix
         run: |
@@ -93,4 +110,8 @@ jobs:
             build/rmr-crypto/rmr_crypto_runtime_matrix.json
             build/rmr-crypto/environment.txt
             build/rmr-crypto/registry-validation.txt
+            build/rmr-crypto/algorithm-layout.json
+            build/rmr-crypto/algorithm-layout.txt
+            build/rmr-crypto/source-authority.json
+            build/rmr-crypto/source-authority.txt
             build/rmr-crypto/contract-matrix.txt
