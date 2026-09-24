@@ -12,6 +12,8 @@ on:
       - "rmr/**"
       - ".github/workflows/rmr-hardware-build-topology.yml"
 
+  workflow_dispatch:
+
 permissions:
   contents: read
 
@@ -23,7 +25,10 @@ jobs:
   topology:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
 
       - name: Configure RMR topology
         run: >
@@ -40,7 +45,10 @@ jobs:
           ctest --test-dir build/rmr-topology -R 'rmr_(topology|hwif)_selftest' --output-on-failure
 
       - name: Cross-compile HWIF matrix
-        run: sh rmr/hwif/build/build_cross_matrix.sh
+        run: |
+          mkdir -p build/rmr-topology
+          sh rmr/hwif/build/build_cross_matrix.sh \
+            | tee build/rmr-topology/hwif-cross-matrix.txt
 
       - name: Run bounded IOPS smoke receipts
         run: |
@@ -59,7 +67,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rmr-hardware-build-topology
+          if-no-files-found: error
           path: |
             build/rmr-topology/rmr_topology_audit.json
+            build/rmr-topology/hwif-cross-matrix.txt
             build/rmr-topology/iops/write.json
             build/rmr-topology/iops/read.json
