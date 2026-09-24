@@ -5,7 +5,7 @@ Licensed under LICENSE_RMR.
 
 # RMR Crypto Algorithm Directory V1
 
-Stable directory addresses for the 15 algorithms already executable through
+Stable directory addresses for the 23 algorithms registered for execution through
 `rmr/crypto/runtime/registry.json`.
 
 | ID | Class | Provider | Security use |
@@ -25,6 +25,14 @@ Stable directory addresses for the 15 algorithms already executable through
 | `aes-256-gcm` | aead | OpenSSL-3-EVP_CIPHER | current |
 | `x25519` | key_agreement | OpenSSL-3-EVP_PKEY | current |
 | `pbkdf2-hmac-sha256` | password_kdf | OpenSSL-3-EVP | current |
+| `sha224` | hash | OpenSSL-3-EVP | current |
+| `sha384` | hash | OpenSSL-3-EVP | current |
+| `sha3-512` | hash | OpenSSL-3-EVP | current |
+| `shake128` | xof | OpenSSL-3-EVP | current |
+| `shake256` | xof | OpenSSL-3-EVP | current |
+| `blake2s-256` | hash | OpenSSL-3-EVP | current |
+| `ed448` | signature | OpenSSL-3-EVP_PKEY | current |
+| `x448` | key_agreement | OpenSSL-3-EVP_PKEY | current |
 
 MD5 and SHA-1 remain `compatibility_only`.
 

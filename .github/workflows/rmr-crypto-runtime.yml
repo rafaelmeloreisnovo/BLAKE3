@@ -87,7 +87,7 @@ jobs:
       - name: Run KAT target
         run: ctest --test-dir build/rmr-crypto -R rmr_crypto_runtime_selftest --output-on-failure
 
-      - name: Materialize 135-cell runtime matrix
+      - name: Materialize dynamic runtime matrix
         run: |
           python3 rmr/crypto/runtime/tools/generate_runtime_matrix.py \
             --native-kat-pass \
@@ -96,9 +96,14 @@ jobs:
           import json
           p = "build/rmr-crypto/rmr_crypto_runtime_matrix.json"
           d = json.load(open(p, encoding="utf-8"))
-          assert d["cells"] == 135
-          assert sum(r["execution_state"] == "KAT_PASS_NATIVE" for r in d["rows"]) == 15
-          print("RMR_CRYPTO_NATIVE_CELLS=15/15")
+          expected_cells = d["architectures"] * d["algorithms"]
+          native_cells = sum(
+              r["execution_state"] == "KAT_PASS_NATIVE" for r in d["rows"]
+          )
+          assert d["cells"] == expected_cells
+          assert native_cells == d["algorithms"]
+          print(f"RMR_CRYPTO_MATRIX_CELLS={d['cells']}/{expected_cells}")
+          print(f"RMR_CRYPTO_NATIVE_CELLS={native_cells}/{d['algorithms']}")
           PY
 
       - name: Upload crypto runtime receipt
