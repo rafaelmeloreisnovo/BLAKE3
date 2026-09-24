@@ -45,6 +45,13 @@ def run_report(script: Path, artifacts: Path, out: Path) -> dict:
 
 
 def make_full(root: Path) -> None:
+    (root / "aaa/receipt.txt").parent.mkdir(parents=True, exist_ok=True)
+    (root / "aaa/receipt.txt").write_text(
+        "RMR_UNRELATED_RECEIPT=PASS\n", encoding="utf-8"
+    )
+    (root / "aaa/status.csv").write_text(
+        "kind,value\nunrelated,PASS\n", encoding="utf-8"
+    )
     (root / "san/receipt.txt").parent.mkdir(parents=True, exist_ok=True)
     (root / "san/receipt.txt").write_text(
         "C_KAT_ASAN_UBSAN=PASS\n"
