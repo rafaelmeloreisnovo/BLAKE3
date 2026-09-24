@@ -312,6 +312,62 @@
       "class": "password_kdf",
       "status": "IMPLEMENTED_PROVIDER",
       "security_use": "current"
+    },
+    {
+      "id": "sha224",
+      "provider": "OpenSSL-3-EVP",
+      "class": "hash",
+      "status": "IMPLEMENTED_PROVIDER",
+      "security_use": "current"
+    },
+    {
+      "id": "sha384",
+      "provider": "OpenSSL-3-EVP",
+      "class": "hash",
+      "status": "IMPLEMENTED_PROVIDER",
+      "security_use": "current"
+    },
+    {
+      "id": "sha3-512",
+      "provider": "OpenSSL-3-EVP",
+      "class": "hash",
+      "status": "IMPLEMENTED_PROVIDER",
+      "security_use": "current"
+    },
+    {
+      "id": "shake128",
+      "provider": "OpenSSL-3-EVP",
+      "class": "xof",
+      "status": "IMPLEMENTED_PROVIDER",
+      "security_use": "current"
+    },
+    {
+      "id": "shake256",
+      "provider": "OpenSSL-3-EVP",
+      "class": "xof",
+      "status": "IMPLEMENTED_PROVIDER",
+      "security_use": "current"
+    },
+    {
+      "id": "blake2s-256",
+      "provider": "OpenSSL-3-EVP",
+      "class": "hash",
+      "status": "IMPLEMENTED_PROVIDER",
+      "security_use": "current"
+    },
+    {
+      "id": "ed448",
+      "provider": "OpenSSL-3-EVP_PKEY",
+      "class": "signature",
+      "status": "IMPLEMENTED_PROVIDER",
+      "security_use": "current"
+    },
+    {
+      "id": "x448",
+      "provider": "OpenSSL-3-EVP_PKEY",
+      "class": "key_agreement",
+      "status": "IMPLEMENTED_PROVIDER",
+      "security_use": "current"
     }
   ],
   "boundaries": [

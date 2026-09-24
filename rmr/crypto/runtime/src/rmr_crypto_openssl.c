@@ -22,6 +22,10 @@ static const EVP_MD *rmr_digest_for(rmr_crypto_algorithm algorithm) {
     case RMR_CRYPTO_SHA512: return EVP_sha512();
     case RMR_CRYPTO_SHA3_256: return EVP_sha3_256();
     case RMR_CRYPTO_BLAKE2B_512: return EVP_blake2b512();
+    case RMR_CRYPTO_SHA224: return EVP_sha224();
+    case RMR_CRYPTO_SHA384: return EVP_sha384();
+    case RMR_CRYPTO_SHA3_512: return EVP_sha3_512();
+    case RMR_CRYPTO_BLAKE2S_256: return EVP_blake2s256();
     default: return NULL;
   }
 }
@@ -54,6 +58,46 @@ int rmr_crypto_digest(rmr_crypto_algorithm algorithm,
 
   *out_len = (size_t)n;
   return 0;
+}
+
+static const EVP_MD *rmr_xof_for(rmr_crypto_algorithm algorithm) {
+  switch (algorithm) {
+    case RMR_CRYPTO_SHAKE128: return EVP_shake128();
+    case RMR_CRYPTO_SHAKE256: return EVP_shake256();
+    default: return NULL;
+  }
+}
+
+int rmr_crypto_xof(rmr_crypto_algorithm algorithm,
+                   const uint8_t *input, size_t input_len,
+                   uint8_t *out, size_t out_len) {
+  const EVP_MD *md = rmr_xof_for(algorithm);
+  EVP_MD_CTX *ctx = NULL;
+  static const uint8_t empty = 0u;
+  int ok = -1;
+
+  if (md == NULL || out == NULL ||
+      (input == NULL && input_len != 0u)) {
+    return -1;
+  }
+
+  ctx = EVP_MD_CTX_new();
+  if (ctx == NULL) {
+    return -1;
+  }
+
+  if (EVP_DigestInit_ex(ctx, md, NULL) != 1 ||
+      EVP_DigestUpdate(ctx,
+                       input_len != 0u ? input : &empty,
+                       input_len) != 1 ||
+      EVP_DigestFinalXOF(ctx, out, out_len) != 1) {
+    goto done;
+  }
+
+  ok = 0;
+done:
+  EVP_MD_CTX_free(ctx);
+  return ok;
 }
 
 static int rmr_crypto_hmac_named(const char *digest_name,
@@ -274,6 +318,99 @@ int rmr_crypto_ed25519_verify(const uint8_t public_key[32],
   return rc == 1 ? 0 : (rc == 0 ? 1 : -1);
 }
 
+int rmr_crypto_ed448_public_from_seed(const uint8_t seed[57],
+                                      uint8_t public_key[57]) {
+  EVP_PKEY *pkey = NULL;
+  size_t n = 57u;
+  int ok = -1;
+
+  if (seed == NULL || public_key == NULL) {
+    return -1;
+  }
+
+  pkey = EVP_PKEY_new_raw_private_key(EVP_PKEY_ED448, NULL, seed, 57u);
+  if (pkey == NULL) {
+    return -1;
+  }
+
+  if (EVP_PKEY_get_raw_public_key(pkey, public_key, &n) == 1 && n == 57u) {
+    ok = 0;
+  }
+
+  EVP_PKEY_free(pkey);
+  return ok;
+}
+
+int rmr_crypto_ed448_sign(const uint8_t seed[57],
+                          const uint8_t *message, size_t message_len,
+                          uint8_t signature[114]) {
+  EVP_PKEY *pkey = NULL;
+  EVP_MD_CTX *ctx = NULL;
+  size_t signature_len = 114u;
+  static const uint8_t empty = 0u;
+  int ok = -1;
+
+  if (seed == NULL || signature == NULL ||
+      (message == NULL && message_len != 0u)) {
+    return -1;
+  }
+
+  pkey = EVP_PKEY_new_raw_private_key(EVP_PKEY_ED448, NULL, seed, 57u);
+  ctx = EVP_MD_CTX_new();
+  if (pkey == NULL || ctx == NULL) {
+    goto done;
+  }
+
+  if (EVP_DigestSignInit(ctx, NULL, NULL, NULL, pkey) != 1 ||
+      EVP_DigestSign(ctx, signature, &signature_len,
+                     message_len != 0u ? message : &empty,
+                     message_len) != 1 ||
+      signature_len != 114u) {
+    goto done;
+  }
+
+  ok = 0;
+done:
+  EVP_MD_CTX_free(ctx);
+  EVP_PKEY_free(pkey);
+  return ok;
+}
+
+int rmr_crypto_ed448_verify(const uint8_t public_key[57],
+                            const uint8_t *message, size_t message_len,
+                            const uint8_t signature[114]) {
+  EVP_PKEY *pkey = NULL;
+  EVP_MD_CTX *ctx = NULL;
+  static const uint8_t empty = 0u;
+  int rc;
+
+  if (public_key == NULL || signature == NULL ||
+      (message == NULL && message_len != 0u)) {
+    return -1;
+  }
+
+  pkey = EVP_PKEY_new_raw_public_key(EVP_PKEY_ED448, NULL, public_key, 57u);
+  ctx = EVP_MD_CTX_new();
+  if (pkey == NULL || ctx == NULL) {
+    EVP_MD_CTX_free(ctx);
+    EVP_PKEY_free(pkey);
+    return -1;
+  }
+
+  if (EVP_DigestVerifyInit(ctx, NULL, NULL, NULL, pkey) != 1) {
+    EVP_MD_CTX_free(ctx);
+    EVP_PKEY_free(pkey);
+    return -1;
+  }
+
+  rc = EVP_DigestVerify(ctx, signature, 114u,
+                        message_len != 0u ? message : &empty,
+                        message_len);
+  EVP_MD_CTX_free(ctx);
+  EVP_PKEY_free(pkey);
+  return rc == 1 ? 0 : (rc == 0 ? 1 : -1);
+}
+
 int rmr_crypto_x25519_public_from_private(const uint8_t private_key[32],
                                           uint8_t public_key[32]) {
   EVP_PKEY *pkey = NULL;
@@ -330,6 +467,65 @@ int rmr_crypto_x25519_shared_secret(const uint8_t private_key[32],
 
   ok = 0;
 
+done:
+  EVP_PKEY_CTX_free(ctx);
+  EVP_PKEY_free(peer);
+  EVP_PKEY_free(priv);
+  return ok;
+}
+
+int rmr_crypto_x448_public_from_private(const uint8_t private_key[56],
+                                        uint8_t public_key[56]) {
+  EVP_PKEY *pkey = NULL;
+  size_t n = 56u;
+  int ok = -1;
+
+  if (private_key == NULL || public_key == NULL) {
+    return -1;
+  }
+
+  pkey = EVP_PKEY_new_raw_private_key(EVP_PKEY_X448, NULL, private_key, 56u);
+  if (pkey == NULL) {
+    return -1;
+  }
+
+  if (EVP_PKEY_get_raw_public_key(pkey, public_key, &n) == 1 && n == 56u) {
+    ok = 0;
+  }
+
+  EVP_PKEY_free(pkey);
+  return ok;
+}
+
+int rmr_crypto_x448_shared_secret(const uint8_t private_key[56],
+                                  const uint8_t peer_public_key[56],
+                                  uint8_t shared_secret[56]) {
+  EVP_PKEY *priv = NULL;
+  EVP_PKEY *peer = NULL;
+  EVP_PKEY_CTX *ctx = NULL;
+  size_t n = 56u;
+  int ok = -1;
+
+  if (private_key == NULL || peer_public_key == NULL || shared_secret == NULL) {
+    return -1;
+  }
+
+  priv = EVP_PKEY_new_raw_private_key(EVP_PKEY_X448, NULL, private_key, 56u);
+  peer = EVP_PKEY_new_raw_public_key(EVP_PKEY_X448, NULL, peer_public_key, 56u);
+  if (priv == NULL || peer == NULL) {
+    goto done;
+  }
+
+  ctx = EVP_PKEY_CTX_new(priv, NULL);
+  if (ctx == NULL ||
+      EVP_PKEY_derive_init(ctx) != 1 ||
+      EVP_PKEY_derive_set_peer(ctx, peer) != 1 ||
+      EVP_PKEY_derive(ctx, shared_secret, &n) != 1 ||
+      n != 56u) {
+    goto done;
+  }
+
+  ok = 0;
 done:
   EVP_PKEY_CTX_free(ctx);
   EVP_PKEY_free(peer);
