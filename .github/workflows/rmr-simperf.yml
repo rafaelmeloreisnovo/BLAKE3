@@ -55,7 +55,30 @@ jobs:
           cmake -S rmr -B build/rmr-simperf -G Ninja             -DRMR_BUILD_TESTS=OFF             -DRMR_BUILD_CRYPTO_RUNTIME=OFF
           cmake --build build/rmr-simperf --target rmr-blake3-size-bench
 
-      - name: Smoke size harness
+      - name: Smoke size harness and preserve receipts
         run: |
-          build/rmr-simperf/rmr-blake3-size-bench rmr 64 16
-          build/rmr-simperf/rmr-blake3-size-bench rmr 1048576 4
+          mkdir -p build/rmr-simperf/receipts
+          build/rmr-simperf/rmr-blake3-size-bench rmr 64 16 \
+            | tee build/rmr-simperf/receipts/size-64.txt
+          build/rmr-simperf/rmr-blake3-size-bench rmr 1048576 4 \
+            | tee build/rmr-simperf/receipts/size-1048576.txt
+          cp rmr/benchmark_framework/simperf/hardware_profiles.json \
+            build/rmr-simperf/receipts/hardware_profiles.json
+          {
+            echo "RMR_SIMPERF_CI=PASS"
+            echo "profiles=5"
+            echo "claim_allowed=false"
+            echo "SIMULATION!=PHYSICAL_BENCHMARK"
+            echo "git_sha=$GITHUB_SHA"
+          } > build/rmr-simperf/receipts/receipt.txt
+          sha256sum build/rmr-simperf/receipts/size-*.txt \
+            build/rmr-simperf/receipts/hardware_profiles.json \
+            build/rmr-simperf/receipts/receipt.txt \
+            > build/rmr-simperf/receipts/SHA256SUMS.txt
+
+      - name: Upload SIMPERF receipts
+        uses: actions/upload-artifact@v4
+        with:
+          name: rmr-simperf-receipts
+          if-no-files-found: error
+          path: build/rmr-simperf/receipts/**
