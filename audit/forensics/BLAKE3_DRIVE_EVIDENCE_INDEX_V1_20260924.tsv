@@ -1,7 +1,0 @@
-id	title	state	canonical_fact
-DRIVE-001	NOVOEXPORT_CUSTODY_INDEX_V1	ACTIVE / APPEND_ONLY	fileId primary identity; hash equality may support byte identity; SHA-256/BLAKE3 allowed only when actually computed
-DRIVE-002	RAFAELIA — NOVOexport MB1871 DOCX39 Primary Hash Index — PRIVATE — 2026-08-17	PRIMARY_BYTES_HASHED_DOCX_STRUCTURE_VERIFIED_DUPLICATES_TYPED	39 objects; all present/size-match; 23 unique SHA-256; 11 duplicate hash groups; 27 objects in duplicate groups
-DRIVE-003	RAFAELIA — NOVOexport Raw 018 Wave 3 — PID Hash Reconciliation — 2026-08-24	EVIDENCED successor closure	conversations-018 witness 12,115,336 bytes; SHA-256 3cf4783727feb5c53868af76d6e2de660e2287c2cb075180a6aad2738b10140c; JSON PASS; 100 objects
-DRIVE-004	RAFAELIA — NOVOexport ALL_TOKEN Integrity Wave 1 — Manifest Aggregate Drift — 2026-08-24	PARTIAL_EVIDENCE_MATERIALIZED	tokens detailed stores agree at 44,185,627; frozen manifest scalar 44,185,626; root cause generator path TOKEN_VAZIO
-DRIVE-005	NOVOexport corpus 000..050	FULL_CORPUS_RECALCULATION_LOCAL_READONLY	51/51 shards; 1,107,289,897 bytes; 5,054 root objects; 50x100 + RAW050x54
-DRIVE-006	Historical export 2025-09-12 witness	BYTE_BACKED_ARCHIVE	archive 258,114,346 bytes SHA-256 0d1eec04eea3b3a8e3cf6435b6a6fb0e732db3f037ac9220f09031b0ecba8815; conversations.json 678,116,200 uncompressed bytes; 2,334 conversations

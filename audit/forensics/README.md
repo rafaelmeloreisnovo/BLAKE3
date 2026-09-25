@@ -4,7 +4,7 @@
 **Repositório:** [`rafaelmeloreisnovo/BLAKE3`](https://github.com/rafaelmeloreisnovo/BLAKE3)  
 **Fonte primária analisada:** [`BLAKE3-team/BLAKE3`](https://github.com/BLAKE3-team/BLAKE3)  
 **Corte temporal do snapshot histórico:** `2026-08-03T08:41:00-03:00`  
-**Successor forense atual:** `2026-09-24 / BLAKE3_PR533_CANONICAL_FACTS_V1`  
+**Successor forense atual:** `2026-09-24 / BLAKE3_FACTUAL_DOSSIER_MAINTENANCE_SECURITY_REFERENCES_V1`  
 **Método:** histórico Git, commits, pull requests, issues, diffs, comparação tree/blob, comentários públicos, benchmarks e matriz de claims.  
 **Regra:** nenhum indício é promovido a acusação de dolo sem receipt independente.
 
@@ -25,6 +25,8 @@
 | [`BLAKE3_FORENSIC_MANIFESTO_NONNEGOTIABLE_V1_20260924.md`](BLAKE3_FORENSIC_MANIFESTO_NONNEGOTIABLE_V1_20260924.md) | Contrato forense-base: último ZERO integral, snapshot 89/108 + 19 deltas, performance favorável/adversa, autoria, claim gates e invariantes inegociáveis. |
 | [`BLAKE3_CLOSED_PR_INPUT_PROVENANCE_LEDGER_V1_20260924.md`](BLAKE3_CLOSED_PR_INPUT_PROVENANCE_LEDGER_V1_20260924.md) | Ledger factual de PRs closed/non-merged, atores de fechamento, rotas alternativas de integração, issues como insumos e automação explicitamente registrada. |
 | [`BLAKE3_SECURITY_COLLISION_COORDINATION_EVIDENCE_V1_20260924.md`](BLAKE3_SECURITY_COLLISION_COORDINATION_EVIDENCE_V1_20260924.md) | Auditoria factual de coordenação em segurança, colisões e tree hashing: concentração de manutenção, coautores, documentação, forks externos, referências e limites de claim. |
+| [`BLAKE3_FACTUAL_DOSSIER_MAINTENANCE_SECURITY_REFERENCES_V1_20260924.md`](BLAKE3_FACTUAL_DOSSIER_MAINTENANCE_SECURITY_REFERENCES_V1_20260924.md) | Dossiê narrativo factual que reconcilia os ledgers anteriores: atos observados de resposta/fechamento/integração, security wording entre coautores, referências entre projetos/coautores e limites explícitos de inferência. |
+| [`../receipts/BLAKE3_FACTUAL_DOSSIER_RECEIPT_V1_20260924.txt`](../receipts/BLAKE3_FACTUAL_DOSSIER_RECEIPT_V1_20260924.txt) | Receipt do dossiê, incluindo mirror no Google Drive, revision ID e blobs predecessores. |
 | [`BLAKE3_CHAIN_OF_CUSTODY_ISSUES_PRS_V1_20260924.md`](BLAKE3_CHAIN_OF_CUSTODY_ISSUES_PRS_V1_20260924.md) | Cadeia de custódia factual de 18 issues de segurança/colisão/árvore, comentários-âncora, grandes PRs, PRs closed/non-merged, SHAs e arestas issue→PR→commit→release. |
 | [`BLAKE3_CHAIN_OF_CUSTODY_INDEX_V1_20260924.tsv`](BLAKE3_CHAIN_OF_CUSTODY_INDEX_V1_20260924.tsv) | Índice tabular legível por máquina com atores, estados, timestamps, SHAs, escala das PRs, URLs-fonte e notas de custódia. |
 | [`../receipts/BLAKE3_CHAIN_OF_CUSTODY_RECEIPT_V1_20260924.txt`](../receipts/BLAKE3_CHAIN_OF_CUSTODY_RECEIPT_V1_20260924.txt) | Receipt da materialização: base master, branch head, Git blob SHAs, tamanhos, escopo e limitações explícitas. |
