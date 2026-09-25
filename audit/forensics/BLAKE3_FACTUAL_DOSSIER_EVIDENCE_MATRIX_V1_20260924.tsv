@@ -1,0 +1,24 @@
+evidence_id	category	source_object	actor_1	actor_2	fact	anchor	state
+FD-001	maintainer_activity	18 issue security subset	oconnor663		6 of 10 observed issue closures in audited closed subset	issues #13,#70,#123,#163,#168,#278	VERIFIED
+FD-002	security_wording	issue #168 -> PR #169	oconnor663	sneves	public security wording coordination after outside request	comments 829367851;829423453;829609667;830462118;843367481	VERIFIED
+FD-003	security_wording	issue #168	oconnor663	veorq	oconnor663 explicitly invited veorq to weigh in	issue #168 public thread	VERIFIED
+FD-004	reference_network	issue #82	oconnor663		oconnor663 referenced oconnor663/bao	comment 620164772	VERIFIED
+FD-005	reference_network	issue #138	zookozcash	oconnor663	zookozcash referenced oconnor663/bessie	comment 1728292337	VERIFIED
+FD-006	reference_network	PR #373	oconnor663		Bao/Bessie/BLAKE3-AEAD named as intended consumers	PR #373	VERIFIED
+FD-007	reference_network	issue #278	oconnor663	coauthor publication	Serious Cryptography recommended with coauthor relation noted	issue #278	VERIFIED
+FD-008	external_security	PR #227	oconnor663	Aldo Gunsing	external security finding named and documented upstream	commit ea3bc782d8128d7f52008d459ecd4df8b51979cf	VERIFIED
+FD-009	external_tree_input	issue #82	qti3e	Fleek Network	external fork introduced in public tree-hashing discussion	comment 1501159222	VERIFIED
+FD-010	external_tree_input	PR #458	oconnor663	rklaehn/qti3e	external contributors CC'd and Iroh fork referenced	PR #458; commit e1c2ea27fdd717fd924d7b286a125408d7e817f7	VERIFIED
+FD-011	alternative_integration	PR #44	phayes	oconnor663	different --check implementation pushed to master before close	commits dc2a79d...;c6a99db...;c5c07bb...	VERIFIED
+FD-012	alternative_integration	PR #118	pascal-cuoq	oconnor663	direct maintainer fix preserves explicit credit	commit 0b13637ae31c2e7e1a471e39258606fabb01685e	VERIFIED
+FD-013	alternative_integration	PR #247	SteveGremory	oconnor663	CMake integrated outside conventional PR merge with Git author preserved	commit 1569e345552187a6640b2eaff540a84b525854e2	VERIFIED
+FD-014	alternative_integration	PR #341	monoid		WASM SIMD later receives release credit although PR merged=false	release 1.7.0	VERIFIED
+FD-015	alternative_integration	PR #487 -> #570	nabijaczleweli	oconnor663	#570 explicitly states original suggestion came from #487	PR #570	VERIFIED
+FD-016	RMR_provenance	PR #533	rafaelmeloreisnovo	oconnor663	public PR closed without merge by oconnor663	head 15829f851e45d1327b017be67a7b88d7725bc653	VERIFIED
+FD-017	RMR_CI	PR #533	rafaelmeloreisnovo		official GitHub Actions run completed with conclusion failure; root cause unavailable	run_id 19656415853	VERIFIED_LIMITED
+FD-018	RMR_comparison	PR #533 vs later upstream			meaningful literal copy not found in scoped exact-line comparison	forensic successor snapshot	REFUTED_IN_SCOPE
+FD-019	limiting_fact	issue #194	abitrolly		collision discussion self-closed by reporter	14 public comments	VERIFIED
+FD-020	limiting_fact	issue #441	ghost	oconnor663	issue remained open with public tree-collision explanation	comment 2579214289	VERIFIED
+FD-021	limiting_fact	18 issue security subset			0 locked issues observed in audited set	custody snapshot	VERIFIED
+FD-022	claim_boundary	private coordination			no direct public evidence recovered in audited set		TOKEN_VAZIO
+FD-023	claim_boundary	motive			motive not inferred from activity topology		TOKEN_VAZIO
