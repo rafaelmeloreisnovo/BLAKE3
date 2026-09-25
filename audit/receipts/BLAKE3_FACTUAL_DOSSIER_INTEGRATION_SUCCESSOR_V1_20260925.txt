@@ -1,0 +1,22 @@
+BLAKE3_FACTUAL_DOSSIER_INTEGRATION_SUCCESSOR_V1
+date=2026-09-25
+repository=rafaelmeloreisnovo/BLAKE3
+
+successor_of_receipt_blob=a83a96321dc3915ec9364ec78a84f8e33142fd12
+original_materialization_base=b8675d419ed2463b27cdadebcd0efd13ce597e1b
+integration_base_master=fc6b25807687d3b6e79e76141486c4fd2e59f22b
+branch=docs/factual-dossier-maintenance-security-references-v1-20260924
+rebased_head_before_this_receipt=d94d91309414b473d54670c6e8e1e44e8c358b31
+
+dossier_blob_unchanged=c92c8b1f596f1dd7159c5d24fb914c57e377eb93
+dossier_content_mutation=false
+readme_blob_after_reconciliation=3975fd86d2c05ba756b61f7191032de04a285ac7
+
+drive_document_id=1CUNl4DVBFgC42T7d3BnPpkSjomDPoEOzGr6H9lB9BDQ
+drive_revision=ANLCKQl7dbCxwsyTj-EdmU7wGsjWoSDeJ8OobUkjsMfX-OFEuYrRYIiWL4t9D2n7A_CEZmFBLeYMhEkBF37CYFk4J0p1yt4bbESZy76teJ8
+
+reason=master advanced while dossier branch was being materialized; branch was rebased by constructing a new tree on current master while preserving dossier and original receipt blobs
+policy=append-only correction/successor; no silent rewrite
+claim_delta=none
+content_delta=none
+integration_delta=base pointer only
