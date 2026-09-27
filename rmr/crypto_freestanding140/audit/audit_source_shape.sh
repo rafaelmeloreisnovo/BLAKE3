@@ -2,7 +2,7 @@
 set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-FILES="$ROOT/include/rmr_cf140.h $ROOT/kernel/rmr_cf140_ops.c $ROOT/addresses/H01/include/rmr_cf140_sha256.h $ROOT/addresses/H01/kernel/rmr_cf140_sha256_compress.c"
+FILES="$ROOT/include/rmr_cf140.h $ROOT/include/rmr_cf140_secret_buffer.h $ROOT/kernel/rmr_cf140_ops.c $ROOT/kernel/rmr_cf140_secret_buffer.c $ROOT/addresses/H01/include/rmr_cf140_sha256.h $ROOT/addresses/H01/kernel/rmr_cf140_sha256_compress.c"
 
 grep -En '(^|[^A-Za-z0-9_])(if|for|while)[[:space:]]*\(' $FILES && {
   echo "FAIL control_statement_in_kernel" >&2

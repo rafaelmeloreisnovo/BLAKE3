@@ -18,6 +18,7 @@ build_one() {
   "$CC" --target="$target" -fuse-ld=lld $CFLAGS $extra \
     -I"$ROOT/include" \
     "$ROOT/kernel/rmr_cf140_ops.c" \
+    "$ROOT/kernel/rmr_cf140_secret_buffer.c" \
     "$ROOT/addresses/H01/kernel/rmr_cf140_sha256_compress.c" \
     "$ROOT/probe/rmr_cf140_probe.c" \
     -nostdlib -static \
