@@ -21,4 +21,13 @@ if "$NM" -u "$OUT/base_prime.o" | grep -q .; then
   exit 1
 fi
 
+"$CC" $CFLAGS -I"$ROOT/rmr/core"   -c "$ROOT/rmr/core/validate_core.c"   -o "$OUT/validate_core.o"
+
+if "$NM" -u "$OUT/validate_core.o" | grep -q .; then
+  echo "FAIL validate_core_unexpected_undefined" >&2
+  "$NM" -u "$OUT/validate_core.o" >&2
+  exit 1
+fi
+
 echo "PASS base_prime=pure_integer_core"
+echo "PASS validate_core=pure_gate_core"

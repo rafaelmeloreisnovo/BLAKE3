@@ -6,6 +6,9 @@ on:
       - 'rmr/core/base.c'
       - 'rmr/core/base_prime.c'
       - 'rmr/core/pai_base.h'
+      - 'rmr/core/validate.c'
+      - 'rmr/core/validate_core.c'
+      - 'rmr/core/pai_validate_core.h'
       - 'rmr/tools/audit_pure_core_boundaries.sh'
       - '.github/workflows/rmr-pure-core-boundary-v1.yml'
   pull_request:
@@ -13,6 +16,9 @@ on:
       - 'rmr/core/base.c'
       - 'rmr/core/base_prime.c'
       - 'rmr/core/pai_base.h'
+      - 'rmr/core/validate.c'
+      - 'rmr/core/validate_core.c'
+      - 'rmr/core/pai_validate_core.h'
       - 'rmr/tools/audit_pure_core_boundaries.sh'
       - '.github/workflows/rmr-pure-core-boundary-v1.yml'
 

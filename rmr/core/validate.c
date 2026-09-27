@@ -7,6 +7,7 @@
  */
 
 #include "pai_validate.h"
+#include "pai_validate_core.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -24,15 +25,6 @@ typedef struct {
     int transitions;
     int length;
 } pai_validate_cfg;
-
-static int gcd_i(int a, int b) {
-    while (b != 0) {
-        int t = b;
-        b = a % b;
-        a = t;
-    }
-    return a < 0 ? -a : a;
-}
 
 static void validate_usage(void) {
     puts("uso: pai validate [--alpha 0.25] [--attractors 42] [--rows 10] [--cols 10] [--dr 7] [--dc 9] [--unique U] [--transitions T] [--len N]");
@@ -75,16 +67,24 @@ int pai_cmd_validate(int argc, char **argv) {
     const int attractors_expected = 42;
     const int capacity = cfg.rows * cfg.cols;
     const double bits_geom = log2((double)capacity);
-    const int gcd_r = gcd_i(cfg.dr, cfg.rows);
-    const int gcd_c = gcd_i(cfg.dc, cfg.cols);
+    pai_validate_core_result core_result;
+    (void)pai_validate_core_check(
+        cfg.alpha,
+        cfg.attractors,
+        cfg.rows,
+        cfg.cols,
+        cfg.dr,
+        cfg.dc,
+        cfg.length,
+        &core_result
+    );
+    const int gcd_r = core_result.gcd_r;
+    const int gcd_c = core_result.gcd_c;
     const double entropy_milli =
         ((double)cfg.bytes_unique * 6000.0 / 256.0) +
         ((double)cfg.transitions * 2000.0 / (double)(cfg.length - 1));
 
-    int ok = 1;
-    if (fabsf(cfg.alpha - alpha_expected) > 1e-6f) ok = 0;
-    if (cfg.attractors != attractors_expected) ok = 0;
-    if (gcd_r != 1 || gcd_c != 1) ok = 0;
+    const int ok = core_result.ok;
 
     printf("[rmr.validate] alpha=%.6f expected=%.2f\n", cfg.alpha, alpha_expected);
     printf("[rmr.validate] attractors=%d expected=%d\n", cfg.attractors, attractors_expected);

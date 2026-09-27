@@ -40,6 +40,7 @@ set(RMR_PAI_SOURCES
   core/bench.c
   core/benchdiff.c
   core/validate.c
+  core/validate_core.c
   core/util.c
   ui/mode_router.c
   ui/bbs/menu.c
