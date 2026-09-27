@@ -6,6 +6,10 @@ CC=${CC:-clang}
 LD_MODE=${LD_MODE:--fuse-ld=lld}
 OPT=${RMR_OPT:--O2}
 
+command -v "$CC" >/dev/null 2>&1 || { echo "missing compiler: $CC" >&2; exit 127; }
+command -v ld.lld >/dev/null 2>&1 || { echo "missing linker: ld.lld" >&2; exit 127; }
+command -v readelf >/dev/null 2>&1 || { echo "missing auditor: readelf" >&2; exit 127; }
+
 case "$OPT" in
   -O2|-O3|-Os|-Oz) ;;
   *) echo "invalid RMR_OPT=$OPT" >&2; exit 2 ;;
