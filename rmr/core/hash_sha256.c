@@ -2,14 +2,10 @@
  * Copyright (c) 2024–2026 Rafael Melo Reis
  * Licensed under LICENSE_RMR.
  *
- * This file is part of the RMR module.
- * It does not modify or replace the BLAKE3 core.
+ * SHA-256 in-memory core for RMR.
+ * File/OS I/O is isolated in hash_sha256_file.c.
  */
-
 #include "pai_hash.h"
-#include <string.h>
-#include <stdio.h>
-#include <stdint.h>
 
 #define ROTR(x,n) ((x >> n) | (x << (32-n)))
 #define CH(x,y,z) ((x & y) ^ (~x & z))
@@ -40,92 +36,106 @@ static const uint32_t K[64] = {
 
 static void process_block(pai_sha256_ctx *ctx, const uint8_t block[64]) {
     uint32_t w[64];
-    for(int i=0;i<16;i++) {
+
+    for (int i = 0; i < 16; ++i) {
         w[i] =
-  ((uint32_t)block[i*4]   << 24) |
-  ((uint32_t)block[i*4+1] << 16) |
-  ((uint32_t)block[i*4+2] <<  8) |
-  ((uint32_t)block[i*4+3]);
-    }
-    for(int i=16;i<64;i++)
-        w[i] = SIG1(w[i-2]) + w[i-7] + SIG0(w[i-15]) + w[i-16];
-
-    uint32_t a=ctx->h[0],b=ctx->h[1],c=ctx->h[2],d=ctx->h[3];
-    uint32_t e=ctx->h[4],f=ctx->h[5],g=ctx->h[6],h=ctx->h[7];
-
-    for(int i=0;i<64;i++) {
-        uint32_t t1 = h + EP1(e) + CH(e,f,g) + K[i] + w[i];
-        uint32_t t2 = EP0(a) + MAJ(a,b,c);
-        h=g; g=f; f=e; e=d+t1;
-        d=c; c=b; b=a; a=t1+t2;
+            ((uint32_t)block[i * 4] << 24) |
+            ((uint32_t)block[i * 4 + 1] << 16) |
+            ((uint32_t)block[i * 4 + 2] << 8) |
+            ((uint32_t)block[i * 4 + 3]);
     }
 
-    ctx->h[0]+=a; ctx->h[1]+=b; ctx->h[2]+=c; ctx->h[3]+=d;
-    ctx->h[4]+=e; ctx->h[5]+=f; ctx->h[6]+=g; ctx->h[7]+=h;
+    for (int i = 16; i < 64; ++i) {
+        w[i] = SIG1(w[i - 2]) + w[i - 7] + SIG0(w[i - 15]) + w[i - 16];
+    }
+
+    uint32_t a = ctx->h[0];
+    uint32_t b = ctx->h[1];
+    uint32_t c = ctx->h[2];
+    uint32_t d = ctx->h[3];
+    uint32_t e = ctx->h[4];
+    uint32_t f = ctx->h[5];
+    uint32_t g = ctx->h[6];
+    uint32_t h = ctx->h[7];
+
+    for (int i = 0; i < 64; ++i) {
+        const uint32_t t1 = h + EP1(e) + CH(e, f, g) + K[i] + w[i];
+        const uint32_t t2 = EP0(a) + MAJ(a, b, c);
+        h = g;
+        g = f;
+        f = e;
+        e = d + t1;
+        d = c;
+        c = b;
+        b = a;
+        a = t1 + t2;
+    }
+
+    ctx->h[0] += a;
+    ctx->h[1] += b;
+    ctx->h[2] += c;
+    ctx->h[3] += d;
+    ctx->h[4] += e;
+    ctx->h[5] += f;
+    ctx->h[6] += g;
+    ctx->h[7] += h;
 }
 
 void pai_sha256_init(pai_sha256_ctx *ctx) {
-    ctx->h[0]=0x6a09e667; ctx->h[1]=0xbb67ae85;
-    ctx->h[2]=0x3c6ef372; ctx->h[3]=0xa54ff53a;
-    ctx->h[4]=0x510e527f; ctx->h[5]=0x9b05688c;
-    ctx->h[6]=0x1f83d9ab; ctx->h[7]=0x5be0cd19;
-    ctx->len=0;
-    ctx->buf_len=0;
+    ctx->h[0] = 0x6a09e667;
+    ctx->h[1] = 0xbb67ae85;
+    ctx->h[2] = 0x3c6ef372;
+    ctx->h[3] = 0xa54ff53a;
+    ctx->h[4] = 0x510e527f;
+    ctx->h[5] = 0x9b05688c;
+    ctx->h[6] = 0x1f83d9ab;
+    ctx->h[7] = 0x5be0cd19;
+    ctx->len = 0;
+    ctx->buf_len = 0;
 }
 
 void pai_sha256_update(pai_sha256_ctx *ctx, const uint8_t *data, size_t len) {
-    ctx->len += len*8;
-    while(len--) {
+    ctx->len += len * 8u;
+
+    while (len-- != 0u) {
         ctx->buf[ctx->buf_len++] = *data++;
-        if(ctx->buf_len == 64) {
+        if (ctx->buf_len == 64u) {
             process_block(ctx, ctx->buf);
-            ctx->buf_len = 0;
+            ctx->buf_len = 0u;
         }
     }
 }
 
 void pai_sha256_final(pai_sha256_ctx *ctx, uint8_t out[32]) {
-    ctx->buf[ctx->buf_len++] = 0x80;
-    while(ctx->buf_len != 56) {
-        if(ctx->buf_len == 64) {
+    ctx->buf[ctx->buf_len++] = 0x80u;
+
+    while (ctx->buf_len != 56u) {
+        if (ctx->buf_len == 64u) {
             process_block(ctx, ctx->buf);
-            ctx->buf_len = 0;
+            ctx->buf_len = 0u;
         }
-        ctx->buf[ctx->buf_len++] = 0;
+        ctx->buf[ctx->buf_len++] = 0u;
     }
 
-    for(int i=7;i>=0;i--)
-        ctx->buf[ctx->buf_len++] = (ctx->len >> (i*8)) & 0xff;
+    for (int i = 7; i >= 0; --i) {
+        ctx->buf[ctx->buf_len++] = (uint8_t)(ctx->len >> ((uint32_t)i * 8u));
+    }
 
     process_block(ctx, ctx->buf);
 
-    for(int i=0;i<8;i++) {
-        out[i*4]   = ctx->h[i]>>24;
-        out[i*4+1] = (uint8_t)(ctx->h[i]>>16);
-        out[i*4+2] = (uint8_t)(ctx->h[i]>>8);
-        out[i*4+3] = (uint8_t)(ctx->h[i]);
+    for (int i = 0; i < 8; ++i) {
+        out[i * 4] = (uint8_t)(ctx->h[i] >> 24);
+        out[i * 4 + 1] = (uint8_t)(ctx->h[i] >> 16);
+        out[i * 4 + 2] = (uint8_t)(ctx->h[i] >> 8);
+        out[i * 4 + 3] = (uint8_t)(ctx->h[i]);
     }
 }
 
 void pai_sha256_hex(const uint8_t hash[32], char out[65]) {
-    static const char hex[]="0123456789abcdef";
-    for(int i=0;i<32;i++) {
-        out[i*2]   = hex[hash[i]>>4];
-        out[i*2+1] = hex[hash[i]&0xf];
+    static const char hex[] = "0123456789abcdef";
+    for (int i = 0; i < 32; ++i) {
+        out[i * 2] = hex[hash[i] >> 4];
+        out[i * 2 + 1] = hex[hash[i] & 0x0fu];
     }
-    out[64]=0;
-}
-
-int pai_sha256_file(const char *path, uint8_t out[32]) {
-    FILE *f = fopen(path,"rb");
-    if(!f) return -1;
-    pai_sha256_ctx ctx;
-    pai_sha256_init(&ctx);
-    uint8_t buf[4096];
-    size_t r;
-    while((r=fread(buf,1,sizeof(buf),f))>0)
-        pai_sha256_update(&ctx,buf,r);
-    fclose(f);
-    pai_sha256_final(&ctx,out);
-    return 0;
+    out[64] = 0;
 }

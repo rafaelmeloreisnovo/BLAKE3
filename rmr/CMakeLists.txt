@@ -31,7 +31,9 @@ set(RMR_PAI_SOURCES
   core/geom.c
   core/toroid.c
   core/hash_sha256.c
+  core/hash_sha256_file.c
   core/hash_blake3.c
+  core/hash_blake3_file.c
   core/scan.c
   core/sign.c
   core/bench.c
