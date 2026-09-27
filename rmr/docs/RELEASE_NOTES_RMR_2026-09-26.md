@@ -76,3 +76,22 @@ Nenhum arquivo do núcleo criptográfico BLAKE3 upstream foi modificado.
 A primeira execução do workflow standalone falhou **antes de compilar o código**, porque o runner não possuía `ld.lld` no PATH. O workflow foi corrigido para provisionar LLD explicitamente e o build script passou a falhar com diagnóstico claro quando compiler/linker/auditor estiverem ausentes.
 
 Esse evento é preservado como evidência de infraestrutura, não classificado como falha semântica do core.
+
+
+## Extraction delta — base and validation
+
+- `pai_prev_prime` e `pai_next_prime` foram movidos para `base_prime.c`, isolando o core inteiro do parsing/relatório hosted.
+- o gate GCD/atratores de `validate` foi extraído para `validate_core.c`.
+- a tolerância float de `alpha` permaneceu no wrapper hosted para preservar semântica e impedir helper soft-float oculto no pure core.
+- criado workflow `rmr-pure-core-boundary-v1`.
+
+## Friction receipts
+
+O build standalone passou a emitir:
+- SHA-256 do ELF;
+- saída `size`;
+- contagem de linhas de símbolos definidos;
+- target;
+- perfil de otimização.
+
+Esses dados serão usados como before/after em mudanças futuras.

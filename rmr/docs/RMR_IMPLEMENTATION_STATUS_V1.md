@@ -87,3 +87,39 @@ Para cada componente:
 8 CROSS-ARCH RECEIPT
 9 PROMOTION
 ```
+
+
+## Delta 2026-09-26 — extraction cycle
+
+Novas fronteiras materializadas:
+
+| Superfície | Estado atual |
+| --- | --- |
+| `rmr/standalone/` source | IMPLEMENTED_FREESTANDING |
+| standalone CI em `f6c6621b...` | VERIFIED_CI para os blobs daquela execução |
+| build receipt extension posterior | PENDING_CURRENT_HEAD_CI |
+| SHA-256 memory/file split | IMPLEMENTED_PENDING_CURRENT_HEAD_CI |
+| BLAKE3 bytes/file split | IMPLEMENTED_PENDING_CURRENT_HEAD_CI |
+| prime neighbor extraction | PURE_INTEGER_CORE_SOURCE_PENDING_CI |
+| validate integer gate extraction | PURE_INTEGER_GATE_SOURCE_PENDING_CI |
+
+### Receipt standalone já observado
+
+No commit `f6c6621b5b6664f38a479a161a3bd380f3fc9068`:
+
+```text
+host_selftest = PASS
+x86_64 FREESTANDING_ARTIFACT = PASS
+AArch64 FREESTANDING_ARTIFACT = PASS
+ARMv7 FREESTANDING_ARTIFACT = PASS
+```
+
+Toolchain observado no CI:
+
+```text
+Clang 18.1.3
+LLD 18.1.3
+GNU readelf 2.42
+```
+
+O build script foi posteriormente ampliado para emitir tamanho/hash/símbolos; essa versão precisa de novo receipt antes de promoção.

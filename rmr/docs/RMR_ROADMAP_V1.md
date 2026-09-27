@@ -23,7 +23,7 @@ Gate de saída: documentação não contradiz imports, linker ou receipts.
 
 ## R1 — standalone foundation
 
-Estado inicial: **PLANNED**
+Estado: **IMPLEMENTED / CI PASS HISTÓRICO; CURRENT-HEAD RECEIPT PENDING**
 
 - tipos compiler-native;
 - memory primitives próprias;
@@ -37,7 +37,7 @@ Gate: `PT_INTERP=0 && DT_NEEDED=0 && unexpected_UND=0`.
 
 ## R2 — separar hashing bytes vs filesystem
 
-Estado: **PLANNED**
+Estado: **IMPLEMENTED / CURRENT-HEAD CI PENDING**
 
 - SHA-256 in-memory em TU puro;
 - file reader como adapter;
@@ -134,3 +134,14 @@ rollback pointer
 ## F_next
 
 Implementar R1 em módulo isolado, sem alterar o PAI hosted; depois usar R1 como dependência interna de novos pure cores.
+
+
+## R2.5 — pure integer extraction
+
+Estado: **IMPLEMENTED / CI PENDING**
+
+- `base_prime.c`: prev/next prime sem I/O/heap;
+- `validate_core.c`: gate inteiro sem float/libm;
+- adapters hosted preservam parsing/relatório.
+
+Gate: object symbol audit sem undefined inesperado.
