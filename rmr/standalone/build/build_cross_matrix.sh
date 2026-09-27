@@ -26,6 +26,16 @@ build_one() {
   "$CC" --target="$target" $LD_MODE $BASE $flags     -I"$ROOT/include"     "$ROOT/src/rmr_standalone_core.c"     "$ROOT/probe/rmr_standalone_probe.c"     -nostdlib -static     -Wl,--gc-sections     -Wl,--icf=safe     -Wl,--build-id=none     -Wl,--no-undefined     -Wl,-e,rmr_sa_probe_entry     -Wl,-Map,"$out.map"     -o "$out"
 
   "$ROOT/audit/audit_artifact.sh" "$out"
+
+  echo "RMR_STANDALONE_RECEIPT_BEGIN"
+  echo "target=$target"
+  echo "optimization=$OPT"
+  sha256sum "$out"
+  size "$out"
+  defined_symbols=$(readelf -Ws "$out" | awk '$7!="UND" && $8!="" {n++} END{print n+0}')
+  echo "defined_symbol_rows=$defined_symbols"
+  echo "RMR_STANDALONE_RECEIPT_END"
+
   echo "[OK] $target -> $out"
 }
 
