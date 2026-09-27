@@ -15,6 +15,10 @@
 
 | Artefato | Função |
 |---|---|
+| [`BLAKE3_OFFICIAL_CI_CHAIN_OF_CUSTODY_V1_20260927.md`](BLAKE3_OFFICIAL_CI_CHAIN_OF_CUSTODY_V1_20260927.md) | Snapshot canônico do CI oficial: HEAD/blobs, proteção/rulesets, 74 checks, paginação 30/74, `fail-fast:false`, variáveis/condições, gaps e marcos históricos. |
+| [`BLAKE3_OFFICIAL_CI_CHAIN_OF_CUSTODY_V1_20260927.yaml`](BLAKE3_OFFICIAL_CI_CHAIN_OF_CUSTODY_V1_20260927.yaml) | Ledger legível por máquina com SOURCE/FORK, contagens, SHAs, gates, commits semânticos e gaps de reprodutibilidade. |
+| [`BLAKE3_OFFICIAL_CI_HISTORY_2019_2026_20260927.tsv`](BLAKE3_OFFICIAL_CI_HISTORY_2019_2026_20260927.tsv) | Histórico integral retornado pela API para `.github/workflows/ci.yml`: 92 commits, timestamps, autores Git, committers, mensagens e URLs oficiais. |
+| [`../receipts/BLAKE3_OFFICIAL_CI_CUSTODY_RECEIPT_V1_20260927.txt`](../receipts/BLAKE3_OFFICIAL_CI_CUSTODY_RECEIPT_V1_20260927.txt) | Receipt que sela HEAD/blobs oficiais, prova 30/74 da paginação e os blobs/commits dos artefatos materializados no fork. |
 | [`BLAKE3_EXPORT_CUSTODY_CANONICAL_FACTS_V1_20260924.md`](BLAKE3_EXPORT_CUSTODY_CANONICAL_FACTS_V1_20260924.md) | Fatos canônicos de export/custódia: e-mails autenticados, transição/coexistência `content ↔ estuary/content`, commitments NOVOexport e limites explícitos. |
 | [`BLAKE3_EXPORT_EMAIL_LEDGER_SANITIZED_V1_20260924.json`](BLAKE3_EXPORT_EMAIL_LEDGER_SANITIZED_V1_20260924.json) | Ledger público sanitizado de e-mails de exportação; IDs pessoais substituídos por SHA-256 e sem URLs assinadas ativas. |
 | [`BLAKE3_DRIVE_EVIDENCE_INDEX_V1_20260924.tsv`](BLAKE3_DRIVE_EVIDENCE_INDEX_V1_20260924.tsv) | Índice de commitments do Drive: custody index, RAW018, corpus 000..050, ALL_TOKEN e witness histórico. |
