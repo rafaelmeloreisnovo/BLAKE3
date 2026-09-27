@@ -57,3 +57,22 @@ Nenhum código de produção foi alterado neste primeiro commit documental.
 ## Next
 
 Adicionar uma foundation freestanding isolada com tipos compiler-native, memory primitives, perfis Q e cross-link proof. Somente depois migrar funções do PAI por módulo.
+
+
+## Code delta — standalone foundation
+
+Commit de implementação adicionou `rmr/standalone/` com core no-libc/no-heap/no-syscall e cross-link probes.
+
+O banner PAI foi corrigido para não classificar o executável hosted como bare metal.
+
+## Code delta — hash I/O split
+
+SHA-256 e BLAKE3 agora separam processamento em memória dos adapters de arquivo `FILE`.
+
+Nenhum arquivo do núcleo criptográfico BLAKE3 upstream foi modificado.
+
+## CI observation
+
+A primeira execução do workflow standalone falhou **antes de compilar o código**, porque o runner não possuía `ld.lld` no PATH. O workflow foi corrigido para provisionar LLD explicitamente e o build script passou a falhar com diagnóstico claro quando compiler/linker/auditor estiverem ausentes.
+
+Esse evento é preservado como evidência de infraestrutura, não classificado como falha semântica do core.

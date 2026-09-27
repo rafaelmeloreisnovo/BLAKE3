@@ -48,3 +48,25 @@ Promotion states are intentionally split:
 - independent third-party reproduction: TOKEN_VAZIO until external receipt.
 
 This update closes an implementation gap; it does not establish a performance winner.
+
+
+## Update 2026-09-26 — standalone migration track
+
+Implementado primeiro degrau do roadmap:
+
+- `rmr/standalone/include/rmr_standalone.h`;
+- `rmr/standalone/src/rmr_standalone_core.c`;
+- host selftest;
+- x86_64/AArch64/ARMv7 link probes;
+- ELF auditor;
+- CI dedicado.
+
+Estado de promoção no momento deste documento:
+
+```text
+SOURCE_IMPLEMENTED = true
+CI_CROSS_LINK      = PENDING_READBACK
+FREESTANDING_PROVED_CURRENT_HEAD = PENDING
+```
+
+Também foi executada a separação de hash-core/bytes versus file adapters no PAI. O próximo passo técnico é validar CI e só então extrair scan/canonicalization para uma ABI de adapter sem filesystem no pure core.
