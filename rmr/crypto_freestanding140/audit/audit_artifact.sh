@@ -14,7 +14,13 @@ READELF=${READELF:-readelf}
   exit 1
 }
 
-"$READELF" -Ws "$BIN" |
-  awk '$7=="UND" {bad=1; print} END{exit bad}' && :
+if "$READELF" -Ws "$BIN" |
+     awk '$7=="UND" {bad=1; print} END{exit bad}'
+then
+  :
+else
+  echo "FAIL unexpected_UND" >&2
+  exit 1
+fi
 
 echo "PASS CF140_FREESTANDING_ARTIFACT"
