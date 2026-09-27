@@ -1,0 +1,116 @@
+schema: BLAKE3_OFFICIAL_CI_CHAIN_OF_CUSTODY_V1
+observed_at: "2026-09-27T20:52:00-03:00"
+state: DOCUMENTARY_EVIDENCE_SNAPSHOT
+
+source:
+  repository: "BLAKE3-team/BLAKE3"
+  branch: "master"
+  head: "6aab490a26124663329dfd3961b8469f8fdb158b"
+  head_date_utc: "2026-09-10T20:47:09Z"
+  head_message: "align the two on-stack block buffers to 64 bytes (#582)"
+  branch_protected: false
+  protection_enabled: false
+  required_status_contexts: []
+  rulesets_count: 0
+  workflow_blobs:
+    ci_yml: "f7dd8c053acc2c215032a17482273a2ca00d90e5"
+    tag_yml: "61be4ff991c29d481cc0b2017ed3c3200585b6b0"
+    build_b3sum_py: "f0e1787c75e8e40320045ccdd3853ce8dea7a52d"
+    upload_github_release_asset_py: "76340bee3986b43c78ee0a140b1cb326e9040029"
+
+fork_custody:
+  repository: "rafaelmeloreisnovo/BLAKE3"
+  source_equivalence:
+    ci_yml_equal_official: true
+    tag_yml_equal_official: true
+  artifacts:
+    - path: "audit/forensics/BLAKE3_OFFICIAL_CI_HISTORY_2019_2026_20260927.tsv"
+      blob_sha: "72ac86e6b5702dd81c622237dc8e622ffdfebc46"
+      creation_commit: "9f2bea5356c3148c9e0f9fe9057fe4be6e145ba1"
+      records: 92
+    - path: "audit/forensics/BLAKE3_OFFICIAL_CI_CHAIN_OF_CUSTODY_V1_20260927.md"
+      blob_sha: "76e00f9d10431863c6ee23cd3c7cd5485496d1a8"
+      creation_commit: "53c6d757a7c88bfed2e451d68db4dacaa05886ff"
+
+checks_snapshot:
+  commit: "6aab490a26124663329dfd3961b8469f8fdb158b"
+  total_count: 74
+  default_page_returned: 30
+  per_page_100_returned: 74
+  omitted_from_default_page: 44
+  all_terminal_success: true
+  first_started_at_utc: "2026-09-10T20:47:15Z"
+  last_completed_at_utc: "2026-09-10T20:55:45Z"
+
+ci_structure:
+  lines: 505
+  top_level_jobs: 15
+  trigger_push_master: true
+  trigger_pull_request: true
+  fail_fast_false_occurrences: 9
+  needs_occurrences: 0
+  concurrency_occurrences: 0
+  always_occurrences: 0
+  continue_on_error_occurrences: 0
+  paths_occurrences: 0
+  vars_context_occurrences: 0
+  secrets_context_occurrences: 0
+  permissions_occurrences: 0
+  timeout_minutes_occurrences: 0
+  has_final_aggregate_or_summary: false
+
+key_semantic_commits:
+  - sha: "9096249e0963f4d8fe1cee4f7a6ab5191259d7c4"
+    date_utc: "2020-01-10T15:22:12Z"
+    author_login: "oconnor663"
+    fact: "enabled CI on pull_request in addition to push"
+  - sha: "4021636022cfa032eb8f4c1e40b21a4e913b0f16"
+    date_utc: "2020-01-20T21:19:16Z"
+    author_login: "oconnor663"
+    fact: "added BLAKE3_NO_* CI tests"
+  - sha: "ca62c4724d70a523af0ed34c8993643cdbf05269"
+    date_utc: "2020-02-06T23:43:50Z"
+    author_login: "oconnor663"
+    fact: "added fail-fast:false to the main matrix"
+  - sha: "4feadee6bbbba2fc686d7e6204d8d6f104b3803e"
+    date_utc: "2020-03-24T20:45:33Z"
+    author_login: "oconnor663"
+    fact: "added fail-fast:false to cross tests"
+  - sha: "6a45feedc618e45d3e3fd8430887728352295b73"
+    date_utc: "2026-04-24T22:10:28Z"
+    author_login: "oconnor663"
+    fact: "added LTO CI coverage and Linux arm64 target"
+  - sha: "fc3d0e98e840631c001837363bba77a4f64c48b9"
+    date_utc: "2026-07-27T16:14:06Z"
+    author_login: "nazar-pc"
+    fact: "changed Visual Studio path in CI"
+  - sha: "9eac279fd71b79ad9e897a4cffb23ee64acfb6df"
+    date_utc: "2026-08-03T20:18:40Z"
+    author_login: "oconnor663"
+    fact: "replaced fixed Visual Studio path with vswhere discovery"
+
+history:
+  ci_path_commit_count: 92
+  first_ci_commit: "98dd9cbbf1bcb1b6541792fd46d7eb56eeefcdb6"
+  latest_ci_touch_commit: "9eac279fd71b79ad9e897a4cffb23ee64acfb6df"
+
+reproducibility_gaps:
+  - "actions/checkout@v4 is tag-pinned, not commit-SHA pinned"
+  - "dtolnay/rust-toolchain uses moving master/stable/nightly refs"
+  - "cargo install cross has no fixed version"
+  - "wasmtime installer is fetched and piped to bash"
+  - "messense/cargo-xwin is not digest pinned"
+  - "gcc:5.4 is tag-addressed"
+  - "permissions and timeout-minutes are not explicit in ci.yml"
+
+claim_gate:
+  source_snapshot_verified: true
+  pagination_gap_verified: true
+  official_head_all_74_success: true
+  intentional_hiding_claim: TOKEN_VAZIO
+  motive_claim: TOKEN_VAZIO
+  legal_responsibility_claim: TOKEN_VAZIO
+
+next:
+  condition: "upstream HEAD, workflow blob, protection, ruleset or check topology changes"
+  action: "create append-only successor snapshot"
