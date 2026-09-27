@@ -20,7 +20,7 @@
 #include <string.h>
 
 static void usage(void) {
-    puts("pai (Pipeline de Arquitetura Integradora) — C bare metal");
+    puts("pai (Pipeline de Arquitetura Integradora) — hosted orchestrator; freestanding cores are separate");
     puts("");
     puts("Comandos:");
     puts("  pai hash  --file arquivo [--algo sha256|blake3]");
