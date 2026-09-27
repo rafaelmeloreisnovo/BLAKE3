@@ -1,0 +1,33 @@
+name: rmr-crypto-freestanding140-v1
+
+on:
+  push:
+    paths:
+      - 'rmr/crypto_freestanding140/**'
+      - '.github/workflows/rmr-crypto-freestanding140-v1.yml'
+  pull_request:
+    paths:
+      - 'rmr/crypto_freestanding140/**'
+      - '.github/workflows/rmr-crypto-freestanding140-v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  freestanding140:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Provision LLD
+        run: |
+          clang --version
+          if ! command -v ld.lld >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y lld
+          fi
+          ld.lld --version
+          readelf --version
+      - name: Hosted semantic selftest
+        run: sh rmr/crypto_freestanding140/build/build_host_selftest.sh
+      - name: Cross-link + source/binary gates
+        run: sh rmr/crypto_freestanding140/build/build_cross_matrix.sh
