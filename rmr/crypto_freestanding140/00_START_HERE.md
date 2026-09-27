@@ -121,3 +121,12 @@ No step is inferred from the previous one.
 - `build/`
 - `audit/`
 - `receipts/`
+
+## Bootstrap implementation delta
+
+- `kernel/rmr_cf140_ops.c`: fixed-shape freestanding substrate.
+- `addresses/H01/kernel/rmr_cf140_sha256_compress.c`: authorial SHA-256 compression source.
+- `tests/selftest_sha256_host.c`: padded `abc` one-block KAT.
+- CI: `rmr-crypto-freestanding140-v1`.
+
+Current H01 boundary: compression core only; streaming/finalization is not yet implemented here.

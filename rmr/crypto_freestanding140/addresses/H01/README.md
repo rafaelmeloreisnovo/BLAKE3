@@ -1,33 +1,19 @@
 # H01 — SHA-256
 
-```yaml
-seed_id: H01
-source_category: HASH_KDF_MIXED
-canonical_class: hash
-source_state: SEED_UNCLASSIFIED
-existing_rmr_runtime_ref: sha256
-freestanding140_state: REFERENCE_EXISTING_NOT_REIMPLEMENTED
-security_use: CANDIDATE_NOT_RECOMMENDATION
-claim_allowed: false
-```
+State: AUTHORIAL_COMPRESSION_CORE_SOURCE / claim_allowed=false
 
-## Authority
+SHA-256 is a standard primitive. RMR authors this source expression and freestanding methodology; it does not claim invention of SHA-256.
 
-The address is part of the RMR authorial implementation framework. The named cryptographic primitive/specification is **not** claimed as an RMR invention merely because this directory exists.
+Implemented here:
+- initialization state;
+- one 64-byte compression function;
+- unrolled 64-round source;
+- no libc/heap/provider;
+- local KAT fixture for the padded `abc` block.
 
-## Implementation rule
+Not implemented here yet:
+- arbitrary-length streaming;
+- padding/finalization API;
+- complete boundary matrix.
 
-Future source for this address must:
-1. pin exact specification/version/parameter set;
-2. remain isolated from third-party implementation code unless provenance/license review authorizes otherwise;
-3. use caller-owned fixed memory in the kernel;
-4. pass freestanding symbol/link gates;
-5. pass known-answer and negative tests;
-6. preserve compatibility/legacy warnings from the registry;
-7. emit receipts before promotion.
-
-## Current state
-
-`REFERENCE_EXISTING_NOT_REIMPLEMENTED`
-
-No implementation claim is implied by this address alone.
+Therefore this is not yet a complete replacement for the existing SHA-256 API.

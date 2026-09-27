@@ -97,8 +97,10 @@ RMR_CF_INLINE rmr_cf_u64 rmr_cf_select64(rmr_cf_u64 mask,
 
 rmr_cf_u32 rmr_cf_load32_le(const rmr_cf_u8 src[4]);
 rmr_cf_u64 rmr_cf_load64_le(const rmr_cf_u8 src[8]);
+rmr_cf_u32 rmr_cf_load32_be(const rmr_cf_u8 src[4]);
 void rmr_cf_store32_le(rmr_cf_u8 dst[4], rmr_cf_u32 value);
 void rmr_cf_store64_le(rmr_cf_u8 dst[8], rmr_cf_u64 value);
+void rmr_cf_store32_be(rmr_cf_u8 dst[4], rmr_cf_u32 value);
 
 void rmr_cf_xor16(rmr_cf_u8 dst[16],
                   const rmr_cf_u8 left[16],

@@ -25,6 +25,13 @@ rmr_cf_u64 rmr_cf_load64_le(const rmr_cf_u8 src[8]) {
            ((rmr_cf_u64)src[7] << 56u);
 }
 
+rmr_cf_u32 rmr_cf_load32_be(const rmr_cf_u8 src[4]) {
+    return ((rmr_cf_u32)src[0] << 24u) |
+           ((rmr_cf_u32)src[1] << 16u) |
+           ((rmr_cf_u32)src[2] << 8u) |
+           ((rmr_cf_u32)src[3]);
+}
+
 void rmr_cf_store32_le(rmr_cf_u8 dst[4], rmr_cf_u32 value) {
     dst[0] = (rmr_cf_u8)value;
     dst[1] = (rmr_cf_u8)(value >> 8u);
@@ -41,6 +48,13 @@ void rmr_cf_store64_le(rmr_cf_u8 dst[8], rmr_cf_u64 value) {
     dst[5] = (rmr_cf_u8)(value >> 40u);
     dst[6] = (rmr_cf_u8)(value >> 48u);
     dst[7] = (rmr_cf_u8)(value >> 56u);
+}
+
+void rmr_cf_store32_be(rmr_cf_u8 dst[4], rmr_cf_u32 value) {
+    dst[0] = (rmr_cf_u8)(value >> 24u);
+    dst[1] = (rmr_cf_u8)(value >> 16u);
+    dst[2] = (rmr_cf_u8)(value >> 8u);
+    dst[3] = (rmr_cf_u8)value;
 }
 
 void rmr_cf_xor16(rmr_cf_u8 dst[16],

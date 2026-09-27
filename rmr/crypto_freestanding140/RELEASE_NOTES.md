@@ -24,3 +24,9 @@ No new cryptographic primitive is promoted in this bootstrap commit.
 ## F_next
 
 Implement and prove the branchless fixed-shape substrate, then port one low-risk exact primitive core at a time behind KAT gates.
+
+## Bootstrap code
+
+Added branchless/fixed-shape freestanding substrate and an H01 SHA-256 compression core. The core is intentionally limited to a single compression block API; it does not yet replace the complete existing SHA-256 streaming API.
+
+CI/KAT promotion remains pending at this release-note snapshot.
