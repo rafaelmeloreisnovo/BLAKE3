@@ -67,9 +67,10 @@ int pai_cmd_validate(int argc, char **argv) {
     const int attractors_expected = 42;
     const int capacity = cfg.rows * cfg.cols;
     const double bits_geom = log2((double)capacity);
+    const int alpha_gate = (fabsf(cfg.alpha - alpha_expected) <= 1e-6f) ? 1 : 0;
     pai_validate_core_result core_result;
     (void)pai_validate_core_check(
-        cfg.alpha,
+        alpha_gate,
         cfg.attractors,
         cfg.rows,
         cfg.cols,

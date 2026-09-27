@@ -2,7 +2,7 @@
  * Copyright (c) 2024–2026 Rafael Melo Reis
  * Licensed under LICENSE_RMR.
  *
- * Pure validation gate. No libc, no heap, no I/O and no libm calls.
+ * Pure integer validation gate. No libc, heap, I/O, float or libm.
  */
 #include "pai_validate_core.h"
 
@@ -15,7 +15,7 @@ static int gcd_i(int a, int b) {
     return (a < 0) ? -a : a;
 }
 
-int pai_validate_core_check(float alpha,
+int pai_validate_core_check(int alpha_ok,
                             int attractors,
                             int rows,
                             int cols,
@@ -28,7 +28,7 @@ int pai_validate_core_check(float alpha,
     }
 
     out->ok = 0;
-    out->alpha_ok = 0;
+    out->alpha_ok = (alpha_ok != 0) ? 1 : 0;
     out->attractors_ok = 0;
     out->gcd_r = 0;
     out->gcd_c = 0;
@@ -37,12 +37,6 @@ int pai_validate_core_check(float alpha,
         return 2;
     }
 
-    float delta = alpha - 0.25f;
-    if (delta < 0.0f) {
-        delta = -delta;
-    }
-
-    out->alpha_ok = (delta <= 1.0e-6f) ? 1 : 0;
     out->attractors_ok = (attractors == 42) ? 1 : 0;
     out->gcd_r = gcd_i(dr, rows);
     out->gcd_c = gcd_i(dc, cols);

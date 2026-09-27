@@ -2,7 +2,7 @@
  * Copyright (c) 2024–2026 Rafael Melo Reis
  * Licensed under LICENSE_RMR.
  *
- * Pure validation gate. No libc, no heap, no I/O and no libm calls.
+ * Pure integer validation gate. No libc, heap, I/O, float or libm.
  */
 #ifndef PAI_VALIDATE_CORE_H
 #define PAI_VALIDATE_CORE_H
@@ -15,7 +15,12 @@ typedef struct pai_validate_core_result {
     int gcd_c;
 } pai_validate_core_result;
 
-int pai_validate_core_check(float alpha,
+/*
+ * alpha_ok is computed by the versioned numeric adapter.
+ * This core intentionally receives the discrete gate rather than floating
+ * point so freestanding targets do not acquire hidden soft-float helpers.
+ */
+int pai_validate_core_check(int alpha_ok,
                             int attractors,
                             int rows,
                             int cols,
