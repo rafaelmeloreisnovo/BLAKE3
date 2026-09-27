@@ -15,7 +15,19 @@ build_one() {
   out=$3
 
   # shellcheck disable=SC2086
-  "$CC" --target="$target" -fuse-ld=lld $CFLAGS $extra     -I"$ROOT/include"     "$ROOT/kernel/rmr_cf140_ops.c"     "$ROOT/probe/rmr_cf140_probe.c"     -nostdlib -static     -Wl,--gc-sections     -Wl,--icf=safe     -Wl,--build-id=none     -Wl,--no-undefined     -Wl,-e,rmr_cf_probe_entry     -Wl,-Map,"$out.map"     -o "$out"
+  "$CC" --target="$target" -fuse-ld=lld $CFLAGS $extra \
+    -I"$ROOT/include" \
+    "$ROOT/kernel/rmr_cf140_ops.c" \
+    "$ROOT/addresses/H01/kernel/rmr_cf140_sha256_compress.c" \
+    "$ROOT/probe/rmr_cf140_probe.c" \
+    -nostdlib -static \
+    -Wl,--gc-sections \
+    -Wl,--icf=safe \
+    -Wl,--build-id=none \
+    -Wl,--no-undefined \
+    -Wl,-e,rmr_cf_probe_entry \
+    -Wl,-Map,"$out.map" \
+    -o "$out"
 
   "$ROOT/audit/audit_artifact.sh" "$out"
   echo "target=$target"
