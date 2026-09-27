@@ -9,7 +9,7 @@ State: IMPLEMENTED_THIS_DELTA
 - distinguish existing provider/upstream references from new code.
 
 ## F1 — substrate
-State: NEXT
+State: SOURCE_IMPLEMENTED / CI_PENDING
 
 - compiler-native types;
 - fixed byte/word XOR;
@@ -21,7 +21,7 @@ State: NEXT
 - cross-link x86_64/AArch64/ARMv7.
 
 ## F2 — hash family
-State: PLANNED
+State: STARTED — H01 compression core source implemented; CI pending
 
 Priority:
 1. SHA-256 — reuse/port the existing authorial memory core after KAT equivalence.

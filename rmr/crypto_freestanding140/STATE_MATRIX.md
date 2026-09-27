@@ -32,3 +32,14 @@ An existing OpenSSL-backed runtime entry is **not** considered an implementation
 ```text
 PROVIDER_BACKED != FREESTANDING140
 ```
+
+## Bootstrap code state
+
+```text
+140 physical addresses = MATERIALIZED
+common freestanding substrate = SOURCE_IMPLEMENTED
+H01 SHA-256 compression core = SOURCE_IMPLEMENTED / CI_PENDING
+H02..D20 new freestanding implementations = NOT_IMPLEMENTED unless explicitly promoted later
+```
+
+The presence of an address directory is never equivalent to implementation.
