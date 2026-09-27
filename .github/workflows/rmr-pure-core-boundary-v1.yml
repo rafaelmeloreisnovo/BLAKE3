@@ -1,0 +1,28 @@
+name: rmr-pure-core-boundary-v1
+
+on:
+  push:
+    paths:
+      - 'rmr/core/base.c'
+      - 'rmr/core/base_prime.c'
+      - 'rmr/core/pai_base.h'
+      - 'rmr/tools/audit_pure_core_boundaries.sh'
+      - '.github/workflows/rmr-pure-core-boundary-v1.yml'
+  pull_request:
+    paths:
+      - 'rmr/core/base.c'
+      - 'rmr/core/base_prime.c'
+      - 'rmr/core/pai_base.h'
+      - 'rmr/tools/audit_pure_core_boundaries.sh'
+      - '.github/workflows/rmr-pure-core-boundary-v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  boundary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit pure core boundaries
+        run: sh rmr/tools/audit_pure_core_boundaries.sh

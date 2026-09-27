@@ -28,6 +28,7 @@ set(RMR_PAI_SOURCES
   core/main.c
   core/cli.c
   core/base.c
+  core/base_prime.c
   core/geom.c
   core/toroid.c
   core/hash_sha256.c
