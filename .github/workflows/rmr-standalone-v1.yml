@@ -1,0 +1,33 @@
+name: rmr-standalone-v1
+
+on:
+  push:
+    paths:
+      - 'rmr/standalone/**'
+      - '.github/workflows/rmr-standalone-v1.yml'
+  pull_request:
+    paths:
+      - 'rmr/standalone/**'
+      - '.github/workflows/rmr-standalone-v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  standalone:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: |
+          clang --version
+          if ! command -v ld.lld >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y lld
+          fi
+          ld.lld --version
+          readelf --version
+      - name: Hosted semantic selftest
+        run: sh rmr/standalone/build/build_host_selftest.sh
+      - name: Cross-link and ELF audit
+        run: sh rmr/standalone/build/build_cross_matrix.sh

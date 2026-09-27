@@ -5,6 +5,24 @@ Licensed under LICENSE_RMR.
 
 # Módulo RMR
 
+## Entrada operacional canônica
+
+Comece por `rmr/docs/00_START_HERE_RMR.md`.
+
+A documentação operacional separa explicitamente:
+
+```text
+HOSTED
+NO_LIBC_ADAPTER
+FREESTANDING_CORE
+BARE_METAL_ENTRY
+PROVIDER_BACKED
+REFERENCE_ONLY
+```
+
+Status de código, roadmap, build gates e release notes não são inferidos de nomes históricos. A fonte é o código observado + receipt correspondente.
+
+
 Todo código e documentação autoral sob `rmr/` é licenciado conforme `rmr/LICENSE_RMR`, salvo exceção de terceiro nominalmente registrada em `rmr/PROVENIENCE.md`.
 
 O código BLAKE3 upstream permanece sob suas licenças, autoria, notices e semântica originais. RMR não reivindica autoria sobre BLAKE3 nem converte automaticamente a licença do upstream.

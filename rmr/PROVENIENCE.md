@@ -38,6 +38,8 @@ Use o texto abaixo quando precisar explicitar copyright/fronteira:
 | `media/` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
 | `README.md`, `CONTRIBUTING.md`, `LICENSE_*`, `Cargo.toml`, `Cargo.lock`, `build.rs` | Upstream BLAKE3 ou derivação documental explicitamente delimitada | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions e notices aplicáveis; material externo deve ser identificado |
 | `rmr/` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/standalone/` | RMR autoral (foundation freestanding: tipos compiler-native, memory primitives, perfis Q e probes de link) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `.github/workflows/rmr-standalone-v1.yml` | Externo autoral RMR (gate CI da foundation standalone) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/benchmark_framework/` | RMR autoral (benchmark/reproducibility framework; blueprint + executable BLAKE3 harness) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/CMakeLists.txt`, `rmr/core/hash_blake3.c` | RMR autoral (build/adaptador externo que consome a API pública do BLAKE3 em `c/`) | RMR Module License (`rmr/LICENSE_RMR`) para a camada RMR; BLAKE3 mantém suas licenças upstream |
 | `rmr/tools/orchestrate_blake3_compare.sh` | RMR autoral (orquestração reproduzível fork × upstream oficial fixado por SHA) | RMR Module License (`rmr/LICENSE_RMR`) |
@@ -397,3 +399,18 @@ seja mascarada como validação integral.
 `next=open draft PR and require full-validation/comprehensive gates`  
 `claim_allowed=false`
 
+
+
+### Atualização 2026-09-26 (operational excellence + standalone foundation)
+
+Criada a trilha code-first em `rmr/docs/` para separar estado real de intenção e classificar superfícies como hosted, no-libc adapter, freestanding, bare-metal, provider-backed ou reference-only.
+
+Criado `rmr/standalone/` como foundation autoral isolada, sem libc/heap/syscall/filesystem/clock no core. O módulo inclui tipos compiler-native, primitives de memória caller-owned, perfis Q8/Q16/Q32/Q42, selftest hosted, probe `-nostdlib` e auditoria ELF.
+
+Também foi separado o processamento de hash em memória do I/O de arquivo:
+- `rmr/core/hash_sha256.c`: core SHA-256 em memória;
+- `rmr/core/hash_sha256_file.c`: adapter hosted `FILE`;
+- `rmr/core/hash_blake3.c`: adapter de bytes para a API BLAKE3 upstream;
+- `rmr/core/hash_blake3_file.c`: adapter hosted `FILE`.
+
+A separação não altera autoria nem semântica do BLAKE3 upstream.

@@ -1,0 +1,36 @@
+name: rmr-hash-boundary-v1
+
+on:
+  push:
+    paths:
+      - 'rmr/core/hash_sha256.c'
+      - 'rmr/core/hash_sha256_file.c'
+      - 'rmr/core/hash_blake3.c'
+      - 'rmr/core/hash_blake3_file.c'
+      - 'rmr/core/pai_hash.h'
+      - 'rmr/tools/audit_hash_boundaries.sh'
+      - '.github/workflows/rmr-hash-boundary-v1.yml'
+  pull_request:
+    paths:
+      - 'rmr/core/hash_sha256.c'
+      - 'rmr/core/hash_sha256_file.c'
+      - 'rmr/core/hash_blake3.c'
+      - 'rmr/core/hash_blake3_file.c'
+      - 'rmr/core/pai_hash.h'
+      - 'rmr/tools/audit_hash_boundaries.sh'
+      - '.github/workflows/rmr-hash-boundary-v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  boundary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: |
+          cc --version
+          nm --version
+      - name: Audit pure-vs-hosted hash boundary
+        run: sh rmr/tools/audit_hash_boundaries.sh

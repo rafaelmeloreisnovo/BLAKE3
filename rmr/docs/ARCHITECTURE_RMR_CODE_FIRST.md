@@ -59,3 +59,21 @@ A camada RMR não modifica nem substitui o BLAKE3 upstream. Qualquer integraçã
 - `scan` registra algoritmo de hash no manifesto via comentário (`# hash=sha256`).
 - `bench` produz `bench.tsv`, `metrics.jsonl`, `summary.json`, `run_manifest.json` e mantém compatibilidade com hashchain FNV-1a.
 - `benchdiff` usa média/mediana/p95/variância + contagem de válidos e ok/fail, com status `ALERT` se delta absoluto em média **ou** p95 exceder threshold.
+
+
+## Update 2026-09-26 — hosted/freestanding split
+
+A arquitetura code-first passa a declarar explicitamente:
+
+```text
+PAI CLI/scan/sign = HOSTED ORCHESTRATOR
+hash bytes core   = PURE/MEMORY-ORIENTED SURFACE
+hash file adapter = HOSTED I/O
+Custody16         = FREESTANDING CORE + explicit adapters
+FIXED256 ASM      = BARE-METAL KERNEL
+RMR standalone    = FREESTANDING FOUNDATION
+```
+
+O texto histórico “PAI — C bare metal” foi removido do banner porque o executável PAI completo usa libc/POSIX.
+
+SHA-256 e BLAKE3 tiveram o I/O de arquivo separado dos translation units de processamento em memória. Isso reduz o acoplamento documental e estrutural, mas **não promove automaticamente** o PAI completo a freestanding.

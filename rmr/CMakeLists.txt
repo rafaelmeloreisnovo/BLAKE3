@@ -28,15 +28,19 @@ set(RMR_PAI_SOURCES
   core/main.c
   core/cli.c
   core/base.c
+  core/base_prime.c
   core/geom.c
   core/toroid.c
   core/hash_sha256.c
+  core/hash_sha256_file.c
   core/hash_blake3.c
+  core/hash_blake3_file.c
   core/scan.c
   core/sign.c
   core/bench.c
   core/benchdiff.c
   core/validate.c
+  core/validate_core.c
   core/util.c
   ui/mode_router.c
   ui/bbs/menu.c

@@ -1,0 +1,30 @@
+# 01 HASH KDF MIXED
+
+This directory indexes the 20 source seed addresses in this family.
+
+```text
+H01	SHA-256	hash	SEED_UNCLASSIFIED
+H02	SHA-512	hash	SEED_UNCLASSIFIED
+H03	BLAKE3	hash	SEED_UNCLASSIFIED
+H04	BLAKE2b	hash	SEED_UNCLASSIFIED
+H05	SHA-3/Keccak	hash	SEED_UNCLASSIFIED
+H06	Argon2	password_kdf	SEED_UNCLASSIFIED
+H07	Skein	hash	SEED_UNCLASSIFIED
+H08	BLAKE2s	hash	SEED_UNCLASSIFIED
+H09	Whirlpool	hash	SEED_UNCLASSIFIED
+H10	Streebog	hash	SEED_UNCLASSIFIED
+H11	RIPEMD-160	hash	SEED_UNCLASSIFIED
+H12	Tiger	hash	SEED_UNCLASSIFIED
+H13	Kupyna	hash	SEED_UNCLASSIFIED
+H14	SM3	hash	SEED_UNCLASSIFIED
+H15	Scrypt	password_kdf	SEED_UNCLASSIFIED
+H16	bcrypt	password_kdf	SEED_UNCLASSIFIED
+H17	PBKDF2	password_kdf	SEED_UNCLASSIFIED
+H18	MD5	hash	LEGACY_OR_UNSAFE_FOR_NEW_USE
+H19	SHA-1	hash	LEGACY_OR_UNSAFE_FOR_NEW_USE
+H20	HAVAL	hash	SEED_UNCLASSIFIED
+```
+
+These are registry addresses, not 20 claims of independent invention or implementation.
+
+Promotion requires the global CONTRACT.md gates.
