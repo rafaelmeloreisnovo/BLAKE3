@@ -201,6 +201,8 @@ jobs:
   cross_tests:
     name: cross ${{ matrix.arch }}
     runs-on: ubuntu-latest
+    env:
+      CROSS_CONFIG: ${{ github.workspace }}/Cross.toml
     strategy:
       fail-fast: false
       matrix:
@@ -216,7 +218,7 @@ jobs:
     steps:
     - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
     - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable ref observed 2026-09-27
-    - run: cargo install cross
+    - run: cargo install cross --version 0.2.5 --locked
     # Test the portable implementation on everything.
     - run: cross test --target ${{ matrix.arch }}
     # Test building for ancient i386 processors without guaranteed SSE2 support.
@@ -243,12 +245,19 @@ jobs:
     - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable ref observed 2026-09-27
       with:
         targets: wasm32-wasip1
-    - name: install Wasmtime
+    - name: install pinned Wasmtime
+      shell: bash
       run: |
-        curl https://wasmtime.dev/install.sh -sSf | bash
-        echo PATH: $PATH
+        set -euo pipefail
+        version="49.0.1"
+        archive="wasmtime-v${version}-x86_64-linux.tar.xz"
+        url="https://github.com/bytecodealliance/wasmtime/releases/download/v${version}/${archive}"
+        curl --fail --location --silent --show-error --output "/tmp/${archive}" "${url}"
+        echo "c71f7e0d30a92e418f0d17db7c6d8f6664c1ad764340a1278678f4209deab534  /tmp/${archive}" | sha256sum -c -
+        tar -xJf "/tmp/${archive}" -C /tmp
         mkdir -p ~/.local/bin
-        ln -s ~/.wasmtime/bin/wasmtime ~/.local/bin/wasmtime
+        install -m 0755 "/tmp/wasmtime-v${version}-x86_64-linux/wasmtime" ~/.local/bin/wasmtime
+        ~/.local/bin/wasmtime --version
     - run: cargo test --target wasm32-wasip1
     - run: cargo test --target wasm32-wasip1 --no-default-features
     - run: cargo test --target wasm32-wasip1 --features wasm32_simd
@@ -268,7 +277,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-    - run: docker run -v $(pwd):/io -w /io messense/cargo-xwin cargo xwin test --target x86_64-pc-windows-msvc --features=mmap,rayon,traits-preview,serde,zeroize
+    - run: docker run -v $(pwd):/io -w /io messense/cargo-xwin@sha256:9856b895265d4966f212228ba64802cf89337e2a2a537aa2533c1b8784cbc81b cargo xwin test --target x86_64-pc-windows-msvc --features=mmap,rayon,traits-preview,serde,zeroize
 
   # Currently only on x86.
   cmake_c_tests:
