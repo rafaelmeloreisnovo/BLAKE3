@@ -8,6 +8,7 @@
 
 
 from pathlib import Path
+import os
 import platform
 import shutil
 import subprocess
@@ -17,7 +18,9 @@ ROOT = Path(__file__).parent.parent.parent
 RUST_TARGET = sys.argv[1]
 
 subprocess.run(
-    ["cargo", "build", "--target", sys.argv[1], "--release"], cwd=ROOT / "b3sum"
+    ["cargo", "build", "--target", sys.argv[1], "--release", "--locked"],
+    cwd=ROOT / "b3sum",
+    check=True,
 )
 
 if platform.system() == "Windows":
@@ -42,4 +45,8 @@ print("copying", repr(original_exe_path), "to", repr(new_exe_path))
 shutil.copyfile(original_exe_path, new_exe_path)
 
 # This lets the subsequent upload step get the filepath.
-print("::set-output name=bin_path::" + new_exe_path)
+github_output = os.environ.get("GITHUB_OUTPUT")
+if not github_output:
+    raise RuntimeError("GITHUB_OUTPUT is not set")
+with open(github_output, "a", encoding="utf-8") as output_file:
+    print("bin_path=" + new_exe_path, file=output_file)
