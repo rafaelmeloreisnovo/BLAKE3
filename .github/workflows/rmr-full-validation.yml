@@ -32,7 +32,7 @@ concurrency:
 
 jobs:
   c-correctness:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -51,7 +51,7 @@ jobs:
           path: rmr/validation/output/c-sanitizers/**
 
   c-performance:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -93,7 +93,7 @@ jobs:
             rmr/benchmark_framework/output/upstream-v3-backends/**
 
   rust-cli:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -116,7 +116,7 @@ jobs:
           path: rmr/benchmark_framework/output/upstream-v3-rust/**
 
   binary-cross:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -150,7 +150,7 @@ jobs:
   aggregate:
     if: always()
     needs: [c-correctness, c-performance, rust-cli, binary-cross]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
