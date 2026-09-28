@@ -17,9 +17,9 @@ jobs:
       fail-fast: false
       matrix:
         target: [
-          { "os": "ubuntu-latest",  "rust-target": "x86_64-unknown-linux-musl", "name": "Linux" },
-          { "os": "macOS-latest",   "rust-target": "x86_64-apple-darwin",       "name": "macOS" },
-          { "os": "windows-latest", "rust-target": "x86_64-pc-windows-msvc",    "name": "Windows" },
+          { "os": "ubuntu-24.04",  "rust-target": "x86_64-unknown-linux-musl", "name": "Linux" },
+          { "os": "macos-26",   "rust-target": "x86_64-apple-darwin",       "name": "macOS" },
+          { "os": "windows-2025-vs2026", "rust-target": "x86_64-pc-windows-msvc",    "name": "Windows" },
         ]
 
     steps:
@@ -29,7 +29,7 @@ jobs:
           python-version: "3.x"
       - run: pip install PyGithub
       - run: sudo apt-get install musl-tools
-        if: matrix.target.os == 'ubuntu-latest'
+        if: matrix.target.os == 'ubuntu-24.04'
       - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable ref observed 2026-09-27
         with:
           targets: ${{ matrix.target.rust-target }}
