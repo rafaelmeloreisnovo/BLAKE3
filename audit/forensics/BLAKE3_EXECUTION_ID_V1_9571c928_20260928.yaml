@@ -1,0 +1,138 @@
+schema: BLAKE3_RMR_EXECUTION_ID_V1
+execution_id: "BLAKE3-RMR-EXEC-V1-9571c928808b-20260928T064421Z-99of99"
+state: PASS_DOCUMENTARY_AND_CI
+
+repository: "rafaelmeloreisnovo/BLAKE3"
+execution_commit:
+  sha: "9571c928808b9aba96e7b9586c54c12ac66cdc3e"
+  tree: "a23db46482c2774c627f2ba12a46cead898db4d7"
+  parents:
+    - "4358dfd56e7b26d8e5e5363820ca8edb493363ed"
+    - "c23a2ef590588044e75d4c7dabe11049ca2b114b"
+  signed_verified: true
+  event: push
+  branch: master
+  created_at_utc: "2026-09-28T06:44:21Z"
+
+terminal_window:
+  first_check_started_at_utc: "2026-09-28T06:44:37Z"
+  last_check_completed_at_utc: "2026-09-28T07:06:36Z"
+  wall_span_seconds: 1319
+
+checks:
+  total: 99
+  returned_complete: 99
+  success: 99
+  failure: 0
+  cancelled: 0
+  queued: 0
+  in_progress: 0
+  ledger_path: "audit/forensics/BLAKE3_EXECUTION_CHECKS_V1_9571c928_20260928.tsv"
+  ledger_blob_sha: "687d8621bf01011d3a88b22bcd46689e6a8222ea"
+
+workflow_runs:
+  total: 13
+  success: 13
+  runs:
+    - {id: 36387950893, name: "tests", path: ".github/workflows/ci.yml", checks: 74, blob: "f7dd8c053acc2c215032a17482273a2ca00d90e5"}
+    - {id: 36387951003, name: "RMR upstream comprehensive V3", path: ".github/workflows/rmr-upstream-comprehensive-v3.yml", checks: 10, blob: "802db1dd890d2f648d62e550930ec9db92418f43"}
+    - {id: 36387950926, name: "RMR full validation matrix", path: ".github/workflows/rmr-full-validation.yml", checks: 5, blob: "0a6de14f7d0743a3882ea2276cda3d9d3636a75d"}
+    - {id: 36387950997, name: "RMR crypto runtime matrix", path: ".github/workflows/rmr-crypto-runtime.yml", checks: 1, blob: "f6b516f39f5442296a868001451cb26e5c0fa3c5"}
+    - {id: 36387950918, name: "RMR BLAKE3 Reproducibility Gate", path: ".github/workflows/rmr-blake3-repro.yml", checks: 1, blob: "9bd64161e0dd0f6cffc639928d3e17649f1b0081"}
+    - {id: 36387950942, name: "rmr-standalone-v1", path: ".github/workflows/rmr-standalone-v1.yml", checks: 1, blob: "0637b27353aade0a75db84536236901a9d52d613"}
+    - {id: 36387950960, name: "rmr-pure-core-boundary-v1", path: ".github/workflows/rmr-pure-core-boundary-v1.yml", checks: 1, blob: "27c524c696ad4a9589cd7ce8d457e3edbc1bf6e7"}
+    - {id: 36387951049, name: "RMR hardware build topology", path: ".github/workflows/rmr-hardware-build-topology.yml", checks: 1, blob: "16f1f75e0620b27456f95e46c05a5ee644ea9512"}
+    - {id: 36387950917, name: "RMR ZIP Custody Gate", path: ".github/workflows/rmr-zip-custody.yml", checks: 1, blob: "a2b6370d5b552f63150a7bf0f89cc2e36dcaa1a5"}
+    - {id: 36387950933, name: "RMR SIMPERF", path: ".github/workflows/rmr-simperf.yml", checks: 1, blob: "05e402e6df8a53bbf5f859ee86dbb32d569f441a"}
+    - {id: 36387950923, name: "rmr-hash-boundary-v1", path: ".github/workflows/rmr-hash-boundary-v1.yml", checks: 1, blob: "03e9f25863e53147ba213296e066623d8153ad18"}
+    - {id: 36387950968, name: "RMR BLAKE3 upstream compare V2", path: ".github/workflows/rmr-blake3-upstream-compare-v2.yml", checks: 1, blob: "cf178097f5da1133e0653b01175f9a2ae88484f1"}
+    - {id: 36387950902, name: "rmr-crypto-freestanding140-v1", path: ".github/workflows/rmr-crypto-freestanding140-v1.yml", checks: 1, blob: "1ad888eb238303798381197f0a42942638c660f2"}
+
+artifacts:
+  persisted_total: 20
+  digest_algorithm: sha256
+  digest_rows_with_sha256: 20
+  ledger_path: "audit/forensics/BLAKE3_EXECUTION_ARTIFACTS_V1_9571c928_20260928.tsv"
+  ledger_blob_sha: "366af9753da1466f7b6e40b51f6bd9adb9fad574"
+
+runtime_evidence:
+  rmr_runner_image: "ubuntu24/20260920.314"
+  python: "3.12.3"
+  cmake: "3.31.6"
+  clang: "18.1.3"
+  lld: "18.1.3"
+  rust_stable: "rustc 1.98.1 (48a229cea 2026-09-01)"
+  cargo_stable: "cargo 1.98.1 (797e8a9bc 2026-08-05)"
+  rust_beta: "rustc 1.99.0-beta.8 (dfb0accb7 2026-09-26)"
+  wasmtime: "49.0.1"
+  resolved_actions:
+    checkout_v6: "d23441a48e516b6c34aea4fa41551a30e30af803"
+    checkout_v4: "11d5960a326750d5838078e36cf38b85af677262"
+    upload_artifact_v4: "ea165f8d65b6e75b540449e92b4886f43607fa02"
+    download_artifact_v4: "d3f86a106a0bac45b974a628896c90dbdf5c8093"
+    setup_python_v6: "ece7cb06caefa5fff74198d8649806c4678c61a1"
+    dtolnay_rust_toolchain_master_observed: "02cb101ec7c40f2c49e1d9714d64511d8e1b74de"
+
+crypto_runtime:
+  registry: PASS
+  algorithm_layout: PASS
+  algorithms: 28
+  contract_matrix: "7/7"
+  cartesian_cells: "252/252"
+  native_cells: "28/28"
+  openssl_cross_provider: TOKEN_VAZIO_PROVIDER_TOOLCHAIN
+
+freestanding140:
+  host_selftest: PASS
+  sha256_abc_compression_kat: PASS
+  source_shape: PASS
+  artifacts:
+    x86_64_sha256: "a62dc0da8ba56126cd2b031e7398ae67c0c55be02c4b04b540cc88d2fa5d815a"
+    aarch64_sha256: "82d4d557aafd550d137f03321ac63393c9521ff91b33fef07c75925bf7c3c798"
+    armv7_sha256: "22a6abfb223c6aac8b66e57a2e6ab474c777692ae026ac17a4b51e196151e544"
+
+aggregate_gates:
+  full_validation:
+    terminal_state: COMPLETE
+    execution_complete: true
+    evidence_gate: PASS
+  upstream_comprehensive_v3:
+    terminal_state: COMPLETE
+    execution_complete: true
+    evidence_gate: PASS
+    core_performance_note: OBSERVED_SLOWER_ON_THIS_RUNNER
+
+reproducibility_observation:
+  status: PASS
+  rmr_median_mib_s: 3978.110
+  rmr_over_official_ratio: 0.997008
+  independent_third_party_reproduction: TOKEN_VAZIO
+
+known_gaps:
+  arm_physical_execution: TOKEN_VAZIO_PHYSICAL
+  aarch64_physical_execution: TOKEN_VAZIO_PHYSICAL
+  physical_iops: TOKEN_VAZIO_CURRENT_CAMPAIGN
+  independent_third_party_reproduction: TOKEN_VAZIO
+  every_toolchain_binary_digest: TOKEN_VAZIO
+  implicit_fallthrough_warnings_rmr_lowlevel: OBSERVED_UNPROMOTED
+  node20_actions_forced_to_node24: OBSERVED_RUNTIME_BOUNDARY
+
+custody_artifacts:
+  manifest:
+    path: "audit/forensics/BLAKE3_EXECUTION_ID_V1_9571c928_20260928.md"
+    blob_sha: "6a0065c1c5590f2a79d90f1908b83ce30ed4c959"
+  checks:
+    path: "audit/forensics/BLAKE3_EXECUTION_CHECKS_V1_9571c928_20260928.tsv"
+    blob_sha: "687d8621bf01011d3a88b22bcd46689e6a8222ea"
+  artifacts:
+    path: "audit/forensics/BLAKE3_EXECUTION_ARTIFACTS_V1_9571c928_20260928.tsv"
+    blob_sha: "366af9753da1466f7b6e40b51f6bd9adb9fad574"
+
+claim_gate:
+  execution_complete: PASS
+  source_workflow_identity: PASS
+  check_collection_complete: PASS
+  artifact_digest_collection: PASS
+  universal_performance_superiority: NOT_CLAIMED
+  physical_execution_claim: TOKEN_VAZIO
+  independent_reproduction_claim: TOKEN_VAZIO
