@@ -37,7 +37,57 @@ jobs:
   source:
     runs-on: ubuntu-latest
     steps:
+      - name: Classify producer terminal state
+        id: producer-state
+        env:
+          SOURCE: ${{ needs.source.result }}
+          C_QUALITY: ${{ needs.c-quality.result }}
+          CORE_PERF: ${{ needs.core-performance.result }}
+          BACKENDS: ${{ needs.backends.result }}
+          ABI_ELF: ${{ needs.abi-elf.result }}
+          TBB: ${{ needs.tbb.result }}
+          RUST_CLI: ${{ needs.rust-cli.result }}
+          CROSS_ARCH: ${{ needs.cross-arch.result }}
+          RMR_INTEGRATION: ${{ needs.rmr-integration.result }}
+        run: |
+          terminal=COMPLETE
+          proceed=true
+          for state in "$SOURCE" "$C_QUALITY" "$CORE_PERF" "$BACKENDS" "$ABI_ELF" "$TBB" "$RUST_CLI" "$CROSS_ARCH" "$RMR_INTEGRATION"; do
+            if [ "$state" = "failure" ]; then
+              terminal=FAIL_TEST
+            fi
+          done
+          if [ "$terminal" != "FAIL_TEST" ]; then
+            for state in "$SOURCE" "$C_QUALITY" "$CORE_PERF" "$BACKENDS" "$ABI_ELF" "$TBB" "$RUST_CLI" "$CROSS_ARCH" "$RMR_INTEGRATION"; do
+              if [ "$state" = "cancelled" ]; then
+                terminal=CANCELLED_SUPERSEDED
+                proceed=false
+              fi
+            done
+          fi
+          if [ "$terminal" = "COMPLETE" ]; then
+            for state in "$SOURCE" "$C_QUALITY" "$CORE_PERF" "$BACKENDS" "$ABI_ELF" "$TBB" "$RUST_CLI" "$CROSS_ARCH" "$RMR_INTEGRATION"; do
+              if [ "$state" = "skipped" ]; then
+                terminal=EVIDENCE_INCOMPLETE
+              fi
+            done
+          fi
+          echo "state=$terminal" >> "$GITHUB_OUTPUT"
+          echo "proceed=$proceed" >> "$GITHUB_OUTPUT"
+          {
+            echo "RMR_UPSTREAM_COMPREHENSIVE_TERMINAL_STATE=$terminal"
+            echo "source=$SOURCE"
+            echo "c-quality=$C_QUALITY"
+            echo "core-performance=$CORE_PERF"
+            echo "backends=$BACKENDS"
+            echo "abi-elf=$ABI_ELF"
+            echo "tbb=$TBB"
+            echo "rust-cli=$RUST_CLI"
+            echo "cross-arch=$CROSS_ARCH"
+            echo "rmr-integration=$RMR_INTEGRATION"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v6
+        if: steps.producer-state.outputs.proceed == 'true'
         with:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -254,13 +304,16 @@ jobs:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/download-artifact@v4
+        if: steps.producer-state.outputs.proceed == 'true'
         with:
           pattern: upstream-v3-*
           path: artifacts
           merge-multiple: false
       - name: Validation completeness selftest
+        if: steps.producer-state.outputs.proceed == 'true'
         run: python3 rmr/validation/tests/test_report_completeness.py
       - name: Generate aggregated V3 receipt
+        if: steps.producer-state.outputs.proceed == 'true'
         run: |
           mkdir -p final
           python3 rmr/upstream_validation/generate_v3_report.py \
@@ -269,11 +322,13 @@ jobs:
             --md-out final/RMR_UPSTREAM_COMPREHENSIVE_V3.md
           cat final/RMR_UPSTREAM_COMPREHENSIVE_V3.md
       - uses: actions/upload-artifact@v4
+        if: steps.producer-state.outputs.proceed == 'true'
         with:
           name: upstream-v3-final-receipt
           if-no-files-found: error
           path: final/**
       - name: Enforce complete comprehensive evidence
+        if: steps.producer-state.outputs.proceed == 'true'
         run: |
           python3 - <<'PY'
           import json
@@ -286,6 +341,7 @@ jobs:
           print("RMR_UPSTREAM_COMPREHENSIVE_EVIDENCE_GATE=PASS")
           PY
       - name: Gate summary
+        if: steps.producer-state.outputs.proceed == 'true'
         env:
           SOURCE: ${{ needs.source.result }}
           C_QUALITY: ${{ needs.c-quality.result }}
