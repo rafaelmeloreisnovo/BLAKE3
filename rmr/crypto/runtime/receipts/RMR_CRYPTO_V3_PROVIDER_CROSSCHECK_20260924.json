@@ -1,4 +1,6 @@
 {
+  "_copyright": "Copyright (c) 2024–2026 Rafael Melo Reis",
+  "_license": "Licensed under LICENSE_RMR.",
   "schema": "RMR-CRYPTO-V3-INDEPENDENT-PROVIDER-KAT-V1",
   "generated_at_utc": "2026-09-24T11:00:00Z",
   "repo": "rafaelmeloreisnovo/BLAKE3",
