@@ -15,6 +15,11 @@
 
 | Artefato | Função |
 |---|---|
+| [`BLAKE3_EXECUTION_ID_V1_9571c928_20260928.md`](BLAKE3_EXECUTION_ID_V1_9571c928_20260928.md) | EXECUTION_ID canônico do merge `9571c928…`: 13 workflows, 99/99 checks, 20 artifacts SHA-256, workflow blobs, toolchains observadas, freestanding hashes e gaps explícitos. |
+| [`BLAKE3_EXECUTION_ID_V1_9571c928_20260928.yaml`](BLAKE3_EXECUTION_ID_V1_9571c928_20260928.yaml) | Ledger legível por máquina do EXECUTION_ID, incluindo topologia de runs, blobs, runtime, claim gate e TOKEN_VAZIO. |
+| [`BLAKE3_EXECUTION_CHECKS_V1_9571c928_20260928.tsv`](BLAKE3_EXECUTION_CHECKS_V1_9571c928_20260928.tsv) | Ledger integral dos 99 check-runs: IDs, run IDs, nomes, conclusões, timestamps, durações e URLs. |
+| [`BLAKE3_EXECUTION_ARTIFACTS_V1_9571c928_20260928.tsv`](BLAKE3_EXECUTION_ARTIFACTS_V1_9571c928_20260928.tsv) | Ledger dos 20 artifacts persistidos com IDs, tamanhos, SHA-256, timestamps e validade. |
+| [`../receipts/BLAKE3_EXECUTION_RECEIPT_V1_9571c928_20260928.txt`](../receipts/BLAKE3_EXECUTION_RECEIPT_V1_9571c928_20260928.txt) | Receipt terminal que sela commit/tree, 99/99 PASS, 13/13 workflows, 20/20 digests, toolchains, freestanding hashes e gaps. |
 | [`BLAKE3_OFFICIAL_CI_CHAIN_OF_CUSTODY_V1_20260927.md`](BLAKE3_OFFICIAL_CI_CHAIN_OF_CUSTODY_V1_20260927.md) | Snapshot canônico do CI oficial: HEAD/blobs, proteção/rulesets, 74 checks, paginação 30/74, `fail-fast:false`, variáveis/condições, gaps e marcos históricos. |
 | [`BLAKE3_OFFICIAL_CI_CHAIN_OF_CUSTODY_V1_20260927.yaml`](BLAKE3_OFFICIAL_CI_CHAIN_OF_CUSTODY_V1_20260927.yaml) | Ledger legível por máquina com SOURCE/FORK, contagens, SHAs, gates, commits semânticos e gaps de reprodutibilidade. |
 | [`BLAKE3_OFFICIAL_CI_HISTORY_2019_2026_20260927.tsv`](BLAKE3_OFFICIAL_CI_HISTORY_2019_2026_20260927.tsv) | Histórico integral retornado pela API para `.github/workflows/ci.yml`: 92 commits, timestamps, autores Git, committers, mensagens e URLs oficiais. |
