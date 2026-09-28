@@ -39,6 +39,7 @@ jobs:
           set -euo pipefail
           export CARGO_HOME="${RUNNER_TEMP}/cargo-home-${{ matrix.lane }}"
           export CARGO_TARGET_DIR="${RUNNER_TEMP}/target-${{ matrix.lane }}"
+          export RUSTFLAGS="-D warnings --remap-path-prefix=${CARGO_HOME}=/cargo-home --remap-path-prefix=${CARGO_TARGET_DIR}=/target --remap-path-prefix=${GITHUB_WORKSPACE}=/workspace"
           mkdir -p "$CARGO_HOME" "$CARGO_TARGET_DIR" evidence
 
           rustc --version --verbose > evidence/rustc-version.txt
