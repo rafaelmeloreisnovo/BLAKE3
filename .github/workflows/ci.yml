@@ -20,11 +20,11 @@ jobs:
       fail-fast: false
       matrix:
         target: [
-          { "os": "ubuntu-latest",    "toolchain": "x86_64-unknown-linux-gnu",  "name": "Linux GNU" },
+          { "os": "ubuntu-24.04",    "toolchain": "x86_64-unknown-linux-gnu",  "name": "Linux GNU" },
           { "os": "ubuntu-24.04-arm", "toolchain": "aarch64-unknown-linux-gnu", "name": "Linux GNU (arm64)" },
-          { "os": "macOS-latest",     "toolchain": "aarch64-apple-darwin",      "name": "macOS" },
-          { "os": "windows-latest",   "toolchain": "x86_64-pc-windows-msvc",    "name": "Windows MSVC" },
-          { "os": "windows-latest",   "toolchain": "x86_64-pc-windows-gnu",     "name": "Windows GNU" }
+          { "os": "macos-26",     "toolchain": "aarch64-apple-darwin",      "name": "macOS" },
+          { "os": "windows-2025-vs2026",   "toolchain": "x86_64-pc-windows-msvc",    "name": "Windows MSVC" },
+          { "os": "windows-2025-vs2026",   "toolchain": "x86_64-pc-windows-gnu",     "name": "Windows GNU" }
         ]
         channel: ["stable", "beta", "nightly"]
 
@@ -153,7 +153,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest", "macOS-latest", "windows-latest"]
+        os: ["ubuntu-24.04", "macos-26", "windows-2025-vs2026"]
     steps:
     - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
     # The current MSRV. This crate doesn't have an official MSRV policy,
@@ -171,11 +171,11 @@ jobs:
       fail-fast: false
       matrix:
         target: [
-          { "os": "ubuntu-latest",    "toolchain": "x86_64-unknown-linux-gnu",  "name": "Linux GNU" },
+          { "os": "ubuntu-24.04",    "toolchain": "x86_64-unknown-linux-gnu",  "name": "Linux GNU" },
           { "os": "ubuntu-24.04-arm", "toolchain": "aarch64-unknown-linux-gnu", "name": "Linux GNU (arm64)" },
-          { "os": "macOS-latest",     "toolchain": "aarch64-apple-darwin",      "name": "macOS" },
-          { "os": "windows-latest",   "toolchain": "x86_64-pc-windows-msvc",    "name": "Windows MSVC" },
-          { "os": "windows-latest",   "toolchain": "x86_64-pc-windows-gnu",     "name": "Windows GNU" }
+          { "os": "macos-26",     "toolchain": "aarch64-apple-darwin",      "name": "macOS" },
+          { "os": "windows-2025-vs2026",   "toolchain": "x86_64-pc-windows-msvc",    "name": "Windows MSVC" },
+          { "os": "windows-2025-vs2026",   "toolchain": "x86_64-pc-windows-gnu",     "name": "Windows GNU" }
         ]
         channel: ["stable", "beta", "nightly"]
 
@@ -200,7 +200,7 @@ jobs:
 
   cross_tests:
     name: cross ${{ matrix.arch }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       CROSS_CONFIG: ${{ github.workspace }}/Cross.toml
     strategy:
@@ -239,7 +239,7 @@ jobs:
 
   wasm_tests:
     name: WASM tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
     - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable ref observed 2026-09-27
@@ -274,7 +274,7 @@ jobs:
 
   cargo_xwin_test:
     name: cargo xwin test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
     - run: docker run -v $(pwd):/io -w /io messense/cargo-xwin@sha256:9856b895265d4966f212228ba64802cf89337e2a2a537aa2533c1b8784cbc81b cargo xwin test --target x86_64-pc-windows-msvc --features=mmap,rayon,traits-preview,serde,zeroize
@@ -282,7 +282,7 @@ jobs:
   # Currently only on x86.
   cmake_c_tests:
     name: CMake C tests SIMD=${{ matrix.simd }} TBB=${{ matrix.use_tbb }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -327,7 +327,7 @@ jobs:
   # Currently only on x86.
   pkg_config_c_tests:
     name: pkg-config C tests TBB=${{ matrix.use_tbb }} BUILD_SHARED_LIBS=${{ matrix.shared_libs }} STDLIB=${{ matrix.stdlib }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -357,7 +357,7 @@ jobs:
   # Note that this jobs builds AArch64 binaries from an x86_64 host.
   build_apple_silicon:
     name: build for Apple Silicon
-    runs-on: macOS-latest
+    runs-on: macos-26
     strategy:
       fail-fast: false
     steps:
@@ -373,7 +373,7 @@ jobs:
 
   build_tinycc:
     name: build with the Tiny C Compiler
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
     - name: install TCC
@@ -390,7 +390,7 @@ jobs:
   # but hopefully at least some of the time it will.
   gcc54:
     name: "compile and test with GCC 5.4"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
     - uses: addnab/docker-run-action@4f65fabd2431ebc8d299f8e5a018d79a769ae185 # v3
@@ -412,7 +412,7 @@ jobs:
       matrix:
         cmakeVersion: [latest]
         ninjaVersion: [latest]
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu-24.04, macos-26, windows-2025-vs2026]
         toolchain: [
           { cc: cl, cxx: cl },
           { cc: clang, cxx: clang++ },
@@ -421,18 +421,18 @@ jobs:
         ]
         use_tbb: [OFF, ON]
         exclude:
-          - os: macOS-latest
+          - os: macos-26
             toolchain: { cc: cl, cxx: cl }
-          - os: macOS-latest
+          - os: macos-26
             toolchain: { cc: clang-cl, cxx: clang-cl }
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
             toolchain: { cc: cl, cxx: cl }
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
             toolchain: { cc: clang-cl, cxx: clang-cl }
-          - os: windows-latest
+          - os: windows-2025-vs2026
             toolchain: { cc: clang, cxx: clang++ }
             use_tbb: ON
-          - os: windows-latest
+          - os: windows-2025-vs2026
             toolchain: { cc: gcc, cxx: g++ }
             use_tbb: ON
     steps:
@@ -441,25 +441,25 @@ jobs:
         with:
           cmakeVersion: ${{ matrix.cmakeVersion }}
           ninjaVersion: ${{ matrix.ninjaVersion }}
-      - if: matrix.os == 'macOS-latest'
+      - if: matrix.os == 'macos-26'
         name: Install dependencies on macOS
         run: |
           brew update
           brew install tbb
-      - if: matrix.os == 'ubuntu-latest'
+      - if: matrix.os == 'ubuntu-24.04'
         name: Install dependencies on Linux
         run: |
           sudo apt-get update
           sudo apt-get install libtbb-dev libtbb12
       - name: CMake generation, build, install
         run: |
-          ${{ matrix.os != 'windows-latest' || '$vs_install_path = & "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath; & "$vs_install_path/Common7/Tools/Launch-VsDevShell.ps1" -Arch amd64 -SkipAutomaticLocation' }}
-          cmake -S c -B c/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/target -DCMAKE_C_COMPILER=${{ matrix.toolchain.cc }} -DCMAKE_CXX_COMPILER=${{ matrix.toolchain.cxx }} -DBLAKE3_USE_TBB=${{ matrix.use_tbb }} -DBLAKE3_FETCH_TBB=${{ matrix.os == 'windows-latest' && 'YES' || 'NO' }} -DBLAKE3_EXAMPLES=ON
+          ${{ matrix.os != 'windows-2025-vs2026' || '$vs_install_path = & "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath; & "$vs_install_path/Common7/Tools/Launch-VsDevShell.ps1" -Arch amd64 -SkipAutomaticLocation' }}
+          cmake -S c -B c/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/target -DCMAKE_C_COMPILER=${{ matrix.toolchain.cc }} -DCMAKE_CXX_COMPILER=${{ matrix.toolchain.cxx }} -DBLAKE3_USE_TBB=${{ matrix.use_tbb }} -DBLAKE3_FETCH_TBB=${{ matrix.os == 'windows-2025-vs2026' && 'YES' || 'NO' }} -DBLAKE3_EXAMPLES=ON
           cmake --build c/build --target install
 
   cmake_3-9_build:
-    name: CMake 3.9.6 ubuntu-latest
-    runs-on: ubuntu-latest
+    name: CMake 3.9.6 ubuntu-24.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: lukka/get-cmake@5f6e04f5267c8133f1273bf2103583fc72c46b17
@@ -476,7 +476,7 @@ jobs:
 
   miri_smoketest:
     name: Miri smoketest
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
     - uses: dtolnay/rust-toolchain@be39649afda95dbf70f87cce95f68b8d5797b296 # nightly ref observed 2026-09-27
@@ -493,17 +493,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest", "macOS-latest"]
+        os: ["ubuntu-24.04", "macos-26"]
     steps:
     - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
     - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable ref observed 2026-09-27
     - name: install TBB
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-24.04'
       run: |
         sudo apt-get update
         sudo apt-get install libtbb-dev libtbb12
     - name: install TBB
-      if: matrix.os == 'macOS-latest'
+      if: matrix.os == 'macos-26'
       run: |
         brew install tbb
         echo "CXXFLAGS=-I$(brew --prefix)/include $CPPFLAGS" >> $GITHUB_ENV
