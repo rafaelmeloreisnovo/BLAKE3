@@ -29,8 +29,8 @@ jobs:
         channel: ["stable", "beta", "nightly"]
 
     steps:
-    - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@master
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+    - uses: dtolnay/rust-toolchain@02cb101ec7c40f2c49e1d9714d64511d8e1b74de # master observed 2026-09-27
       with:
         toolchain: ${{ format('{0}-{1}', matrix.channel, matrix.target.toolchain) }}
     # Print the compiler version, for debugging.
@@ -155,13 +155,13 @@ jobs:
       matrix:
         os: ["ubuntu-latest", "macOS-latest", "windows-latest"]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
     # The current MSRV. This crate doesn't have an official MSRV policy,
     # but in practice we'll probably do what libc does:
     # https://github.com/rust-lang/libs-team/issues/72.
     # This test target is here so that we notice if we accidentally bump
     # the MSRV, but it's not a promise that we won't bump it.
-    - uses: dtolnay/rust-toolchain@1.85.1
+    - uses: dtolnay/rust-toolchain@077fee5b0788f1a772d4c6ce2814159cd1d6632b # 1.85.1 ref observed 2026-09-27
     - run: cargo build --features=mmap,rayon,traits-preview,serde,zeroize
 
   b3sum_tests:
@@ -180,8 +180,8 @@ jobs:
         channel: ["stable", "beta", "nightly"]
 
     steps:
-    - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@master
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+    - uses: dtolnay/rust-toolchain@02cb101ec7c40f2c49e1d9714d64511d8e1b74de # master observed 2026-09-27
       with:
         toolchain: ${{ format('{0}-{1}', matrix.channel, matrix.target.toolchain) }}
     # Test b3sum.
@@ -214,8 +214,8 @@ jobs:
           - s390x-unknown-linux-gnu
 
     steps:
-    - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@stable
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+    - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable ref observed 2026-09-27
     - run: cargo install cross
     # Test the portable implementation on everything.
     - run: cross test --target ${{ matrix.arch }}
@@ -239,8 +239,8 @@ jobs:
     name: WASM tests
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@stable
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+    - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable ref observed 2026-09-27
       with:
         targets: wasm32-wasip1
     - name: install Wasmtime
@@ -267,7 +267,7 @@ jobs:
     name: cargo xwin test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
     - run: docker run -v $(pwd):/io -w /io messense/cargo-xwin cargo xwin test --target x86_64-pc-windows-msvc --features=mmap,rayon,traits-preview,serde,zeroize
 
   # Currently only on x86.
@@ -280,7 +280,7 @@ jobs:
         use_tbb: ["OFF", "ON"]
         simd: ["x86-intrinsics", "amd64-asm"]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
     - run: |
         sudo apt-get update
         sudo apt-get install ninja-build libtbb-dev libtbb12
@@ -326,7 +326,7 @@ jobs:
         shared_libs: ["OFF", "ON"]
         stdlib: ["libc++", "libstdc++"]
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
     - name: update packages
       run: |
         sudo apt-get update
@@ -352,8 +352,8 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-    - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@stable
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+    - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable ref observed 2026-09-27
       with:
         targets: aarch64-apple-darwin
     - name: build blake3
@@ -366,7 +366,7 @@ jobs:
     name: build with the Tiny C Compiler
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
     - name: install TCC
       run: sudo apt-get install -y tcc
     - name: compile
@@ -383,8 +383,8 @@ jobs:
     name: "compile and test with GCC 5.4"
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: addnab/docker-run-action@v3
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+    - uses: addnab/docker-run-action@4f65fabd2431ebc8d299f8e5a018d79a769ae185 # v3
       with:
         image: gcc:5.4
         options: -v ${{ github.workspace }}:/work
@@ -427,7 +427,7 @@ jobs:
             toolchain: { cc: gcc, cxx: g++ }
             use_tbb: ON
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: lukka/get-cmake@5f6e04f5267c8133f1273bf2103583fc72c46b17
         with:
           cmakeVersion: ${{ matrix.cmakeVersion }}
@@ -452,7 +452,7 @@ jobs:
     name: CMake 3.9.6 ubuntu-latest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: lukka/get-cmake@5f6e04f5267c8133f1273bf2103583fc72c46b17
         with:
           cmakeVersion: 3.9.6
@@ -469,8 +469,8 @@ jobs:
     name: Miri smoketest
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@nightly
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+    - uses: dtolnay/rust-toolchain@be39649afda95dbf70f87cce95f68b8d5797b296 # nightly ref observed 2026-09-27
       with:
         components: miri
     # Currently the test search "miri" only matches "test_miri_smoketest", but
@@ -486,8 +486,8 @@ jobs:
       matrix:
         os: ["ubuntu-latest", "macOS-latest"]
     steps:
-    - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@stable
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+    - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable ref observed 2026-09-27
     - name: install TBB
       if: matrix.os == 'ubuntu-latest'
       run: |
