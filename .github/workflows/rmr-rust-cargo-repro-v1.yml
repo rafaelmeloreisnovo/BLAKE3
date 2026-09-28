@@ -1,0 +1,112 @@
+name: RMR Rust/Cargo Reproducibility V1
+
+on:
+  push:
+    branches:
+      - master
+      - "hardening/**"
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  BLAKE3_CI: "1"
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  build:
+    name: independent build ${{ matrix.lane }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [A, B]
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable action ref observed 2026-09-27
+        with:
+          toolchain: 1.98.1-x86_64-unknown-linux-gnu
+
+      - name: Build from a fresh Cargo home
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CARGO_HOME="${RUNNER_TEMP}/cargo-home-${{ matrix.lane }}"
+          export CARGO_TARGET_DIR="${RUNNER_TEMP}/target-${{ matrix.lane }}"
+          mkdir -p "$CARGO_HOME" "$CARGO_TARGET_DIR" evidence
+
+          rustc --version --verbose > evidence/rustc-version.txt
+          cargo --version --verbose > evidence/cargo-version.txt
+          cc --version | head -n 1 > evidence/cc-version.txt
+          ld --version | head -n 1 > evidence/ld-version.txt
+
+          cargo build --manifest-path b3sum/Cargo.toml --release --locked
+          cargo tree --manifest-path b3sum/Cargo.toml --locked --edges normal,build > evidence/cargo-tree.txt
+
+          binary="$CARGO_TARGET_DIR/release/b3sum"
+          test -x "$binary"
+          cp "$binary" evidence/b3sum
+
+          {
+            echo "source_sha=$GITHUB_SHA"
+            echo "cargo_lock_sha256=$(sha256sum b3sum/Cargo.lock | awk '{print $1}')"
+            echo "root_cargo_toml_sha256=$(sha256sum Cargo.toml | awk '{print $1}')"
+            echo "b3sum_cargo_toml_sha256=$(sha256sum b3sum/Cargo.toml | awk '{print $1}')"
+            echo "build_rs_sha256=$(sha256sum build.rs | awk '{print $1}')"
+            echo "cargo_config_sha256=$(sha256sum .cargo/config.toml | awk '{print $1}')"
+            echo "cross_config_sha256=$(sha256sum Cross.toml | awk '{print $1}')"
+            echo "cargo_tree_sha256=$(sha256sum evidence/cargo-tree.txt | awk '{print $1}')"
+            echo "rustc_version_sha256=$(sha256sum evidence/rustc-version.txt | awk '{print $1}')"
+            echo "cargo_version_sha256=$(sha256sum evidence/cargo-version.txt | awk '{print $1}')"
+            echo "cc_version_sha256=$(sha256sum evidence/cc-version.txt | awk '{print $1}')"
+            echo "ld_version_sha256=$(sha256sum evidence/ld-version.txt | awk '{print $1}')"
+            echo "binary_sha256=$(sha256sum evidence/b3sum | awk '{print $1}')"
+          } > evidence/evidence.txt
+
+          cat evidence/evidence.txt
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: rust-cargo-repro-${{ matrix.lane }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 30
+
+  compare:
+    name: compare independent evidence
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: rust-cargo-repro-A
+          path: A
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: rust-cargo-repro-B
+          path: B
+
+      - name: Compare evidence and final binary
+        shell: bash
+        run: |
+          set -euo pipefail
+          diff -u A/evidence.txt B/evidence.txt
+          diff -u A/cargo-tree.txt B/cargo-tree.txt
+          diff -u A/rustc-version.txt B/rustc-version.txt
+          diff -u A/cargo-version.txt B/cargo-version.txt
+          diff -u A/cc-version.txt B/cc-version.txt
+          diff -u A/ld-version.txt B/ld-version.txt
+          cmp A/b3sum B/b3sum
+
+          echo "RMR_RUST_CARGO_REPRO_V1=PASS"
+          echo "binary_sha256=$(sha256sum A/b3sum | awk '{print $1}')"
+          echo "evidence_sha256=$(sha256sum A/evidence.txt | awk '{print $1}')"
