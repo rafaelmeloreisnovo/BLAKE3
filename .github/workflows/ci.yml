@@ -201,8 +201,6 @@ jobs:
   cross_tests:
     name: cross ${{ matrix.arch }}
     runs-on: ubuntu-24.04
-    env:
-      CROSS_CONFIG: ${{ github.workspace }}/Cross.toml
     strategy:
       fail-fast: false
       matrix:
@@ -219,6 +217,34 @@ jobs:
     - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
     - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable ref observed 2026-09-27
     - run: cargo install cross --version 0.2.5 --locked
+    - name: pin cross image digest
+      shell: bash
+      run: |
+        set -euo pipefail
+        case "${{ matrix.arch }}" in
+          i586-unknown-linux-musl)
+            echo "CROSS_TARGET_I586_UNKNOWN_LINUX_MUSL_IMAGE=ghcr.io/cross-rs/i586-unknown-linux-musl@sha256:52bdb60a8a6a41a9b707724419065cc1d7f4299d7764dfc3a0952b0448793cdf" >> "$GITHUB_ENV"
+            ;;
+          i686-unknown-linux-musl)
+            echo "CROSS_TARGET_I686_UNKNOWN_LINUX_MUSL_IMAGE=ghcr.io/cross-rs/i686-unknown-linux-musl@sha256:6f713800fd461b01d7ed04d2cda2bc8bbe293dd1190cfbe30d587eea26a056fd" >> "$GITHUB_ENV"
+            ;;
+          armv7-unknown-linux-gnueabihf)
+            echo "CROSS_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_IMAGE=ghcr.io/cross-rs/armv7-unknown-linux-gnueabihf@sha256:4a08bebb60f08d52c1885b643a768f163c7318c05f91cf119f6c02855ea52699" >> "$GITHUB_ENV"
+            ;;
+          aarch64-unknown-linux-gnu)
+            echo "CROSS_TARGET_AARCH64_UNKNOWN_LINUX_GNU_IMAGE=ghcr.io/cross-rs/aarch64-unknown-linux-gnu@sha256:7f8308a8734d9fcd2ebbe9a3e4bdea74af293f0799d80c3cc341e340cda49a4c" >> "$GITHUB_ENV"
+            ;;
+          powerpc64-unknown-linux-gnu)
+            echo "CROSS_TARGET_POWERPC64_UNKNOWN_LINUX_GNU_IMAGE=ghcr.io/cross-rs/powerpc64-unknown-linux-gnu@sha256:db02ecb2429912a6e939cc3d5cfe00aa20d7423ff484980f1fbfee4a3f2683cf" >> "$GITHUB_ENV"
+            ;;
+          s390x-unknown-linux-gnu)
+            echo "CROSS_TARGET_S390X_UNKNOWN_LINUX_GNU_IMAGE=ghcr.io/cross-rs/s390x-unknown-linux-gnu@sha256:0d8edc92c39158abe211fddfc9617bf5b7865c2ae0f58873f9cf0c58bb315271" >> "$GITHUB_ENV"
+            ;;
+          *)
+            echo "unmapped_cross_target=${{ matrix.arch }}" >&2
+            exit 2
+            ;;
+        esac
     # Test the portable implementation on everything.
     - run: cross test --target ${{ matrix.arch }}
     # Test building for ancient i386 processors without guaranteed SSE2 support.
