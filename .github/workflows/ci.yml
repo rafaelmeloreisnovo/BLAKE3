@@ -7,6 +7,10 @@ on:
     # not on tags
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   BLAKE3_CI: "1"
   RUSTFLAGS: "-D warnings"
