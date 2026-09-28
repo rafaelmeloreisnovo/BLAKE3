@@ -152,28 +152,73 @@ jobs:
     needs: [c-correctness, c-performance, rust-cli, binary-cross]
     runs-on: ubuntu-latest
     steps:
+      - name: Classify producer terminal state
+        id: producer-state
+        env:
+          C_CORRECTNESS: ${{ needs.c-correctness.result }}
+          C_PERFORMANCE: ${{ needs.c-performance.result }}
+          RUST_CLI: ${{ needs.rust-cli.result }}
+          BINARY_CROSS: ${{ needs.binary-cross.result }}
+        run: |
+          terminal=COMPLETE
+          proceed=true
+          for state in "$C_CORRECTNESS" "$C_PERFORMANCE" "$RUST_CLI" "$BINARY_CROSS"; do
+            if [ "$state" = "failure" ]; then
+              terminal=FAIL_TEST
+            fi
+          done
+          if [ "$terminal" != "FAIL_TEST" ]; then
+            for state in "$C_CORRECTNESS" "$C_PERFORMANCE" "$RUST_CLI" "$BINARY_CROSS"; do
+              if [ "$state" = "cancelled" ]; then
+                terminal=CANCELLED_SUPERSEDED
+                proceed=false
+              fi
+            done
+          fi
+          if [ "$terminal" = "COMPLETE" ]; then
+            for state in "$C_CORRECTNESS" "$C_PERFORMANCE" "$RUST_CLI" "$BINARY_CROSS"; do
+              if [ "$state" = "skipped" ]; then
+                terminal=EVIDENCE_INCOMPLETE
+              fi
+            done
+          fi
+          echo "state=$terminal" >> "$GITHUB_OUTPUT"
+          echo "proceed=$proceed" >> "$GITHUB_OUTPUT"
+          {
+            echo "RMR_FULL_VALIDATION_TERMINAL_STATE=$terminal"
+            echo "c-correctness=$C_CORRECTNESS"
+            echo "c-performance=$C_PERFORMANCE"
+            echo "rust-cli=$RUST_CLI"
+            echo "binary-cross=$BINARY_CROSS"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v6
+        if: steps.producer-state.outputs.proceed == 'true'
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/download-artifact@v4
+        if: steps.producer-state.outputs.proceed == 'true'
         with:
           pattern: rmr-full-*
           path: artifacts
           merge-multiple: false
       - name: Validation completeness selftest
+        if: steps.producer-state.outputs.proceed == 'true'
         run: python3 rmr/validation/tests/test_report_completeness.py
       - name: Generate full receipt
+        if: steps.producer-state.outputs.proceed == 'true'
         run: |
           mkdir -p final
           python3 rmr/validation/generate_full_validation_report.py             --artifacts artifacts             --json-out final/RMR_FULL_VALIDATION_RECEIPT_V1.json             --md-out final/RMR_FULL_VALIDATION_RECEIPT_V1.md
           cat final/RMR_FULL_VALIDATION_RECEIPT_V1.md
       - uses: actions/upload-artifact@v4
+        if: steps.producer-state.outputs.proceed == 'true'
         with:
           name: rmr-full-validation-receipt
           if-no-files-found: error
           path: final/**
       - name: Enforce complete validation evidence
+        if: steps.producer-state.outputs.proceed == 'true'
         run: |
           python3 - <<'PY'
           import json
