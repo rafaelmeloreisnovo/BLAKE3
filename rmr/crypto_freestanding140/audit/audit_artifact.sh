@@ -14,8 +14,10 @@ READELF=${READELF:-readelf}
   exit 1
 }
 
+# ELF symbol-table entry 0 is the reserved STN_UNDEF entry and is expected.
+# Fail closed on every other undefined symbol.
 if "$READELF" -Ws "$BIN" |
-     awk '$7=="UND" {bad=1; print} END{exit bad}'
+     awk '$7=="UND" && $1!="0:" {bad=1; print} END{exit bad}'
 then
   :
 else
