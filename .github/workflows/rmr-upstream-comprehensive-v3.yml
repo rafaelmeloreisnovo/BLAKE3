@@ -47,7 +47,7 @@ jobs:
         run: bash rmr/tools/audit_source_delta_v3.sh
       - name: Verify official-vs-fork source authority
         run: python3 rmr/crypto/runtime/tools/validate_source_authority.py --out rmr/benchmark_framework/output/upstream-v3-source/source-authority.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: upstream-v3-source
           if-no-files-found: error
@@ -69,7 +69,7 @@ jobs:
           CC: clang
           CXX: clang++
         run: bash rmr/tools/validate_c_quality_v3.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: upstream-v3-c-quality
           if-no-files-found: error
@@ -95,7 +95,7 @@ jobs:
           TARGET_MIB: "128"
           SIZES: "64 256 1024 4096 65536 1048576 16777216"
         run: bash rmr/tools/orchestrate_blake3_compare_v2.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: upstream-v3-core-performance
           if-no-files-found: error
@@ -126,7 +126,7 @@ jobs:
           ROUNDS: "7"
           TARGET_MIB: "64"
         run: bash rmr/tools/run_c_ablation_v3.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: upstream-v3-backends
           if-no-files-found: error
@@ -150,7 +150,7 @@ jobs:
           CC: clang
           CXX: clang++
         run: bash rmr/tools/audit_abi_elf_v3.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: upstream-v3-abi-elf
           if-no-files-found: error
@@ -172,7 +172,7 @@ jobs:
           CC: clang
           CXX: clang++
         run: bash rmr/tools/benchmark_tbb_v3.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: upstream-v3-tbb
           if-no-files-found: error
@@ -188,7 +188,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Rust library, profile ablation and b3sum
         run: bash rmr/tools/benchmark_rust_cli_v3.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: upstream-v3-rust-cli
           if-no-files-found: error
@@ -209,7 +209,7 @@ jobs:
           rustup target add wasm32-unknown-unknown
       - name: Cross architecture compile matrix
         run: bash rmr/tools/build_cross_arch_blake3_v3.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: upstream-v3-cross-arch
           if-no-files-found: error
@@ -229,7 +229,7 @@ jobs:
           sudo apt-get install -y clang lld cmake ninja-build libssl-dev binutils
       - name: Full RMR integration
         run: bash rmr/tools/validate_rmr_integration_v3.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: upstream-v3-rmr-integration
           if-no-files-found: error
@@ -303,7 +303,7 @@ jobs:
         with:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         if: steps.producer-state.outputs.proceed == 'true'
         with:
           pattern: upstream-v3-*
@@ -321,7 +321,7 @@ jobs:
             --json-out final/RMR_UPSTREAM_COMPREHENSIVE_V3.json \
             --md-out final/RMR_UPSTREAM_COMPREHENSIVE_V3.md
           cat final/RMR_UPSTREAM_COMPREHENSIVE_V3.md
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: steps.producer-state.outputs.proceed == 'true'
         with:
           name: upstream-v3-final-receipt
