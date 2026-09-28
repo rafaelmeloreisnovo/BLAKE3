@@ -86,7 +86,7 @@ jobs:
             > build/rmr-simperf/receipts/SHA256SUMS.txt
 
       - name: Upload SIMPERF receipts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: rmr-simperf-receipts
           if-no-files-found: error
