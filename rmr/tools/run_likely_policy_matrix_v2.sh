@@ -70,7 +70,8 @@ cap_flags() {
 }
 
 sched_snapshot() {
-  local tag="$1" f="$OUT/scheduler/$tag.txt"
+  local tag="$1"
+  local f="$OUT/scheduler/$tag.txt"
   {
     echo "observed_at_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     echo "affinity=$AFFINITY"
