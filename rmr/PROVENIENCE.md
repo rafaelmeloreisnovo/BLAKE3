@@ -38,7 +38,7 @@ Use o texto abaixo quando precisar explicitar copyright/fronteira:
 | `media/` | Upstream BLAKE3 | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions (ver `LICENSE_*`) |
 | `README.md`, `CONTRIBUTING.md`, `LICENSE_*`, `Cargo.toml`, `Cargo.lock`, `build.rs` | Upstream BLAKE3 ou derivação documental explicitamente delimitada | CC0 1.0 / Apache 2.0 / Apache 2.0 LLVM-exceptions e notices aplicáveis; material externo deve ser identificado |
 | `rmr/` | RMR autoral | RMR Module License (`rmr/LICENSE_RMR`) |
-| `rmr/standalone/` | RMR autoral (foundation freestanding: tipos compiler-native, memory primitives, perfis Q e probes de link) | RMR Module License (`rmr/LICENSE_RMR`) |
+| `rmr/portable/` | RMR autoral prospectivo (API C freestanding, batch fixo, Rust no_std, Java fixed-frame, adapters/provider, manifests e gates) | `LicenseRef-RMR-Individual-Research-1.0` somente para arquivos explicitamente marcados; upstream BLAKE3 permanece upstream |\n| `rmr/standalone/` | RMR autoral (foundation freestanding: tipos compiler-native, memory primitives, perfis Q e probes de link) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `.github/workflows/rmr-standalone-v1.yml` | Externo autoral RMR (gate CI da foundation standalone) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/benchmark_framework/` | RMR autoral (benchmark/reproducibility framework; blueprint + executable BLAKE3 harness) | RMR Module License (`rmr/LICENSE_RMR`) |
 | `rmr/CMakeLists.txt`, `rmr/core/hash_blake3.c` | RMR autoral (build/adaptador externo que consome a API pública do BLAKE3 em `c/`) | RMR Module License (`rmr/LICENSE_RMR`) para a camada RMR; BLAKE3 mantém suas licenças upstream |
