@@ -87,10 +87,51 @@ jobs:
         shell: bash
         run: sh rmr/portable/build/build_cross_matrix.sh
 
-      - name: Every-file provenance manifest
+      - name: Every-file provenance manifest + final receipt
         shell: bash
         run: |
           set -euo pipefail
-          sh rmr/portable/tools/build_source_manifest.sh /tmp/rmr-source-manifest.tsv
-          test -s /tmp/rmr-source-manifest.tsv
-          echo "RMR_SOURCE_MANIFEST_SHA256=$(sha256sum /tmp/rmr-source-manifest.tsv | awk '{print $1}')"
+          manifest=/tmp/rmr-source-manifest.tsv
+          receipt=/tmp/rmr-portable-final-receipt.txt
+
+          sh rmr/portable/tools/build_source_manifest.sh "$manifest" | tee /tmp/rmr-manifest-summary.txt
+          test -s "$manifest"
+
+          manifest_sha="$(sha256sum "$manifest" | awk '{print $1}')"
+          files="$(awk -F= '$1=="RMR_SOURCE_MANIFEST_FILES"{print $2}' /tmp/rmr-manifest-summary.txt)"
+          portable="$(awk -F= '$1=="RMR_SOURCE_MANIFEST_PORTABLE"{print $2}' /tmp/rmr-manifest-summary.txt)"
+          upstream_exact="$(awk -F= '$1=="RMR_SOURCE_MANIFEST_UPSTREAM_EXACT"{print $2}' /tmp/rmr-manifest-summary.txt)"
+          upstream_divergent="$(awk -F= '$1=="RMR_SOURCE_MANIFEST_UPSTREAM_DIVERGENT"{print $2}' /tmp/rmr-manifest-summary.txt)"
+          fork_additions="$(awk -F= '$1=="RMR_SOURCE_MANIFEST_FORK_ADDITIONS"{print $2}' /tmp/rmr-manifest-summary.txt)"
+          unresolved_origin="$(awk -F= '$1=="RMR_SOURCE_MANIFEST_UNRESOLVED_ORIGIN"{print $2}' /tmp/rmr-manifest-summary.txt)"
+          license_token="$(awk -F= '$1=="RMR_SOURCE_MANIFEST_LICENSE_TOKEN_VAZIO"{print $2}' /tmp/rmr-manifest-summary.txt)"
+
+          cat > "$receipt" <<EOF
+          schema=rmr.portable-final-receipt/v1
+          source_sha=$RMR_SOURCE_SHA
+          run_id=$GITHUB_RUN_ID
+          run_number=$GITHUB_RUN_NUMBER
+          external_js_actions=0
+          source_shape=PASS
+          host_semantic_kat=PASS
+          cross_arch=PASS
+          pt_interp=ABSENT_ALL_SIX
+          dt_needed=ABSENT_ALL_SIX
+          unexpected_und=0_ALL_SIX
+          source_manifest_sha256=$manifest_sha
+          source_manifest_files=$files
+          portable_files=$portable
+          upstream_exact_review_paths=$upstream_exact
+          upstream_divergent_review_paths=$upstream_divergent
+          fork_addition_review_paths=$fork_additions
+          unresolved_origin=$unresolved_origin
+          license_token_vazio=$license_token
+          upstream_comparison_head=6aab490a26124663329dfd3961b8469f8fdb158b
+          upstream_rewritten=false
+          EOF
+
+          echo "RMR_SOURCE_MANIFEST_SHA256=$manifest_sha"
+          echo "RMR_PORTABLE_FINAL_RECEIPT_BEGIN"
+          cat "$receipt"
+          echo "RMR_PORTABLE_FINAL_RECEIPT_END"
+          echo "RMR_PORTABLE_FINAL_RECEIPT_SHA256=$(sha256sum "$receipt" | awk '{print $1}')"
