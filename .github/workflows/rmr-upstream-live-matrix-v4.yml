@@ -75,8 +75,8 @@ jobs:
           rustup target add wasm32-unknown-unknown
           OFFICIAL_SHA="$(awk -F= '$1=="official_sha_resolved"{print $2}' rmr/benchmark_framework/output/upstream-live-v4/receipt.txt)"
           test -n "$OFFICIAL_SHA"
-          OFFICIAL_REF="$OFFICIAL_SHA" \\
-          RESULT_ROOT=rmr/benchmark_framework/output/upstream-live-v4/cross-arch \\
+          OFFICIAL_REF="$OFFICIAL_SHA" \
+          RESULT_ROOT=rmr/benchmark_framework/output/upstream-live-v4/cross-arch \
           bash rmr/tools/build_cross_arch_blake3_v3.sh
 
       - name: Print comparison summary
