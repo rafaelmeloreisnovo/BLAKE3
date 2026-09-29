@@ -41,13 +41,29 @@ jobs:
         run: |
           set -euo pipefail
           command -v clang
-          command -v ld.lld
           command -v readelf
           command -v sha256sum
+
+          if ! command -v ld.lld >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y lld-18
+          fi
+
+          if ! command -v ld.lld >/dev/null 2>&1; then
+            if command -v ld.lld-18 >/dev/null 2>&1; then
+              sudo ln -sf "$(command -v ld.lld-18)" /usr/local/bin/ld.lld
+            else
+              echo "RMR_PORTABLE_LLD=TOKEN_VAZIO"
+              exit 1
+            fi
+          fi
+
           clang --version
           ld.lld --version
+          readelf --version | head -n1
           if command -v rustc >/dev/null 2>&1; then rustc --version; fi
           if command -v javac >/dev/null 2>&1; then javac -version; fi
+          echo "RMR_PORTABLE_TOOLCHAIN_EDGE=EXTERNAL_EXPLICIT"
 
       - name: Zero external JavaScript Action gate
         shell: bash
