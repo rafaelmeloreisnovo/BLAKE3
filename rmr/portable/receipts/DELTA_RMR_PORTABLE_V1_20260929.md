@@ -6,7 +6,7 @@ Date: 2026-09-29
 base = a5c5a82690356faeae1400bb65e6821766f9b1d9
 binary_fix_merge = 5e4c984074966c9ba6fbb4385d165ab52112d744
 binary_validation_run = 36565932252 / RMR Portable V1 #20
-state = BINARY_PASS_PROVENANCE_REFINEMENT_PENDING
+state = PASS_CI
 ```
 
 ## Materialized
@@ -104,5 +104,29 @@ RUST_NOSTD = PASS
 JAVA_FIXED256 = PASS
 CROSS_ARCH = PASS
 BLAKE3_PROVIDER_KAT = PASS
-PROVENANCE_FINAL = PENDING_CURRENT_CI
+PROVENANCE_FINAL = PASS_CI
+```
+
+
+## Final provenance promotion
+
+The provenance-only gate completed successfully before this static promotion:
+
+```text
+run = RMR Portable V1 #26 / 36566818526
+source_manifest_files = 830
+upstream_exact_review_paths = 13
+upstream_divergent_review_paths = 7
+fork_addition_review_paths = 30
+unresolved_origin = 0
+license_token_vazio = 30
+```
+
+The exact manifest and dynamic-receipt SHA-256 values remain CI evidence rather
+than being copied into this tracked file, preventing a self-referential
+manifest/receipt hash cycle.
+
+```text
+origin_completeness = PASS
+license_completeness = PARTIAL_TOKEN_VAZIO_30
 ```
