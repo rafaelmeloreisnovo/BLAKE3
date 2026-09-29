@@ -19,3 +19,19 @@ Este arquivo se aplica a toda a árvore do repositório.
 - Sempre registre diffs contra o upstream oficial ao preparar revisões.
 - Documente claramente o que é upstream vs externo em `DOCUMENTACAO.md` e
   `rmr/PROVENIENCE.md`.
+
+
+## RMR Portable V1 — license exception
+
+`rmr/portable/**` is a prospective project-authored surface. New files in
+that tree may use:
+
+```text
+SPDX-License-Identifier: LicenseRef-RMR-Individual-Research-1.0
+```
+
+instead of the legacy `rmr/LICENSE_RMR`, when explicitly listed by the
+portable path/license matrix.
+
+This exception does not relicense upstream BLAKE3 or retroactively revoke
+earlier RMR grants. Provider adapters must preserve the upstream boundary.
