@@ -116,6 +116,11 @@ build_side() {
   fi
   [ "$tbb" = "on" ] && extra_link=(-ltbb -lstdc++)
   "$compiler" -O3 -std=c11 -I"$src/c" "$ROOT/rmr/benchmark_framework/core/blake3_size_bench.c" "$lib" "${link_lto[@]}" "${extra_link[@]}" -o "$build/bench"
+  "$compiler" -O3 -std=c11 -I"$src/c" "$ROOT/rmr/upstream_validation/blake3_backend_probe.c" "$lib" "${link_lto[@]}" "${extra_link[@]}" -o "$build/probe"
+  "$build/probe" > "$OUT/$config-$side-probe.txt"
+  local abc
+  abc="$(awk -F= '$1=="abc"{print $2}' "$OUT/$config-$side-probe.txt")"
+  [ "$abc" = "$EXPECTED_ABC" ] || { echo "known_answer_test=FAIL side=$side config=$config abc=$abc" >&2; exit 21; }
   echo "$build/bench|$lib"
 }
 
