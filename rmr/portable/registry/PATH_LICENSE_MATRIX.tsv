@@ -1,0 +1,13 @@
+path_prefix	origin_class	license_class	binary_role
+rmr/portable/	RMR_PORTABLE_V1	LicenseRef-RMR-Individual-Research-1.0	project-authored prospective surface
+rmr/	RMR_LEGACY	RMR Module License prior grant	legacy project-authored boundary
+src/	UPSTREAM_BLAKE3	upstream licenses	upstream Rust implementation
+c/	UPSTREAM_BLAKE3	upstream licenses	upstream C provider
+b3sum/	UPSTREAM_BLAKE3	upstream licenses	upstream CLI
+reference_impl/	UPSTREAM_BLAKE3	upstream licenses	upstream reference
+test_vectors/	UPSTREAM_BLAKE3	upstream licenses	upstream vectors
+benches/	UPSTREAM_BLAKE3	upstream licenses	upstream benchmark
+media/	UPSTREAM_BLAKE3	upstream licenses	upstream media
+audit/	RMR_AUDIT	prior applicable grant	audit evidence
+audits/	RMR_AUDIT	prior applicable grant	audit evidence
+auditoria/	RMR_AUDIT	prior applicable grant	audit evidence

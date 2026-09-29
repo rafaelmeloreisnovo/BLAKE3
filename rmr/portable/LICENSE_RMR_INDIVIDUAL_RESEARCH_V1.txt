@@ -1,0 +1,100 @@
+RMR Individual Research Source License 1.0
+Copyright (c) 2026 Rafael Melo Reis
+SPDX-License-Identifier: LicenseRef-RMR-Individual-Research-1.0
+
+NOTICE: This is a project-authored source-available license. It is not an
+OSI-approved open-source license.
+
+1. COVERED MATERIAL
+This license applies only to files that explicitly identify
+LicenseRef-RMR-Individual-Research-1.0, or to a path/license matrix that
+expressly binds those files to this license. It does not relicense upstream
+BLAKE3, third-party code, or earlier copies distributed under prior grants.
+
+2. FREE INDIVIDUAL RESEARCH PERMISSION
+A natural person acting only on their own behalf may, without a license fee:
+(a) inspect and study the Covered Material;
+(b) make private copies needed for individual research;
+(c) modify the Covered Material privately for individual, non-commercial
+    research, reproducibility, security review, benchmarking, and education;
+(d) publish research results, measurements, criticism, and citations.
+
+This permission does not extend to use performed for, funded by, commissioned
+by, supervised by, or materially resourced by a company, university,
+laboratory, government body, nonprofit organization, consortium, employer,
+client, or other institution.
+
+3. INSTITUTIONAL USE
+Institutional research, teaching deployments, laboratory use, grant-funded
+use, organizational benchmarking, internal company evaluation, or use by a
+person acting on behalf of an institution requires a separate written license
+signed by the rights holder and the institution.
+
+4. COMMERCIAL USE
+Commercial exploitation is prohibited unless separately authorized in a
+written agreement signed by the rights holder. Commercial exploitation
+includes sale, resale, paid distribution, OEM embedding, commercial SDK/API
+use, monetized hosting, paid consulting delivery, product integration, or use
+that materially supports a revenue-generating product or service.
+
+5. REDISTRIBUTION
+No right to sublicense or commercially redistribute the Covered Material is
+granted by this public license. An individual researcher may share a minimal
+excerpt reasonably necessary to discuss research results, provided copyright,
+license, provenance, and modification notices are preserved.
+
+6. FORMAL AUTHORIZATION
+A commercial or institutional authorization should identify at least:
+parties and signing authority; covered repository/path; commit/version and
+artifact digest; permitted field of use; term and territory; redistribution
+rights; fees if any; support/warranty terms if any; confidentiality if any;
+audit scope if any; dispute forum; signatures; and effective date.
+
+7. PROVENANCE AND MODIFICATION NOTICE
+The copyright, license identifier, source path/version, and material
+modification notice must be preserved in every permitted research copy.
+
+8. AUDIT AND VERIFICATION
+This public research license does not create a general right to inspect a
+person's private systems. Audit rights for an institution or commercial
+licensee exist only when stated in a signed agreement and must follow its
+scope, notice, confidentiality, frequency, and evidence-preservation terms.
+
+A signed agreement may require reimbursement of reasonable, documented,
+directly attributable verification costs after a confirmed material breach,
+subject to applicable law. Routine audit cost, technical verification cost,
+attorney fees, litigation cost, court-awarded cost, and damages are separate
+categories and must not be automatically conflated.
+
+9. CONTRACTUAL PENALTY / DAMAGES
+This public license sets no automatic fine or contractual penalty.
+
+A separately signed institutional or commercial agreement may specify a
+contractual penalty for a specifically identified material obligation, subject
+to mandatory law, proportionality, judicial adjustment where applicable, and
+the terms of that signed agreement. Supplementary damages are available only
+to the extent separately agreed and legally established.
+
+A person who never assented to such an agreement is not automatically bound by
+its contractual penalty. Statutory remedies for unauthorized copying or use
+remain distinct from contractual remedies.
+
+10. TERMINATION
+The permission granted by this license terminates for a person who materially
+breaches its conditions. Rights already granted by an earlier license to an
+earlier copy are not retroactively cancelled by this license.
+
+11. THIRD-PARTY / UPSTREAM BOUNDARY
+BLAKE3 algorithm implementations, upstream source, test vectors,
+documentation, and third-party components retain their own licenses and
+attributions. No RMR notice may be used to erase or narrow upstream rights.
+
+12. NO WARRANTY
+THE COVERED MATERIAL IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, NON-INFRINGEMENT, SECURITY, OR ERROR-FREE OPERATION.
+
+13. LEGAL REVIEW
+This project license is a technical/legal template and is not a substitute for
+jurisdiction-specific advice from qualified counsel before material
+institutional or commercial enforcement.

@@ -1,0 +1,96 @@
+name: RMR Portable V1
+
+on:
+  push:
+    paths:
+      - 'rmr/portable/**'
+      - 'rmr/PROVENIENCE.md'
+      - 'AGENTS.md'
+      - '.github/workflows/rmr-portable-v1.yml'
+  pull_request:
+    paths:
+      - 'rmr/portable/**'
+      - 'rmr/PROVENIENCE.md'
+      - 'AGENTS.md'
+      - '.github/workflows/rmr-portable-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  portable:
+    runs-on: ubuntu-latest
+    env:
+      RMR_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
+    steps:
+      - name: Authorial exact-SHA checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+          git init .
+          git remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
+          git fetch --no-tags --depth=1 origin "$RMR_SOURCE_SHA"
+          git checkout --detach FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$RMR_SOURCE_SHA"
+
+      - name: Toolchain boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v clang
+          command -v readelf
+          command -v sha256sum
+
+          if ! command -v ld.lld >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y lld-18
+          fi
+
+          if ! command -v ld.lld >/dev/null 2>&1; then
+            if command -v ld.lld-18 >/dev/null 2>&1; then
+              sudo ln -sf "$(command -v ld.lld-18)" /usr/local/bin/ld.lld
+            else
+              echo "RMR_PORTABLE_LLD=TOKEN_VAZIO"
+              exit 1
+            fi
+          fi
+
+          clang --version
+          ld.lld --version
+          readelf --version | head -n1
+          if command -v rustc >/dev/null 2>&1; then rustc --version; fi
+          if command -v javac >/dev/null 2>&1; then javac -version; fi
+          echo "RMR_PORTABLE_TOOLCHAIN_EDGE=EXTERNAL_EXPLICIT"
+
+      - name: Zero external JavaScript Action gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -nE '^[[:space:]]*uses:[[:space:]]+[^.]' .github/workflows/rmr-portable-v1.yml; then
+            echo "RMR_PORTABLE_EXTERNAL_ACTION=FAIL"
+            exit 1
+          fi
+          echo "RMR_PORTABLE_EXTERNAL_ACTIONS=0"
+
+      - name: Source-shape gate
+        shell: bash
+        run: sh rmr/portable/audit/audit_source_shape.sh
+
+      - name: Host C + BLAKE3 KAT + Java + Rust
+        shell: bash
+        run: sh rmr/portable/build/build_host_selftest.sh
+
+      - name: Cross-architecture freestanding matrix
+        shell: bash
+        run: sh rmr/portable/build/build_cross_matrix.sh
+
+      - name: Every-file provenance manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          sh rmr/portable/tools/build_source_manifest.sh /tmp/rmr-source-manifest.tsv
+          test -s /tmp/rmr-source-manifest.tsv
+          echo "RMR_SOURCE_MANIFEST_SHA256=$(sha256sum /tmp/rmr-source-manifest.tsv | awk '{print $1}')"
