@@ -12,14 +12,15 @@ command -v readelf >/dev/null 2>&1 || exit 127
 rm -rf "$OUT"
 mkdir -p "$OUT"
 
-BASE="-std=c11 -O2 -ffreestanding -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-common -fvisibility=hidden -ffunction-sections -fdata-sections -fno-ident -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wstrict-prototypes -Werror"
+STRICT="-std=c11 -O2 -ffreestanding -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-common -fvisibility=hidden -ffunction-sections -fdata-sections -fno-ident -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wstrict-prototypes -Werror"
+UPSTREAM="-std=c11 -O2 -ffreestanding -fno-builtin -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-common -fvisibility=hidden -ffunction-sections -fdata-sections -fno-ident -DBLAKE3_NO_SSE2 -DBLAKE3_NO_SSE41 -DBLAKE3_NO_AVX2 -DBLAKE3_NO_AVX512 -DBLAKE3_USE_NEON=0 -DBLAKE3_ATOMICS=0 -DNDEBUG"
 
 build_core() {
   name=$1
   target=$2
   extra=$3
   # shellcheck disable=SC2086
-  "$CC" --target="$target" $LD_MODE $BASE $extra     -I"$ROOT/include"     "$ROOT/src/rmr_portable_v1.c" "$ROOT/probe/rmr_pv1_probe.c"     -nostdlib -static -Wl,--gc-sections -Wl,--build-id=none     -Wl,--no-undefined -Wl,-e,rmr_pv1_probe_entry     -o "$OUT/core-$name"
+  "$CC" --target="$target" $LD_MODE $STRICT $extra     -I"$ROOT/include"     "$ROOT/src/rmr_portable_v1.c" "$ROOT/probe/rmr_pv1_probe.c"     -nostdlib -static -Wl,--gc-sections -Wl,--build-id=none     -Wl,--no-undefined -Wl,-e,rmr_pv1_probe_entry     -o "$OUT/core-$name"
   "$ROOT/audit/audit_artifact.sh" "$OUT/core-$name"
 }
 
@@ -28,8 +29,25 @@ build_provider() {
   target=$2
   extra=$3
   resource=$("$CC" -print-resource-dir)
+  common="-nostdinc -isystem $resource/include -I$ROOT/provider/blake3/include -I$ROOT/include -I$REPO/c"
+
+  # Authorial adapter/memshim/probe are strict.
   # shellcheck disable=SC2086
-  "$CC" --target="$target" $LD_MODE $BASE $extra     -nostdinc -isystem "$resource/include"     -I"$ROOT/provider/blake3/include" -I"$ROOT/include" -I"$REPO/c"     -DBLAKE3_NO_SSE2 -DBLAKE3_NO_SSE41 -DBLAKE3_NO_AVX2 -DBLAKE3_NO_AVX512     -DBLAKE3_USE_NEON=0 -DBLAKE3_ATOMICS=0 -DNDEBUG     "$ROOT/provider/blake3/rmr_portable_memshim.c"     "$ROOT/provider/blake3/rmr_portable_blake3_v1.c"     "$REPO/c/blake3.c" "$REPO/c/blake3_dispatch.c" "$REPO/c/blake3_portable.c"     "$ROOT/probe/rmr_pv1_blake3_probe.c"     -nostdlib -static -Wl,--gc-sections -Wl,--build-id=none     -Wl,--no-undefined -Wl,-e,rmr_pv1_blake3_probe_entry     -o "$OUT/blake3-$name"
+  "$CC" --target="$target" $STRICT $extra $common     -c "$ROOT/provider/blake3/rmr_portable_memshim.c"     -o "$OUT/memshim-$name.o"
+  # shellcheck disable=SC2086
+  "$CC" --target="$target" $STRICT $extra $common     -c "$ROOT/provider/blake3/rmr_portable_blake3_v1.c"     -o "$OUT/adapter-$name.o"
+  # shellcheck disable=SC2086
+  "$CC" --target="$target" $STRICT $extra $common     -c "$ROOT/probe/rmr_pv1_blake3_probe.c"     -o "$OUT/probe-$name.o"
+
+  # Upstream files keep upstream warning policy.
+  for src in blake3.c blake3_dispatch.c blake3_portable.c; do
+    # shellcheck disable=SC2086
+    "$CC" --target="$target" $UPSTREAM $extra $common       -c "$REPO/c/$src" -o "$OUT/$src-$name.o"
+  done
+
+  # shellcheck disable=SC2086
+  "$CC" --target="$target" $LD_MODE $extra     "$OUT/memshim-$name.o" "$OUT/adapter-$name.o" "$OUT/probe-$name.o"     "$OUT/blake3.c-$name.o" "$OUT/blake3_dispatch.c-$name.o" "$OUT/blake3_portable.c-$name.o"     -nostdlib -static -Wl,--gc-sections -Wl,--build-id=none     -Wl,--no-undefined -Wl,-e,rmr_pv1_blake3_probe_entry     -o "$OUT/blake3-$name"
+
   "$ROOT/audit/audit_artifact.sh" "$OUT/blake3-$name"
 }
 
