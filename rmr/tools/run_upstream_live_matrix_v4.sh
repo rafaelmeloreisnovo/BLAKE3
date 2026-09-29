@@ -214,6 +214,6 @@ python3 "$ROOT/rmr/upstream_validation/analyze_live_matrix_v4.py" --csv "$OUT/re
   echo "physical_device_reproduction=TOKEN_VAZIO"
   echo "independent_third_party_reproduction=TOKEN_VAZIO"
 } > "$OUT/receipt.txt"
-sha256sum "$OUT"/*.csv "$OUT"/*.json "$OUT"/*.md "$OUT"/*.txt "$OUT"/*.sha256 > "$OUT/SHA256SUMS.txt"
+sha256sum "$OUT"/*.csv "$OUT"/*.json "$OUT"/*.md "$OUT"/*.txt "$OUT"/*.sha256 "$OUT"/*.diff "$OUT"/*.log > "$OUT/SHA256SUMS.txt"
 echo "RMR_UPSTREAM_LIVE_MATRIX_V4=PASS"
 cat "$OUT/receipt.txt"
