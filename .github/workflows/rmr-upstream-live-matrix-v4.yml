@@ -1,0 +1,93 @@
+name: RMR upstream live compile matrix V4
+
+on:
+  pull_request:
+    paths:
+      - "c/**"
+      - "rmr/tools/run_upstream_live_matrix_v4.sh"
+      - "rmr/upstream_validation/analyze_live_matrix_v4.py"
+      - "rmr/benchmark_framework/core/blake3_size_bench.c"
+      - ".github/workflows/rmr-upstream-live-matrix-v4.yml"
+  push:
+    branches:
+      - master
+    paths:
+      - "c/**"
+      - "rmr/tools/run_upstream_live_matrix_v4.sh"
+      - "rmr/upstream_validation/analyze_live_matrix_v4.py"
+      - "rmr/benchmark_framework/core/blake3_size_bench.c"
+      - ".github/workflows/rmr-upstream-live-matrix-v4.yml"
+  workflow_dispatch:
+    inputs:
+      matrix_mode:
+        description: "balanced or exhaustive common compile matrix"
+        required: true
+        default: "balanced"
+        type: choice
+        options:
+          - balanced
+          - exhaustive
+      rounds:
+        description: "paired AB/BA rounds per size/config"
+        required: true
+        default: "7"
+        type: string
+      target_mib:
+        description: "MiB processed per side/round/size"
+        required: true
+        default: "64"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rmr-upstream-live-v4-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      MATRIX_MODE: ${{ inputs.matrix_mode || 'balanced' }}
+      ROUNDS: ${{ inputs.rounds || '7' }}
+      TARGET_MIB: ${{ inputs.target_mib || '64' }}
+      OFFICIAL_REPO: https://github.com/BLAKE3-team/BLAKE3.git
+      OFFICIAL_REF_REQUESTED: refs/heads/master
+    steps:
+      - name: Checkout fork exact SHA
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Install common toolchains
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang gcc g++ lld cmake ninja-build libtbb-dev binutils
+
+      - name: Run live upstream common compile matrix
+        run: bash rmr/tools/run_upstream_live_matrix_v4.sh
+
+      - name: Cross-architecture compile parity at frozen official SHA
+        run: |
+          rustup target add wasm32-unknown-unknown
+          OFFICIAL_SHA="$(awk -F= '$1=="official_sha_resolved"{print $2}' rmr/benchmark_framework/output/upstream-live-v4/receipt.txt)"
+          test -n "$OFFICIAL_SHA"
+          OFFICIAL_REF="$OFFICIAL_SHA" \
+          RESULT_ROOT=rmr/benchmark_framework/output/upstream-live-v4/cross-arch \
+          bash rmr/tools/build_cross_arch_blake3_v3.sh
+
+      - name: Print comparison summary
+        run: |
+          cat rmr/benchmark_framework/output/upstream-live-v4/summary.md
+          cat rmr/benchmark_framework/output/upstream-live-v4/receipt.txt
+          cat rmr/benchmark_framework/output/upstream-live-v4/cross-arch/receipt.txt
+
+      - name: Upload evidence bundle
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: rmr-upstream-live-matrix-v4
+          if-no-files-found: error
+          path: rmr/benchmark_framework/output/upstream-live-v4/**
