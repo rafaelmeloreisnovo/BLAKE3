@@ -21,7 +21,7 @@ build_core() {
   extra=$3
   # shellcheck disable=SC2086
   "$CC" --target="$target" $LD_MODE $STRICT $extra     -I"$ROOT/include"     "$ROOT/src/rmr_portable_v1.c" "$ROOT/probe/rmr_pv1_probe.c"     -nostdlib -static -Wl,--gc-sections -Wl,--build-id=none     -Wl,--no-undefined -Wl,-e,rmr_pv1_probe_entry     -o "$OUT/core-$name"
-  "$ROOT/audit/audit_artifact.sh" "$OUT/core-$name"
+  sh "$ROOT/audit/audit_artifact.sh" "$OUT/core-$name"
 }
 
 build_provider() {
@@ -48,7 +48,7 @@ build_provider() {
   # shellcheck disable=SC2086
   "$CC" --target="$target" $LD_MODE $extra     "$OUT/memshim-$name.o" "$OUT/adapter-$name.o" "$OUT/probe-$name.o"     "$OUT/blake3.c-$name.o" "$OUT/blake3_dispatch.c-$name.o" "$OUT/blake3_portable.c-$name.o"     -nostdlib -static -Wl,--gc-sections -Wl,--build-id=none     -Wl,--no-undefined -Wl,-e,rmr_pv1_blake3_probe_entry     -o "$OUT/blake3-$name"
 
-  "$ROOT/audit/audit_artifact.sh" "$OUT/blake3-$name"
+  sh "$ROOT/audit/audit_artifact.sh" "$OUT/blake3-$name"
 }
 
 build_core x86_64 x86_64-none-elf ""
