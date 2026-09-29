@@ -1,0 +1,53 @@
+name: RMR LIKELY policy matrix V2
+
+on:
+  pull_request:
+    paths:
+      - "c/**"
+      - "rmr/tools/run_likely_policy_matrix_v2.sh"
+      - "rmr/upstream_validation/analyze_likely_policy_matrix_v2.py"
+      - "rmr/benchmark_framework/core/blake3_size_bench.c"
+      - "rmr/upstream_validation/blake3_backend_probe.c"
+      - ".github/workflows/rmr-likely-policy-matrix-v2.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rmr-likely-policy-v2-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout fork exact SHA
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Install common compilers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc g++ clang cmake ninja-build binutils util-linux
+
+      - name: Run pinned LIKELY policy matrix
+        env:
+          ROUNDS: "12"
+          TARGET_MIB: "128"
+        run: bash rmr/tools/run_likely_policy_matrix_v2.sh
+
+      - name: Print policy summary
+        run: |
+          cat rmr/benchmark_framework/output/likely-policy-v2/summary.md
+          cat rmr/benchmark_framework/output/likely-policy-v2/receipt.txt
+
+      - name: Upload policy evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: rmr-likely-policy-v2
+          if-no-files-found: error
+          path: rmr/benchmark_framework/output/likely-policy-v2/**
