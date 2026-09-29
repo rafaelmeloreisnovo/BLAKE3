@@ -11,3 +11,9 @@ media/	UPSTREAM_BLAKE3	upstream licenses	upstream media
 audit/	RMR_AUDIT	prior applicable grant	audit evidence
 audits/	RMR_AUDIT	prior applicable grant	audit evidence
 auditoria/	RMR_AUDIT	prior applicable grant	audit evidence
+upstream_blob_relation=EXACT	UPSTREAM_BLAKE3_EXACT	upstream licenses	path+blob SHA equal to upstream comparison head
+upstream_blob_relation=DIVERGENT	UPSTREAM_PATH_DIVERGENT_BLOB	upstream-or-fork-modified review required	path exists upstream but blob differs
+fork_absent_path=RAFAELIA	FORK_RAFAELIA_MATERIAL	TOKEN_VAZIO file-license review	fork-added Rafaelia namespace material
+fork_absent_path=TOOLS	FORK_TOOLING_ADDITION	TOKEN_VAZIO file-license review	fork-added tooling absent from compared upstream
+fork_absent_path=MEDIA	FORK_MEDIA_ADDITION	TOKEN_VAZIO media rights	fork-added media absent from compared upstream
+
