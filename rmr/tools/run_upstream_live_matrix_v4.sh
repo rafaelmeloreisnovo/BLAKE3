@@ -87,7 +87,7 @@ PY
 }
 cap_flags() {
   case "$1" in
-    portable) printf '%s\n' "-DBLAKE3_SIMD_TYPE=none" ;;
+    portable) printf '%s\n' "" ;;
     sse2) printf '%s\n' "-DBLAKE3_NO_SSE41 -DBLAKE3_NO_AVX2 -DBLAKE3_NO_AVX512" ;;
     sse41) printf '%s\n' "-DBLAKE3_NO_AVX2 -DBLAKE3_NO_AVX512" ;;
     avx2) printf '%s\n' "-DBLAKE3_NO_AVX512" ;;
