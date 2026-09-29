@@ -70,10 +70,20 @@ jobs:
       - name: Run live upstream common compile matrix
         run: bash rmr/tools/run_upstream_live_matrix_v4.sh
 
+      - name: Cross-architecture compile parity at frozen official SHA
+        run: |
+          rustup target add wasm32-unknown-unknown
+          OFFICIAL_SHA="$(awk -F= '$1=="official_sha_resolved"{print $2}' rmr/benchmark_framework/output/upstream-live-v4/receipt.txt)"
+          test -n "$OFFICIAL_SHA"
+          OFFICIAL_REF="$OFFICIAL_SHA" \\
+          RESULT_ROOT=rmr/benchmark_framework/output/upstream-live-v4/cross-arch \\
+          bash rmr/tools/build_cross_arch_blake3_v3.sh
+
       - name: Print comparison summary
         run: |
           cat rmr/benchmark_framework/output/upstream-live-v4/summary.md
           cat rmr/benchmark_framework/output/upstream-live-v4/receipt.txt
+          cat rmr/benchmark_framework/output/upstream-live-v4/cross-arch/receipt.txt
 
       - name: Upload evidence bundle
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
