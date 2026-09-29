@@ -28,13 +28,12 @@ if grep -nE '^[[:space:]]*import[[:space:]]' "$JAVA"; then
   exit 1
 fi
 
-if ! grep -Fq '#![no_std]' "$RUST"; then
+grep -Fq '#![no_std]' "$RUST" || {
   echo "RMR_PORTABLE_RUST_NOSTD=FAIL"
   exit 1
-fi
+}
 
-find "$ROOT" -type f \( -name '*.c' -o -name '*.h' -o -name '*.rs' -o -name '*.java' \)   ! -path '*/provider/blake3/include/*' -print0 |
-while IFS= read -r -d '' f; do
+for f in $(find "$ROOT" -type f \( -name '*.c' -o -name '*.h' -o -name '*.rs' -o -name '*.java' \) ! -path '*/provider/blake3/include/*' -print | LC_ALL=C sort); do
   grep -Fq 'LicenseRef-RMR-Individual-Research-1.0' "$f" || {
     echo "RMR_PORTABLE_LICENSE_HEADER_MISSING=$f"
     exit 1
