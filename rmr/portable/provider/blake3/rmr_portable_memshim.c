@@ -19,6 +19,13 @@ void *memset(void *d, int v, rmr_pv1_ms_usize n) {
     while(n!=0u){*o++=b;--n;}
     return d;
 }
+
+rmr_pv1_ms_usize strlen(const char *s) {
+    const char *p=s;
+    while(*p!='\0'){++p;}
+    return (rmr_pv1_ms_usize)(p-s);
+}
+
 #if defined(__arm__) && !defined(__aarch64__)
 void __aeabi_memcpy(void *d,const void *s,rmr_pv1_ms_usize n){(void)memcpy(d,s,n);}
 void __aeabi_memcpy4(void *d,const void *s,rmr_pv1_ms_usize n){(void)memcpy(d,s,n);}
