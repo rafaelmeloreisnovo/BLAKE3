@@ -133,7 +133,7 @@ append_result() {
   mib="$(printf '%s\n' "$line" | awk -F, '$1=="SIZE_RESULT"{print $7}')"
   digest="$(printf '%s\n' "$line" | awk -F, '$1=="SIZE_RESULT"{print $9}')"
   lib_size="$(stat -c%s "$lib")"; lib_sha="$(sha256sum "$lib" | awk '{print $1}')"
-  printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n' "$config" "$compiler" "$simd" "$cap" "$opt" "$lto" "$tbb" "$size" "$round" "$side" "$iterations" "$sec" "$ns" "$mib" "$digest" "$lib_size" "$lib_sha" "$config_sha" >> "$OUT/results.csv"
+  printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n' "$config" "$compiler" "$simd" "$cap" "$opt" "$lto" "$tbb" "$size" "$round" "$side" "$iterations" "$sec" "$ns" "$mib" "$digest" "$lib_size" "$lib_sha" "$config_sha" >> "$OUT/results.csv"
 }
 
 run_config() {

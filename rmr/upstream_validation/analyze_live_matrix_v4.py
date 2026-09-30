@@ -42,6 +42,12 @@ def main():
     ap.add_argument("--md", required=True)
     a=ap.parse_args()
     rows=list(csv.DictReader(Path(a.csv).open(encoding="utf-8")))
+    expected={"config_id","compiler","simd","cap","opt","lto","tbb","size_bytes","round","side","iterations","seconds","ns_per_op","mib_s","digest","lib_size_bytes","lib_sha256","config_sha256"}
+    if not rows:
+        raise SystemExit("results_csv_empty")
+    for i,r in enumerate(rows, start=2):
+        if set(r) != expected or None in r or any(r[k] in (None,"") for k in ("config_id","size_bytes","round","side","mib_s","digest","config_sha256")):
+            raise SystemExit(f"results_csv_shape=FAIL line={i}")
     g=defaultdict(lambda: defaultdict(dict)); meta={}; digest=defaultdict(set); libmeta=defaultdict(dict)
     for r in rows:
         key=(r["config_id"], int(r["size_bytes"])); rd=int(r["round"]); side=r["side"]
