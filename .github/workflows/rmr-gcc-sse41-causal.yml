@@ -1,0 +1,53 @@
+name: RMR GCC SSE4.1 causal delta
+
+on:
+  pull_request:
+    paths:
+      - "c/**"
+      - "rmr/tools/run_gcc_sse41_causal_v1.sh"
+      - "rmr/upstream_validation/analyze_gcc_sse41_causal_v1.py"
+      - "rmr/benchmark_framework/core/blake3_size_bench.c"
+      - "rmr/upstream_validation/blake3_backend_probe.c"
+      - ".github/workflows/rmr-gcc-sse41-causal.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rmr-gcc-sse41-causal-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  causal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout fork exact SHA
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Install deterministic toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc g++ cmake ninja-build binutils
+
+      - name: Run paired causal ablation
+        env:
+          ROUNDS: "15"
+          TARGET_MIB: "128"
+        run: bash rmr/tools/run_gcc_sse41_causal_v1.sh
+
+      - name: Print causal summary
+        run: |
+          cat rmr/benchmark_framework/output/gcc-sse41-causal-v1/summary.md
+          cat rmr/benchmark_framework/output/gcc-sse41-causal-v1/receipt.txt
+
+      - name: Upload causal evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: rmr-gcc-sse41-causal-v1
+          if-no-files-found: error
+          path: rmr/benchmark_framework/output/gcc-sse41-causal-v1/**
