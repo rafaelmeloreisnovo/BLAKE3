@@ -3,10 +3,20 @@ name: rmr-crypto-freestanding140-v1
 on:
   push:
     paths:
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'build.rs'
+      - '.cargo/config.toml'
+      - 'src/**'
       - 'rmr/crypto_freestanding140/**'
       - '.github/workflows/rmr-crypto-freestanding140-v1.yml'
   pull_request:
     paths:
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'build.rs'
+      - '.cargo/config.toml'
+      - 'src/**'
       - 'rmr/crypto_freestanding140/**'
       - '.github/workflows/rmr-crypto-freestanding140-v1.yml'
 
@@ -31,3 +41,12 @@ jobs:
         run: sh rmr/crypto_freestanding140/build/build_host_selftest.sh
       - name: Cross-link + source/binary gates
         run: sh rmr/crypto_freestanding140/build/build_cross_matrix.sh
+
+  rust-baremetal-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Provision OS-less Rust target
+        run: rustup target add thumbv7em-none-eabi
+      - name: Rust freestanding + bare-metal compile and negative gate
+        run: sh rmr/crypto_freestanding140/build/build_rust_baremetal.sh
