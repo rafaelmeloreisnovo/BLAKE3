@@ -1,2 +1,6 @@
+[alias]
+rmr-freestanding = "check --locked --lib --no-default-features --features pure"
+rmr-baremetal = "check --locked --lib --no-default-features --features pure --target thumbv7em-none-eabi"
+
 [target.wasm32-wasip1]
 runner = "wasmtime"

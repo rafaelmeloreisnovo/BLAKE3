@@ -19,12 +19,14 @@ build_one() {
     -I"$ROOT/include" \
     "$ROOT/kernel/rmr_cf140_ops.c" \
     "$ROOT/addresses/H01/kernel/rmr_cf140_sha256_compress.c" \
+    "$ROOT/control/rmr_cf140_guard.c" \
     "$ROOT/probe/rmr_cf140_probe.c" \
     -nostdlib -static \
     -Wl,--gc-sections \
     -Wl,--icf=safe \
     -Wl,--build-id=none \
     -Wl,--no-undefined \
+    -Wl,-u,rmr_cf_guard_step \
     -Wl,-e,rmr_cf_probe_entry \
     -Wl,-Map,"$out.map" \
     -o "$out"
