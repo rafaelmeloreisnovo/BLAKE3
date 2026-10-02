@@ -44,9 +44,19 @@ jobs:
 
   rust-baremetal-gate:
     runs-on: ubuntu-latest
+    env:
+      RMR_RUST_TOOLCHAIN: '1.99.0'
+      RMR_BAREMETAL_TARGETS: 'thumbv7em-none-eabi armv7a-none-eabi aarch64-unknown-none'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - name: Provision OS-less Rust target
-        run: rustup target add thumbv7em-none-eabi
-      - name: Rust freestanding + bare-metal compile and negative gate
+      - name: Provision pinned Rust and OS-less targets
+        run: |
+          rustup toolchain install "$RMR_RUST_TOOLCHAIN" --profile minimal
+          rustup target add --toolchain "$RMR_RUST_TOOLCHAIN" \
+            thumbv7em-none-eabi \
+            armv7a-none-eabi \
+            aarch64-unknown-none
+          rustc +"$RMR_RUST_TOOLCHAIN" -Vv
+          cargo +"$RMR_RUST_TOOLCHAIN" -V
+      - name: Rust freestanding build matrix and negative gates
         run: sh rmr/crypto_freestanding140/build/build_rust_baremetal.sh
