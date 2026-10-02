@@ -1,0 +1,52 @@
+{
+  "schema": "rafaelia.freestanding-jvm-module/v1",
+  "id": "blake3-rmr-provider",
+  "repository": "rafaelmeloreisnovo/BLAKE3",
+  "authority": "upstream BLAKE3 remains cryptographic reference; project-authored orchestration integration is isolated under rmr/",
+  "authority_path": "rmr/",
+  "module_kind": "CRYPTO_RMR",
+  "boundary": "FREESTANDING_CORE",
+  "jvm_is_freestanding": false,
+  "upstream_crypto_mutation": false,
+  "hosted_adapter_policy": "JVM/JNI/provider adapters may call an evidence-qualified rmr surface but must not modify or relabel the upstream cryptographic core",
+  "required_flags": [
+    "SOURCE_BOUND",
+    "AUTHORITY_BOUND",
+    "FAIL_CLOSED",
+    "SHADOW_GUARD"
+  ],
+  "friction_controls": {
+    "tail_recursion": false,
+    "reflection_dispatch": false,
+    "shadow_state": "RMR_PROVIDER_STATE_ONLY",
+    "warning_transport": "BITMASK_OR_TYPED_STATUS"
+  },
+  "state": "IMPLEMENTED_UNTESTED",
+  "urgency": "P0",
+  "claim_allowed": false,
+  "central_contract": "rafaelmeloreisnovo/RafGitTools:docs/architecture/FREESTANDING_JVM_ORCHESTRATION_V1.md",
+  "token_vazio": [
+    {
+      "id": "TOKEN_VAZIO_BLAKE3_RMR_PROVIDER_EQUIVALENCE_CURRENT_HEAD",
+      "missing": "same-head functional equivalence evidence between the selected rmr provider surface and the upstream reference for the claimed vectors",
+      "evidence_needed": "exact-head vector corpus + upstream comparison + compiler/environment receipt",
+      "urgency": "P0",
+      "next": "execute bounded provider equivalence before any cryptographic conformance claim"
+    },
+    {
+      "id": "TOKEN_VAZIO_BLAKE3_RMR_JVM_ADAPTER",
+      "missing": "current-head hosted JVM/JNI adapter execution receipt for the selected rmr provider ABI",
+      "evidence_needed": "ABI identity + adapter test + exact provider artifact hash",
+      "urgency": "P1",
+      "next": "bind only an evidence-qualified rmr ABI through a hosted adapter"
+    },
+    {
+      "id": "TOKEN_VAZIO_BLAKE3_RMR_PERFORMANCE_PROMOTION",
+      "missing": "controlled benchmark evidence sufficient to claim an efficiency improvement",
+      "evidence_needed": "same-machine repeated samples, variance, build flags, exact commits and baseline",
+      "urgency": "P2",
+      "next": "retain performance as unpromoted until a controlled comparison closes the gate"
+    }
+  ],
+  "rollback": "close draft PR or revert only this rmr contract; never rewrite or mutate upstream BLAKE3 logic"
+}
