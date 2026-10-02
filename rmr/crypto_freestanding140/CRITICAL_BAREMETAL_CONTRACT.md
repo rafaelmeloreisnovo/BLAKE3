@@ -20,6 +20,20 @@ cargo rmr-baremetal
 
 `rmr-baremetal` targets `thumbv7em-none-eabi`, disables default features and selects `pure`. This is a compile gate for an OS-less target; it is not a physical-device execution claim.
 
+## Cargo lock boundary
+
+The repository intentionally ignores `Cargo.lock` because the root is a library crate. The RMR gate must not pretend a persistent lock exists.
+
+For each gate execution, when no lock file is present, `build_rust_baremetal.sh` creates one ephemeral `Cargo.lock`, prints its SHA-256, executes all Rust checks with `--locked`, and removes the ephemeral lock on exit. Therefore:
+
+```text
+LOCKED_WITHIN_RUN = true
+LOCK_PERSISTED_IN_REPO = false
+CROSS_RUN_DEPENDENCY_REPRODUCIBILITY = TOKEN_VAZIO
+```
+
+A persistent supply-chain lock is a separate governance decision and is not introduced by this guard.
+
 ## Fail-ACK protocol
 
 Execution is not committed merely because the operation reports success.
