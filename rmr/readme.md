@@ -30,14 +30,15 @@ O código BLAKE3 upstream permanece sob suas licenças, autoria, notices e semâ
 ## Fronteiras normativas
 
 1. `rmr/LICENSE_RMR` — texto jurídico do material autoral RMR.
-2. `rmr/PROVENIENCE.md` — origem, autoria, licença e exceções por caminho.
-3. `rmr/docs/ARCHITECTURE.md` — arquitetura, isolamento e cabeçalhos canônicos.
-4. `rmr/crypto/README.md` — catálogo criptográfico, perfil SHA-256 e governança de referências.
-5. `rmr/crypto/AUTHORSHIP.md` — atribuição, assistência por IA e responsabilidade humana.
-6. `rmr/crypto/CONTRIBUTING.md` — protocolo de contribuição e importação de terceiros.
-7. `rmr/crypto/THIRD_PARTY_NOTICES.md` — notices, marcas e não afiliação.
-8. `rmr/crypto/SECURITY.md` — limites de segurança e reporte.
-9. `rmr/pai42/README.md` — ponte geométrica determinística entre os 42 ciclos ATA OMEGA e a observação circular PAI42.
+2. `rmr/PUBLIC_PRIVATE_BOUNDARY.md` — fronteira entre material público do fork e material privado RAFAELIA.
+3. `rmr/PROVENIENCE.md` — origem, autoria, licença e exceções por caminho.
+4. `rmr/docs/ARCHITECTURE.md` — arquitetura, isolamento e cabeçalhos canônicos.
+5. `rmr/crypto/README.md` — catálogo criptográfico, perfil SHA-256 e governança de referências.
+6. `rmr/crypto/AUTHORSHIP.md` — atribuição, assistência por IA e responsabilidade humana.
+7. `rmr/crypto/CONTRIBUTING.md` — protocolo de contribuição e importação de terceiros.
+8. `rmr/crypto/THIRD_PARTY_NOTICES.md` — notices, marcas e não afiliação.
+9. `rmr/crypto/SECURITY.md` — limites de segurança e reporte.
+10. `rmr/pai42/README.md` — ponte geométrica determinística entre os 42 ciclos ATA OMEGA e a observação circular PAI42.
 
 ## RMR Crypto Registry
 
