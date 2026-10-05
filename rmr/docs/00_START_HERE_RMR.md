@@ -103,6 +103,7 @@ Sem esses campos, o perfil numérico é `TOKEN_VAZIO_CONTRACT`.
 - `rmr/docs/RMR_BUILD_AND_BINARY_CONTRACT_V1.md`
 - `rmr/docs/RMR_ROADMAP_V1.md`
 - `rmr/docs/RELEASE_NOTES_RMR_2026-09-26.md`
+- `rmr/PUBLIC_PRIVATE_BOUNDARY.md`
 - `rmr/PROVENIENCE.md`
 - `rmr/crypto/CUSTODY.md`
 - `rmr/docs/HOTPATH_CONTRACT.md`
