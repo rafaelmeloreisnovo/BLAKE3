@@ -1,3 +1,8 @@
+<!--
+Copyright (c) 2024–2026 Rafael Melo Reis
+Licensed under LICENSE_RMR.
+-->
+
 # RMR Public/Private Boundary
 
 Status: CANONICAL_DRAFT
