@@ -17,18 +17,28 @@ Java_io_rafaelia_rmrhash_NativeHash_selfTest(JNIEnv *env, jclass owner) {
         0x48,0xc5,0x58,0x46,0x5d,0x79,0xdb,0x03,
         0xfd,0x35,0x9c,0x6c,0xd5,0xbd,0x9d,0x85
     };
+    static const rmr_pv1_b3_u8 expected_empty[32] = {
+        0xaf,0x13,0x49,0xb9,0xf5,0xf9,0xa1,0xa6,
+        0xa0,0x40,0x4d,0xea,0x36,0xdc,0xc9,0x49,
+        0x9b,0xcb,0x25,0xc9,0xad,0xc1,0x12,0xb7,
+        0xcc,0x9a,0x93,0xca,0xe4,0x1f,0x32,0x62
+    };
     rmr_pv1_b3_u8 digest[32];
     unsigned int different = 0u;
     unsigned int i;
     (void)env; (void)owner;
     if (rmr_pv1_blake3_256(abc, 3u, digest) != 0) return JNI_FALSE;
     for (i = 0u; i < 32u; ++i) different |= (unsigned int)(digest[i] ^ expected[i]);
+    if (rmr_pv1_blake3_256(abc, 0u, digest) != 0) return JNI_FALSE;
+    for (i = 0u; i < 32u; ++i)
+        different |= (unsigned int)(digest[i] ^ expected_empty[i]);
     return different == 0u ? JNI_TRUE : JNI_FALSE;
 }
 
 JNIEXPORT jbyteArray JNICALL
 Java_io_rafaelia_rmrhash_NativeHash_digest(JNIEnv *env, jclass owner, jbyteArray input) {
     jsize length;
+    static const rmr_pv1_b3_u8 empty_data[1] = { 0u };
     jbyte *bytes = (jbyte *)0;
     rmr_pv1_b3_u8 output[32];
     jbyteArray result;
@@ -42,7 +52,8 @@ Java_io_rafaelia_rmrhash_NativeHash_digest(JNIEnv *env, jclass owner, jbyteArray
         bytes = (*env)->GetByteArrayElements(env, input, (jboolean *)0);
         if (bytes == (jbyte *)0) return (jbyteArray)0;
     }
-    rc = rmr_pv1_blake3_256((const rmr_pv1_b3_u8 *)bytes,
+    rc = rmr_pv1_blake3_256(length == 0 ? empty_data :
+                             (const rmr_pv1_b3_u8 *)bytes,
                              (rmr_pv1_b3_usize)length, output);
     if (bytes != (jbyte *)0)
         (*env)->ReleaseByteArrayElements(env, input, bytes, JNI_ABORT);
