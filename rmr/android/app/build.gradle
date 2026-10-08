@@ -1,0 +1,42 @@
+plugins {
+    id 'com.android.application'
+}
+
+def sourceSha = System.getenv('RMR_SOURCE_SHA') ?: 'TOKEN_VAZIO'
+
+android {
+    namespace 'io.rafaelia.rmrhash'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'io.rafaelia.rmrhash'
+        minSdk 29
+        targetSdk 35
+        versionCode 1
+        versionName '0.1.0-research'
+        buildConfigField 'String', 'SOURCE_SHA', '"' + sourceSha + '"'
+        ndk { abiFilters 'armeabi-v7a', 'arm64-v8a' }
+        externalNativeBuild { cmake { cFlags '-std=c11 -O2' } }
+    }
+
+    buildFeatures { buildConfig true }
+    externalNativeBuild {
+        cmake { path file('src/main/cpp/CMakeLists.txt'); version '3.22.1' }
+    }
+    buildTypes {
+        debug { minifyEnabled false; shrinkResources false }
+        release { minifyEnabled false; shrinkResources false }
+    }
+}
+
+def generatedNotices = layout.buildDirectory.dir('generated/notice-assets')
+tasks.register('copyRmrLicenses', Copy) {
+    from(rootProject.file('../../LICENSE_A2'))
+    from(rootProject.file('../../LICENSE_A2LLVM'))
+    from(rootProject.file('../../LICENSE_CC0'))
+    from(rootProject.file('../LICENSE_RMR'))
+    from(rootProject.file('../portable/LICENSE_RMR_INDIVIDUAL_RESEARCH_V1.txt'))
+    into(generatedNotices)
+}
+android.sourceSets.main.assets.srcDir(generatedNotices)
+tasks.named('preBuild').configure { dependsOn('copyRmrLicenses') }
