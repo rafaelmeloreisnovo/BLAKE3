@@ -1,0 +1,116 @@
+name: RMR Android APK V1
+
+on:
+  pull_request:
+    paths:
+      - 'rmr/android/**'
+      - 'rmr/portable/**'
+      - 'c/blake3*'
+      - '.github/workflows/rmr-android-apk.yml'
+  push:
+    paths:
+      - 'rmr/android/**'
+      - 'rmr/portable/**'
+      - 'c/blake3*'
+      - '.github/workflows/rmr-android-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rmr-android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    env:
+      RMR_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - name: Exact-SHA source checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init .
+          git remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
+          git fetch --no-tags --depth=1 origin "$RMR_SOURCE_SHA"
+          git checkout --detach FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$RMR_SOURCE_SHA"
+
+      - name: Portable upstream KAT + RMR host selftest
+        shell: bash
+        run: |
+          set -euo pipefail
+          sh rmr/portable/build/build_host_selftest.sh
+          echo 'RMR_ANDROID_HOST_PROVIDER_KAT=PASS'
+
+      - name: Pinned Android build toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          export JAVA_HOME="${JAVA_HOME_17_X64:-$JAVA_HOME}"
+          export PATH="$JAVA_HOME/bin:$PATH"
+          java -version
+          sdk="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+          test -n "$sdk"
+          export ANDROID_SDK_ROOT="$sdk"
+          export ANDROID_HOME="$sdk"
+          manager="$sdk/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$manager"
+          yes | "$manager" --licenses >/dev/null || true
+          "$manager" 'platforms;android-36' 'build-tools;36.0.0' 'ndk;27.2.12479018' 'cmake;3.22.1'
+          echo "ANDROID_SDK_ROOT=$sdk" >> "$GITHUB_ENV"
+          echo "ANDROID_HOME=$sdk" >> "$GITHUB_ENV"
+
+          version=8.11.1
+          expected=f397b287023acdba1e9f6fc5ea72d22dd63669d59ed4a289a29b1a76eee151c6
+          mkdir -p "$RUNNER_TEMP/rmr-gradle"
+          curl -fsSL "https://services.gradle.org/distributions/gradle-$version-bin.zip" -o "$RUNNER_TEMP/rmr-gradle/gradle.zip"
+          printf '%s  %s\n' "$expected" "$RUNNER_TEMP/rmr-gradle/gradle.zip" | sha256sum -c --strict
+          unzip -q "$RUNNER_TEMP/rmr-gradle/gradle.zip" -d "$RUNNER_TEMP/rmr-gradle"
+          echo "$RUNNER_TEMP/rmr-gradle/gradle-$version/bin" >> "$GITHUB_PATH"
+          echo "RMR_GRADLE_SHA256=$expected"
+
+      - name: Assemble both ABIs with no third-party runtime library
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle --project-dir rmr/android --no-daemon :app:assembleDebug
+
+      - name: APK entries, license assets and scoped receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk=rmr/android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$apk"
+          unzip -Z1 "$apk" | grep -Fx 'lib/armeabi-v7a/librmrhash.so'
+          unzip -Z1 "$apk" | grep -Fx 'lib/arm64-v8a/librmrhash.so'
+          unzip -Z1 "$apk" | grep -Fx 'assets/LICENSE_CC0'
+          unzip -Z1 "$apk" | grep -Fx 'assets/LICENSE_A2'
+          mkdir -p rmr/android/build/receipts
+          cat > rmr/android/build/receipts/apk-receipt.txt <<EOF
+          schema=rmr.android.apk/v1
+          source_sha=$RMR_SOURCE_SHA
+          run_id=$GITHUB_RUN_ID
+          abi=armeabi-v7a,arm64-v8a
+          host_blake3_kat=PASS
+          apk_packaging=PASS
+          apk_sha256=$(sha256sum "$apk" | cut -d' ' -f1)
+          apk_bytes=$(stat -c '%s' "$apk")
+          signing=DEBUG_NONAUTHORIAL
+          android_shared_library=PLATFORM_LINKED
+          physical_device=TOKEN_VAZIO
+          release_claim_allowed=false
+          EOF
+          cat rmr/android/build/receipts/apk-receipt.txt
+
+      - name: Publish research debug APK and receipt
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2 exact commit; build-time service
+        with:
+          name: rmr-blake3-android-debug-${{ github.run_id }}
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            rmr/android/app/build/outputs/apk/debug/app-debug.apk
+            rmr/android/build/receipts/apk-receipt.txt
