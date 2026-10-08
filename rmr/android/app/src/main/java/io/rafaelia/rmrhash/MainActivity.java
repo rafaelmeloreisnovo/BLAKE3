@@ -52,7 +52,7 @@ public final class MainActivity extends Activity {
 
         try {
             katOk = NativeHash.selfTest();
-            report.setText("KAT(abc)=" + (katOk ? "PASS" : "FAIL") +
+            report.setText("KAT(abc,empty)=" + (katOk ? "PASS" : "FAIL") +
                 "\nSOURCE_SHA=" + BuildConfig.SOURCE_SHA +
                 "\nABI=" + android.os.Build.SUPPORTED_ABIS[0] +
                 "\nAPPLIANCE=ANDROID_PLATFORM_LINKED" +
@@ -87,7 +87,7 @@ public final class MainActivity extends Activity {
             }
             report.setText("BLAKE3-256=" + new String(out) +
                 "\nINPUT_UTF8_BYTES=" + bytes.length +
-                "\nKAT(abc)=PASS" +
+                "\nKAT(abc,empty)=PASS" +
                 "\nSOURCE_SHA=" + BuildConfig.SOURCE_SHA +
                 "\nABI=" + android.os.Build.SUPPORTED_ABIS[0] +
                 "\nDEVICE_RECEIPT=TOKEN_VAZIO");
