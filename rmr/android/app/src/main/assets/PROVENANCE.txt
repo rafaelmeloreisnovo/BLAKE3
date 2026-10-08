@@ -1,0 +1,9 @@
+RMR BLAKE3 Android Laboratory V1
+Copyright (c) 2026 Rafael Melo Reis.
+RMR integration: rmr/LICENSE_RMR.
+RMR portable adapter: rmr/portable/LICENSE_RMR_INDIVIDUAL_RESEARCH_V1.txt.
+Upstream BLAKE3 C algorithm: original attribution and licenses preserved.
+The APK packages full licenses copied from the same checkout by Gradle.
+Source: https://github.com/rafaelmeloreisnovo/BLAKE3
+Adapter is NOT authorship of the BLAKE3 algorithm.
+SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM

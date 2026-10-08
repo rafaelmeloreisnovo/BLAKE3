@@ -414,3 +414,12 @@ Também foi separado o processamento de hash em memória do I/O de arquivo:
 - `rmr/core/hash_blake3_file.c`: adapter hosted `FILE`.
 
 A separação não altera autoria nem semântica do BLAKE3 upstream.
+
+## RMR Android laboratory V1 — 2026-10-08
+
+| Path | Provenance | License / boundary |
+| --- | --- | --- |
+| `rmr/android/**` | RMR Android research APK adapter and Java/JNI UI; independent implementation inspired by the layering in EstudioAudio, no EstudioAudio code copied | `rmr/LICENSE_RMR` for new Android files; `rmr/portable/**` retains its individually declared research license; `c/**` keeps original BLAKE3 upstream licenses |
+| `.github/workflows/rmr-android-apk.yml` | RMR Android build and artifact publication gate | RMR Module License; build-time external pinned upload-artifact action, not APK runtime dependency |
+
+The Android app links only the existing RMR portable BLAKE3 adapter and unchanged upstream C provider; it does not reclassify upstream authorship. The distributed APK is Android platform-linked and must not be described as a fully freestanding ELF. SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM. Same-SHA physical-device execution, release signing, long-file streaming, and security certification remain TOKEN_VAZIO until tested.
