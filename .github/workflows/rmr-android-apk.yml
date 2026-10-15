@@ -1,4 +1,4 @@
-name: RMR Android APK V1
+name: RMR Android Triple BLAKE3 APK V2
 
 on:
   pull_request:
@@ -27,6 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RMR_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      B3_UPSTREAM_SHA: f55849f89cd85083c1c9daa2c5de20766f309c00
+      BLAKE3_OFFICIAL_DIR: ${{ github.workspace }}/rmr/android/upstream_official
     steps:
       - name: Exact-SHA source checkout
         shell: bash
@@ -37,6 +39,24 @@ jobs:
           git fetch --no-tags --depth=1 origin "$RMR_SOURCE_SHA"
           git checkout --detach FETCH_HEAD
           test "$(git rev-parse HEAD)" = "$RMR_SOURCE_SHA"
+
+      - name: Fetch and verify OFFICIAL BLAKE3 source by exact SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p rmr/android/upstream_official
+          git -C rmr/android/upstream_official init
+          git -C rmr/android/upstream_official remote add origin https://github.com/BLAKE3-team/BLAKE3.git
+          git -C rmr/android/upstream_official fetch --no-tags --depth=1 origin "$B3_UPSTREAM_SHA"
+          git -C rmr/android/upstream_official checkout --detach FETCH_HEAD
+          test "$(git -C rmr/android/upstream_official rev-parse HEAD)" = "$B3_UPSTREAM_SHA"
+          test -s rmr/android/upstream_official/c/blake3.c
+          test -s rmr/android/upstream_official/LICENSE_A2
+          test -s rmr/android/upstream_official/LICENSE_A2LLVM
+          test -s rmr/android/upstream_official/LICENSE_CC0
+          echo "OFFICIAL_PROVIDER_SOURCE=$B3_UPSTREAM_SHA"
+          echo "FORK_ROOT_C_SHA256=$(sha256sum c/blake3.c | cut -d' ' -f1)"
+          echo "OFFICIAL_ROOT_C_SHA256=$(sha256sum rmr/android/upstream_official/c/blake3.c | cut -d' ' -f1)"
 
       - name: Portable upstream KAT + RMR host selftest
         shell: bash
@@ -72,7 +92,7 @@ jobs:
           echo "$RUNNER_TEMP/rmr-gradle/gradle-$version/bin" >> "$GITHUB_PATH"
           echo "RMR_GRADLE_SHA256=$expected"
 
-      - name: Assemble both ABIs with no third-party runtime library
+      - name: Assemble one APK with three providers and both ABIs
         shell: bash
         run: |
           set -euo pipefail
@@ -86,6 +106,24 @@ jobs:
           test -s "$apk"
           unzip -Z1 "$apk" | grep -Fx 'lib/armeabi-v7a/librmrhash.so'
           unzip -Z1 "$apk" | grep -Fx 'lib/arm64-v8a/librmrhash.so'
+          for abi in armeabi-v7a arm64-v8a; do
+            for lib in libofficialhash.so libforkhash.so; do
+              unzip -Z1 "$apk" | grep -Fx "lib/$abi/$lib"
+            done
+          done
+          for notice in OFFICIAL_LICENSE_A2 OFFICIAL_LICENSE_A2LLVM OFFICIAL_LICENSE_CC0 LICENSE_RMR THIRD_PARTY_NOTICES_RAFAELIA.md PROVENANCE.txt; do
+            unzip -Z1 "$apk" | grep -Fx "assets/$notice"
+          done
+          "$ANDROID_SDK_ROOT/build-tools/36.0.0/zipalign" -c -p 4 "$apk"
+          "$ANDROID_SDK_ROOT/build-tools/36.0.0/apksigner" verify --verbose "$apk"
+          mkdir -p "$RUNNER_TEMP/rmr-abi"
+          for abi in armeabi-v7a arm64-v8a; do
+            for lib in officialhash forkhash rmrhash; do
+              unzip -p "$apk" "lib/$abi/lib$lib.so" > "$RUNNER_TEMP/rmr-abi/$abi-$lib.so"
+              test -s "$RUNNER_TEMP/rmr-abi/$abi-$lib.so"
+              file "$RUNNER_TEMP/rmr-abi/$abi-$lib.so"
+            done
+          done
           unzip -Z1 "$apk" | grep -Fx 'assets/LICENSE_CC0'
           unzip -Z1 "$apk" | grep -Fx 'assets/LICENSE_A2'
           mkdir -p rmr/android/build/receipts
@@ -94,6 +132,13 @@ jobs:
           source_sha=$RMR_SOURCE_SHA
           run_id=$GITHUB_RUN_ID
           abi=armeabi-v7a,arm64-v8a
+          providers=UPSTREAM_OFFICIAL,FORK_ROOT_C,RMR_PORTABLE_ADAPTER
+          upstream_commit=$B3_UPSTREAM_SHA
+          upstream_root_c_sha256=$(sha256sum rmr/android/upstream_official/c/blake3.c | cut -d' ' -f1)
+          fork_root_c_sha256=$(sha256sum c/blake3.c | cut -d' ' -f1)
+          official_license_assets=PASS
+          triple_native_libs=PASS
+          apk_debug_signature=VERIFIED
           host_blake3_kat=PASS
           apk_packaging=PASS
           apk_sha256=$(sha256sum "$apk" | cut -d' ' -f1)
@@ -108,7 +153,7 @@ jobs:
       - name: Publish research debug APK and receipt
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2 exact commit; build-time service
         with:
-          name: rmr-blake3-android-debug-${{ github.run_id }}
+          name: rmr-blake3-triple-abi-debug-${{ github.run_id }}
           retention-days: 14
           if-no-files-found: error
           path: |
