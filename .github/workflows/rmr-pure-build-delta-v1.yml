@@ -1,0 +1,8 @@
+name: RMR pure BLAKE3 source vs compile-policy V1
+
+on:
+  pull_request:
+    paths:
+      - 'Cargo.toml'
+      - 'build.rs'
+      - 'src
