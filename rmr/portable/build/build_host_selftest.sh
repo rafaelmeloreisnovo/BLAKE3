@@ -15,6 +15,16 @@ UPSTREAM="-std=c11 -O2 -DBLAKE3_NO_SSE2 -DBLAKE3_NO_SSE41 -DBLAKE3_NO_AVX2 -DBLA
 # Pure RMR core: strict warnings.
 # shellcheck disable=SC2086
 "$CC" $STRICT -I"$ROOT/include"   "$ROOT/src/rmr_portable_v1.c"   "$ROOT/tests/selftest_core.c"   -o "$OUT/core_selftest"
+
+# Negative control: two different 256-byte inputs intentionally collide
+# under the separate XOR reducer. This MUST NOT be treated as BLAKE3.
+# shellcheck disable=SC2086
+"$CC" $STRICT -I"$ROOT/include" \
+  "$ROOT/src/rmr_portable_v1.c" \
+  "$ROOT/tests/selftest_reducer_noncrypto.c" \
+  -o "$OUT/reducer_noncrypto_selftest"
+"$OUT/reducer_noncrypto_selftest"
+echo "RMR_FIXED256_NONCRYPTO_COLLISION_FALSIFIER=PASS"
 "$OUT/core_selftest"
 
 # RMR provider adapter: strict.
