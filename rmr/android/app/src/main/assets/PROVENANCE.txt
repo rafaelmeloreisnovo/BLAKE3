@@ -1,9 +1,34 @@
-RMR BLAKE3 Android Laboratory V1
-Copyright (c) 2026 Rafael Melo Reis.
-RMR integration: rmr/LICENSE_RMR.
-RMR portable adapter: rmr/portable/LICENSE_RMR_INDIVIDUAL_RESEARCH_V1.txt.
-Upstream BLAKE3 C algorithm: original attribution and licenses preserved.
-The APK packages full licenses copied from the same checkout by Gradle.
-Source: https://github.com/rafaelmeloreisnovo/BLAKE3
-Adapter is NOT authorship of the BLAKE3 algorithm.
+BLAKE3 Android Triple ABI Comparison Laboratory V2
+Copyright (c) 2026 Rafael Melo Reis: Android UI/JNI adapters.
+The cryptographic BLAKE3 algorithm is NOT a new invention or a third RMR algorithm.
+
+PROVIDER 1 / OFFICIAL: original source, https://github.com/BLAKE3-team/BLAKE3
+Pinned exact Git SHA: f55849f89cd85083c1c9daa2c5de20766f309c00
+Native lib: officialhash (compiled separately from official checkout).
+Full upstream alternative license files in assets: OFFICIAL_LICENSE_A2,
+OFFICIAL_LICENSE_A2LLVM, OFFICIAL_LICENSE_CC0.
+
+PROVIDER 2 / FORK ROOT: https://github.com/rafaelmeloreisnovo/BLAKE3
+Source: c/blake3.c, c/blake3_dispatch.c, c/blake3_portable.c, c/blake3.h
+Fork commit: BuildConfig.SOURCE_SHA shown in the application and CI receipt.
+Native lib: forkhash.
+Fork modifications and provenance: c/README.md and THIRD_PARTY_NOTICES_RAFAELIA.md.
+Inherited code remains BLAKE3-team copyright with upstream license rights unchanged.
+
+PROVIDER 3 / RMR: Existing authorial adapter, not a new cryptographic primitive.
+Source: rmr/portable/provider/blake3/rmr_portable_blake3_v1.c and
+rmr/portable/provider/blake3/rmr_portable_memshim.c
+Backed by this fork's C BLAKE3 source; wrapper under
+rmr/portable/LICENSE_RMR_INDIVIDUAL_RESEARCH_V1.txt.
+The RMR Android JNI wrapper is licensed under rmr/LICENSE_RMR.
+Native lib: rmrhash.
+The existing RMR portable provider and its source were not refactored.
+JNI bridge and app are hosted/platform-linked, NOT freestanding.
+
+Copyright/attribution/origin documents are included in the APK assets.
+Full texts: LICENSE_A2, LICENSE_A2LLVM, LICENSE_CC0, LICENSE_RMR,
+LICENSE_RMR_INDIVIDUAL_RESEARCH_V1.txt, THIRD_PARTY_NOTICES_RAFAELIA.md.
+No publisher affiliation with BLAKE3-team is implied.
+Research APK: Android DEBUG signed, not publication signing.
+No web, file, microphone, camera, or contact permission requested.
 SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM
