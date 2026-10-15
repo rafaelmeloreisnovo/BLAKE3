@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
 }
 
-def sourceSha = System.getenv('RMR_SOURCE_SHA') ?: 'TOKEN_VAZIO'
+def sourceSha = System.getenv('RMR_SOURCE_SHA') ?: 'TOKEN_VAZIO'\ndef officialSha = System.getenv('B3_UPSTREAM_SHA') ?: 'TOKEN_VAZIO'
 
 android {
     namespace 'io.rafaelia.rmrhash'
@@ -12,9 +12,9 @@ android {
         applicationId 'io.rafaelia.rmrhash'
         minSdk 29
         targetSdk 35
-        versionCode 1
-        versionName '0.1.0-research'
-        buildConfigField 'String', 'SOURCE_SHA', '"' + sourceSha + '"'
+        versionCode 2
+        versionName '0.2.0-triple-research'
+        buildConfigField 'String', 'SOURCE_SHA', '"' + sourceSha + '"'\n        buildConfigField 'String', 'OFFICIAL_SHA', '"' + officialSha + '"'
         ndk { abiFilters 'armeabi-v7a', 'arm64-v8a' }
         externalNativeBuild { cmake { cFlags '-std=c11 -O2' } }
     }
@@ -35,7 +35,7 @@ tasks.register('copyRmrLicenses', Copy) {
     from(rootProject.file('../../LICENSE_A2LLVM'))
     from(rootProject.file('../../LICENSE_CC0'))
     from(rootProject.file('../LICENSE_RMR'))
-    from(rootProject.file('../portable/LICENSE_RMR_INDIVIDUAL_RESEARCH_V1.txt'))
+    from(rootProject.file('../portable/LICENSE_RMR_INDIVIDUAL_RESEARCH_V1.txt'))\n    from(rootProject.file('../../THIRD_PARTY_NOTICES_RAFAELIA.md'))\n    from(rootProject.file('upstream_official/LICENSE_A2')) { rename { 'OFFICIAL_LICENSE_A2' } }\n    from(rootProject.file('upstream_official/LICENSE_A2LLVM')) { rename { 'OFFICIAL_LICENSE_A2LLVM' } }\n    from(rootProject.file('upstream_official/LICENSE_CC0')) { rename { 'OFFICIAL_LICENSE_CC0' } }
     into(generatedNotices)
 }
 android.sourceSets.main.assets.srcDir(generatedNotices)
