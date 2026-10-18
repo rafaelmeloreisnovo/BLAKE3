@@ -1,0 +1,86 @@
+name: RMR pure BLAKE3 source vs compile-policy V1
+
+on:
+  pull_request:
+    paths:
+      - 'Cargo.toml'
+      - 'build.rs'
+      - 'src/**'
+      - 'c/**'
+      - 'rmr/tools/run_pure_build_delta_v1.sh'
+      - 'rmr/upstream_validation/analyze_pure_build_delta_v1.py'
+      - 'rmr/upstream_validation/tests/test_pure_build_delta_v1.py'
+      - 'rmr/benchmark_framework/core/pure_cargo_bench_v1.rs'
+      - '.github/workflows/rmr-pure-build-delta-v1.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'Cargo.toml'
+      - 'build.rs'
+      - 'src/**'
+      - 'c/**'
+      - 'rmr/tools/run_pure_build_delta_v1.sh'
+      - 'rmr/upstream_validation/analyze_pure_build_delta_v1.py'
+      - 'rmr/upstream_validation/tests/test_pure_build_delta_v1.py'
+      - 'rmr/benchmark_framework/core/pure_cargo_bench_v1.rs'
+      - '.github/workflows/rmr-pure-build-delta-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rmr-pure-build-delta-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pure-compile-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      EXPECTED_FORK_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      RUST_TOOLCHAIN: '1.99.0'
+      ROUNDS: '7'
+      TARGET_MIB: '32'
+    steps:
+      - name: Checkout fork at exact PR HEAD
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Verify toolchain and source authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build clang gcc g++ binutils
+          rustup toolchain install 1.99.0 --profile minimal
+          test "$(git rev-parse HEAD)" = "$EXPECTED_FORK_SHA"
+          RUSTUP_TOOLCHAIN=1.99.0 cargo --version
+          RUSTUP_TOOLCHAIN=1.99.0 rustc --version
+
+      - name: Unit falsifiers before network-dependent compilation
+        shell: bash
+        run: python3 -m unittest discover -s rmr/upstream_validation/tests -p test_pure_build_delta_v1.py -v
+
+      - name: Run native C and Rust 2x2 compile policy experiment
+        shell: bash
+        run: bash rmr/tools/run_pure_build_delta_v1.sh
+
+      - name: Print exact-head receipt and per-size deltas
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s rmr/benchmark_framework/output/pure-build-delta-v1/receipt.txt
+          cat rmr/benchmark_framework/output/pure-build-delta-v1/summary.md
+          cat rmr/benchmark_framework/output/pure-build-delta-v1/receipt.txt
+
+      - name: Archive raw benchmark and compiler evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rmr-pure-build-delta-${{ github.run_id }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            rmr/benchmark_framework/output/pure-build-delta-v1/**
