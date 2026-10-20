@@ -18,6 +18,14 @@ typedef __UINT32_TYPE__ rmr_pv1_u32;
 #define RMR_PV1_BATCH4_INPUT_BYTES 1024u
 #define RMR_PV1_BATCH4_OUTPUT_BYTES 64u
 
+/*
+ * NON-CRYPTOGRAPHIC REDUCTION (linear XOR, 256 -> 16 bytes).
+ * Constructed collisions exist: changing in[0] and in[16] by the same
+ * XOR mask preserves out[0]. Do NOT use this as a cryptographic digest,
+ * authentication tag, signature, key derivation, or custody proof.
+ * Use the separately tested rmr_pv1_blake3_256 provider for BLAKE3.
+ * Contract test: tests/selftest_reducer_noncrypto.c
+ */
 void rmr_pv1_reduce256(rmr_pv1_u8 out[RMR_PV1_REDUCED_BYTES],
                        const rmr_pv1_u8 in[RMR_PV1_FRAME_BYTES]);
 
