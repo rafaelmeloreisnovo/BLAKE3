@@ -263,12 +263,22 @@ public final class MainActivity extends Activity {
             : state.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, Integer.MIN_VALUE);
         String temperature = batteryTemp == Integer.MIN_VALUE ? "TOKEN_VAZIO_UNAVAILABLE"
             : Integer.toString(batteryTemp);
+        int batteryStatus = state == null ? Integer.MIN_VALUE
+            : state.getIntExtra(BatteryManager.EXTRA_STATUS, Integer.MIN_VALUE);
+        String chargeState = batteryStatus == Integer.MIN_VALUE ? "TOKEN_VAZIO_UNAVAILABLE"
+            : Integer.toString(batteryStatus);
+        int level = state == null ? -1 : state.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = state == null ? -1 : state.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+        String batteryPercent = level < 0 || scale <= 0 ? "TOKEN_VAZIO_UNAVAILABLE"
+            : Integer.toString(level * 100 / scale);
         return "phase:" + phase + ";bytes:" + size
             + ";elapsed_realtime_ns:" + SystemClock.elapsedRealtimeNanos()
             + ";wall_clock_ms_untrusted:" + System.currentTimeMillis()
             + ";thermal_status_android:" + thermal
             + ";battery_temp_tenths_c_not_cpu:" + temperature
-            + ";cpu_frequency: TOKEN_VAZIO_NOT_READ";
+            + ";battery_status_code:" + chargeState
+            + ";battery_pct:" + batteryPercent
+            + ";cpu_frequency:TOKEN_VAZIO_NOT_READ";
     }
 
     private void industrialCampaign() {
