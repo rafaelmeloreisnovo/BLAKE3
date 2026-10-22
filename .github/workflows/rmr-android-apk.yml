@@ -65,6 +65,22 @@ jobs:
           sh rmr/portable/build/build_host_selftest.sh
           echo 'RMR_ANDROID_HOST_PROVIDER_KAT=PASS'
 
+      - name: Industrial V3 JVM-only orchestration and negative controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          export JAVA_HOME="${JAVA_HOME_17_X64:-$JAVA_HOME}"
+          export PATH="$JAVA_HOME/bin:$PATH"
+          mkdir -p "$RUNNER_TEMP/rmr-bench-host"
+          javac -Xlint:all -Werror -encoding UTF-8 \
+            -d "$RUNNER_TEMP/rmr-bench-host" \
+            rmr/android/app/src/main/java/io/rafaelia/rmrhash/BenchmarkCampaignV3.java \
+            rmr/android/tests/io/rafaelia/rmrhash/BenchmarkCampaignV3Test.java
+          java -cp "$RUNNER_TEMP/rmr-bench-host" \
+            io.rafaelia.rmrhash.BenchmarkCampaignV3Test
+          echo 'BENCH_V3_HOST_FAKE_CLOCK_ONLY=PASS_SCOPED'
+          echo 'DEVICE_BENCHMARK=NOT_RUN'
+
       - name: Pinned Android build toolchain
         shell: bash
         run: |
