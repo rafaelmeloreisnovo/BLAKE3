@@ -94,8 +94,10 @@ jobs:
           export ANDROID_HOME="$sdk"
           manager="$sdk/cmdline-tools/latest/bin/sdkmanager"
           test -x "$manager"
-          yes | "$manager" --licenses >/dev/null || true
-          "$manager" 'platforms;android-36' 'build-tools;36.0.0' 'ndk;27.2.12479018' 'cmake;3.22.1'
+          # SDK/NDK licenses require independent pre-provisioned consent.
+          # No implicit yes, swallowed failure, or interactive auto-acceptance.
+          # EOF makes unaccepted license prompts fail closed instead.
+          "$manager" 'platforms;android-36' 'build-tools;36.0.0' 'ndk;27.2.12479018' 'cmake;3.22.1' </dev/null
           echo "ANDROID_SDK_ROOT=$sdk" >> "$GITHUB_ENV"
           echo "ANDROID_HOME=$sdk" >> "$GITHUB_ENV"
 
