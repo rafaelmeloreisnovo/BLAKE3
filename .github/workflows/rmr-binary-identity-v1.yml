@@ -1,0 +1,134 @@
+name: RMR Bit-Exact Binary Replay V1
+
+on:
+  pull_request:
+    paths:
+      - 'rmr/AGENTS.md'
+      - 'rmr/audit/**'
+      - '.github/workflows/rmr-binary-identity-v1.yml'
+  push:
+    paths:
+      - 'rmr/AGENTS.md'
+      - 'rmr/audit/**'
+      - '.github/workflows/rmr-binary-identity-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-source-two-pass:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      RMR_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      RMR_BASE_SHA: ${{ github.event.pull_request.base.sha || '' }}
+      RMR_RECEIPT_OUTPUT: ${{ runner.temp }}/rmr-binary-identity-v1-receipt.txt
+    steps:
+      - name: Exact HEAD checkout without third-party actions
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init .
+          git remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
+          git fetch --no-tags --depth=1 origin "$RMR_SOURCE_SHA"
+          git checkout --detach FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$RMR_SOURCE_SHA"
+          echo "RMR_EXACT_HEAD=$RMR_SOURCE_SHA"
+
+      - name: Fail-closed baseline delta gate for all tracked original files
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "$RMR_BASE_SHA" ]]; then
+            git fetch --no-tags --depth=1 origin "$RMR_BASE_SHA"
+            changed=0
+            while IFS= read -r -d '' status; do
+              if ! IFS= read -r -d '' path; then
+                echo "RMR_GIT_DIFF=FAIL_TRUNCATED_PATH"
+                exit 1
+              fi
+              if [[ "$status" != "A" ]]; then
+                echo "RMR_ORIGINAL_SOURCE=FAIL_NON_ADDITION:$status:$path"
+                exit 1
+              fi
+              case "$path" in
+                rmr/AGENTS.md|\
+                rmr/audit/rmr_binary_identity_v1.sh|\
+                rmr/audit/rmr_source_byte_census_v1.py|\
+                rmr/audit/RMR_PROMOTION_GATES_V1.md|\
+                .github/workflows/rmr-binary-identity-v1.yml)
+                  changed=$((changed + 1))
+                  ;;
+                *)
+                  echo "RMR_ORIGINAL_SOURCE=FAIL_UNLISTED_PATH:$path"
+                  exit 1
+                  ;;
+              esac
+            done < <(git diff --name-status -z "$RMR_BASE_SHA" "$RMR_SOURCE_SHA")
+            [[ "$changed" -eq 5 ]] || {
+              echo "RMR_ORIGINAL_SOURCE=FAIL_ADDITION_CARDINALITY:$changed"
+              exit 1
+            }
+            echo "RMR_ORIGINAL_SOURCE=UNCHANGED_ALL_PREEXISTING_PATHS"
+            echo "RMR_ADDITIVE_PATHS=$changed"
+          else
+            echo "RMR_ORIGINAL_SOURCE_BASE_DIFF=TOKEN_VAZIO_NON_PR_EVENT"
+          fi
+
+      - name: Toolchain and provenance preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v clang
+          command -v readelf
+          command -v nm
+          command -v size
+          command -v sha256sum
+          command -v javac
+          if ! command -v ld.lld >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y lld-18
+            command -v ld.lld || sudo ln -s "$(command -v ld.lld-18)" /usr/local/bin/ld.lld
+          fi
+          clang --version | head -n 1
+          ld.lld --version | head -n 1
+          readelf --version | head -n 1
+          echo "RMR_EXTERNAL_ACTIONS=0"
+
+      - name: Bit-preserved host KAT and six-target two-pass cross-link
+        shell: bash
+        run: |
+          set -euo pipefail
+          RMR_EXPECTED_SHA="$RMR_SOURCE_SHA" sh rmr/audit/rmr_binary_identity_v1.sh
+          test -s "$RMR_RECEIPT_OUTPUT"
+          if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+            {
+              echo '### RMR bit-exact scope receipt'
+              cat "$RMR_RECEIPT_OUTPUT"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Always publish terminal gate diagnostics
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -s "$RMR_RECEIPT_OUTPUT" ]]; then
+            echo "RMR_TERMINAL_RECEIPT=OBSERVED"
+            cat "$RMR_RECEIPT_OUTPUT"
+            if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+              {
+                echo "### RMR binary audit — terminal receipt (PASS or FAIL)"
+                echo "Exact commit: $RMR_SOURCE_SHA"
+                echo '~~~text'
+                cat "$RMR_RECEIPT_OUTPUT"
+                echo '~~~'
+              } >> "$GITHUB_STEP_SUMMARY"
+            fi
+          else
+            echo "RMR_TERMINAL_RECEIPT=TOKEN_VAZIO_RECEIPT_NOT_CREATED"
+            if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+              echo "RMR audit receipt: TOKEN_VAZIO_RECEIPT_NOT_CREATED for $RMR_SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
