@@ -42,3 +42,47 @@ Scope: audit instrumentation in Draft PR #182. Baseline: master SHA ee7da2db2c94
 - A warning observed -> record exact compiler diagnostic; never alter original file merely to make it green.
 
 Rollback: close Draft PR or revert additive commits; never delete original authorship or past receipts.
+
+
+## Retroalimentação de evidência — token vazio útil e token ∅
+
+A matriz não colapsa ausência de medição em número e não converte `SKIPPED` em `PASS`:
+
+| Estado | Semântica estrita | Procedimento de fechamento |
+|---|---|---|
+| `0` | Contagem **medida** exatamente zero em escopo/tempo/provedor declarados | Preservar consulta, SHA, horário e alcance da consulta |
+| `NOT_RUN_EXACT_HEAD` | Nenhuma execução observada para SHA/ação específicos; não é erro observado | Executar o gate exato, guardar logs e recibo |
+| `FAIL_OBSERVED_COMMAND_NONZERO` | Comando executou e saiu com código não zero; diagnóstico separado | Registrar exit code, reproduzir e isolar causa; rollback antes de novo teste |
+| `TOKEN_VAZIO_ÚTIL` (`TOKEN_VAZIO_UTIL`) | A lacuna é **conhecida, tipada e testável**, mas o recibo está ausente | Anotar ID da lacuna, responsável, antecedente, falsificador, evidência necessária e urgência |
+| `TOKEN_VAZIO_∅` (`TOKEN_VAZIO_EMPTY_SET`) | A variável/pergunta ainda **não tem domínio, fonte ou operacionalização definida**; não é zero, negação nem falha | Registrar origem epistemológica e o primeiro experimento de descoberta. Proibir claim e promoção até a pergunta tornar-se falsificável |
+| `BLOCKED_PROVIDER_RULESET` | Proteção/enforcement ausente ou sem autoridade demonstrada | Confrontar ruleset e aprovação independente com readback do provedor; 403 → `TOKEN_VAZIO_PROVIDER_AUTHORITY_READBACK` |
+| `PASS_SCOPED` | Evidência positiva para commit + ambiente + artefato + teste identificados | Não herdar para novo commit, novo PR, nova arquitetura ou dispositivo |
+
+### Recipients / owners / urgências
+- **P0 / custodiante GitHub + CI:** `G1-G6`, SHA exato, preservação byte a byte, falha com recibo terminal; destino de evidência: PR e logs de Actions.
+- **P0 / revisor humano independente:** `G11` e aprovação do diff completo; comentário do próprio autor não equivale a `APPROVED`.
+- **P0 / proprietário do repositório:** `G12`, autorização do provedor, branch protection/rulesets/required checks.
+- **P1 / operador ARM32 e ARM64:** `G8-G9`, hash do **mesmo APK/ELF**, SDK, CPU/ABI e KAT físico.
+- **P2 / auditor externo da toolchain e métricas:** `G7/G10`, reprodutibilidade inter-run e experimentos com térmica/frequência controladas.
+- **P3 / curadoria científica:** hipótese exploratória ainda sem instrumento (`TOKEN_VAZIO_∅`); transformar em pergunta falsificável sem fingir evidência.
+
+### Observação externa e não regressão após integração de outro PR
+
+Em 2026-10-23 o GitHub reportou o merge do BLAKE3 PR #180:
+`master@b4c41a398927bdc05b777378136f6144ae9dc956`.
+O PR #182 continua tendo como ancestral a base anterior
+`ee7da2db2c9465d5c1ff9dcecf5435d5d3258973`.
+Nenhum PASS do auditado #182 em HEAD antigo será herdado automaticamente para o
+eventual **merge commit** sobre o master que agora contém o benchmark V3.
+É obrigatório verificar o novo commit integrado e gerar um recibo novo.
+`PR_MERGED` não implica `CI_PASS`, `APK_PHYSICAL_PASS` ou `CLAIM_ALLOWED`.
+
+### Terminal receipt / falhas negativas
+
+O wrapper de replay `rmr_binary_identity_v1.sh` escreve agora recibo
+terminal inclusive na falha, indicando `FAIL_OBSERVED_COMMAND_NONZERO` e
+`TOKEN_VAZIO_DIAGNOSTIC_PENDING` para a causa ainda não determinada. O
+workflow preserva o recibo (ou `TOKEN_VAZIO_RECEIPT_NOT_CREATED`) no sumário
+de Actions, **inclusive quando falhar**. Arquivos originais continuam imutáveis.
+
+**Este documento é um contrato/estado de fonte, não uma prova de execução deste HEAD.**
