@@ -20,7 +20,7 @@ if [ "$actual" != "$RMR_EXPECTED_SHA" ]; then
   exit 1
 fi
 
-for tool in git clang ld.lld readelf nm size stat sha256sum cmp sort xargs python3; do
+for tool in git clang ld.lld readelf nm size stat sha256sum cmp sort xargs python3 javac java rustc; do
   if ! command -v "$tool" >/dev/null 2>&1; then
     echo "RMR_BIT_IDENTITY=BLOCKED_MISSING_TOOL:$tool"
     exit 1
@@ -94,6 +94,29 @@ for name in core-x86_64 core-aarch64 core-armv7 blake3-x86_64 blake3-aarch64 bla
 
   # Read-only inspection of final ELF and link metadata. These fingerprints
   # are observational; they cannot substitute for a physical runtime receipt.
+  # Original artifact gate is weaker for UND NOTYPE: do not edit the
+  # historical script. Add a complete, fail-closed audit in this wrapper.
+  if readelf -W -s "$a" | awk '$7=="UND" && $1!="0:" {print; bad=1} END {exit (bad ? 0 : 1)}'; then
+    echo "RMR_BIT_IDENTITY=FAIL_UNEXPECTED_UNDEFINED:$name"
+    exit 1
+  fi
+  if readelf -W -l "$a" | grep -q 'INTERP'; then
+    echo "RMR_BIT_IDENTITY=FAIL_INTERPRETER:$name"
+    exit 1
+  fi
+  if readelf -W -d "$a" 2>/dev/null | grep -q 'NEEDED'; then
+    echo "RMR_BIT_IDENTITY=FAIL_DYNAMIC_DEPENDENCY:$name"
+    exit 1
+  fi
+  machine=$(readelf -W -h "$a" | sed -n 's/^[[:space:]]*Machine:[[:space:]]*//p')
+  case "$name:$machine" in
+    *-x86_64:*X86-64*|*-aarch64:*AArch64*|*-armv7:*ARM*) ;;
+    *)
+      echo "RMR_BIT_IDENTITY=FAIL_TARGET_MACHINE:$name:$machine"
+      exit 1
+      ;;
+  esac
+  echo "$name.machine=$machine" >> "$WORK/receipt.txt"
   readelf -W -h -l -S -s -r "$a" > "$WORK/$name.readelf.txt"
   nm -an "$a" > "$WORK/$name.nm.txt"
   size -A "$a" > "$WORK/$name.size.txt"
