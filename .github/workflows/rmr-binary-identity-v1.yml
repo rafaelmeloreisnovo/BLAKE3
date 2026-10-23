@@ -4,12 +4,12 @@ on:
   pull_request:
     paths:
       - 'rmr/AGENTS.md'
-      - 'rmr/audit/rmr_binary_identity_v1.sh'
+      - 'rmr/audit/**'
       - '.github/workflows/rmr-binary-identity-v1.yml'
   push:
     paths:
       - 'rmr/AGENTS.md'
-      - 'rmr/audit/rmr_binary_identity_v1.sh'
+      - 'rmr/audit/**'
       - '.github/workflows/rmr-binary-identity-v1.yml'
   workflow_dispatch:
 
@@ -36,27 +36,45 @@ jobs:
           test "$(git rev-parse HEAD)" = "$RMR_SOURCE_SHA"
           echo "RMR_EXACT_HEAD=$RMR_SOURCE_SHA"
 
-      - name: Protect all pre-existing source/binary-contract files
+      - name: Fail-closed baseline delta gate for all tracked original files
         shell: bash
         run: |
           set -euo pipefail
           if [[ -n "$RMR_BASE_SHA" ]]; then
             git fetch --no-tags --depth=1 origin "$RMR_BASE_SHA"
-            if ! git diff --quiet "$RMR_BASE_SHA" "$RMR_SOURCE_SHA" -- \
-              c src reference_impl Cargo.toml build.rs \
-              rmr/portable rmr/fixed256 rmr/freestanding_custody16 \
-              rmr/build rmr/core rmr/hwif rmr/include rmr/topology; then
-              echo "RMR_ORIGINAL_SOURCE=FAIL_CHANGED"
-              git diff --name-only "$RMR_BASE_SHA" "$RMR_SOURCE_SHA" -- \
-                c src reference_impl Cargo.toml build.rs \
-                rmr/portable rmr/fixed256 rmr/freestanding_custody16 \
-                rmr/build rmr/core rmr/hwif rmr/include rmr/topology
+            changed=0
+            while IFS= read -r -d '' status; do
+              if ! IFS= read -r -d '' path; then
+                echo "RMR_GIT_DIFF=FAIL_TRUNCATED_PATH"
+                exit 1
+              fi
+              if [[ "$status" != "A" ]]; then
+                echo "RMR_ORIGINAL_SOURCE=FAIL_NON_ADDITION:$status:$path"
+                exit 1
+              fi
+              case "$path" in
+                rmr/AGENTS.md|\
+                rmr/audit/rmr_binary_identity_v1.sh|\
+                rmr/audit/rmr_source_byte_census_v1.py|\
+                rmr/audit/RMR_PROMOTION_GATES_V1.md|\
+                .github/workflows/rmr-binary-identity-v1.yml)
+                  changed=$((changed + 1))
+                  ;;
+                *)
+                  echo "RMR_ORIGINAL_SOURCE=FAIL_UNLISTED_PATH:$path"
+                  exit 1
+                  ;;
+              esac
+            done < <(git diff --name-status -z "$RMR_BASE_SHA" "$RMR_SOURCE_SHA")
+            [[ "$changed" -eq 5 ]] || {
+              echo "RMR_ORIGINAL_SOURCE=FAIL_ADDITION_CARDINALITY:$changed"
               exit 1
-            fi
+            }
+            echo "RMR_ORIGINAL_SOURCE=UNCHANGED_ALL_PREEXISTING_PATHS"
+            echo "RMR_ADDITIVE_PATHS=$changed"
           else
-            echo "RMR_ORIGINAL_SOURCE_BASE_DIFF=TOKEN_VAZIO_DISPATCH"
+            echo "RMR_ORIGINAL_SOURCE_BASE_DIFF=TOKEN_VAZIO_NON_PR_EVENT"
           fi
-          echo "RMR_ORIGINAL_SOURCE=UNCHANGED_IN_SCOPED_PR"
 
       - name: Toolchain and provenance preflight
         shell: bash
