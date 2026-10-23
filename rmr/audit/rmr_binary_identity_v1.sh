@@ -30,7 +30,36 @@ done
 export SOURCE_DATE_EPOCH
 SOURCE_DATE_EPOCH=$(git show -s --format=%ct "$RMR_EXPECTED_SHA")
 WORK=$(mktemp -d "${TMPDIR:-/tmp}/rmr-bit-identity.XXXXXXXX")
-trap 'rm -rf "$WORK"' EXIT HUP INT TERM
+# Preserve a fail-closed receipt before removing the isolated scratch area.
+# A failed command has an observed nonzero exit code; its root cause remains
+# explicitly unknown until the corresponding diagnostic log is reviewed.
+rmr_finalize() {
+  exit_code=$?
+  trap - EXIT HUP INT TERM
+  if [ "$exit_code" -ne 0 ]; then
+    {
+      echo "audit_exit_code=$exit_code"
+      echo "audit_status=FAIL_OBSERVED_COMMAND_NONZERO"
+      echo "audit_failure_root_cause=TOKEN_VAZIO_DIAGNOSTIC_PENDING"
+      echo "claim_allowed=false"
+      echo "release_allowed=false"
+    } >> "$WORK/receipt.txt"
+  fi
+  if [ -f "$WORK/receipt.txt" ]; then
+    echo "RMR_BINARY_IDENTITY_TERMINAL_RECEIPT_BEGIN"
+    cat "$WORK/receipt.txt"
+    echo "RMR_BINARY_IDENTITY_TERMINAL_RECEIPT_SHA256=$(sha256sum "$WORK/receipt.txt" | awk '{print $1}')"
+    echo "RMR_BINARY_IDENTITY_TERMINAL_RECEIPT_END"
+    if [ -n "${RMR_RECEIPT_OUTPUT:-}" ]; then
+      cp "$WORK/receipt.txt" "$RMR_RECEIPT_OUTPUT" || echo "RMR_RECEIPT_PERSIST=FAIL"
+    fi
+  fi
+  rm -rf "$WORK"
+  exit "$exit_code"
+}
+trap 'rmr_finalize' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 source_manifest() {
   git ls-files -z -- rmr | xargs -0 -r sha256sum | LC_ALL=C sort
