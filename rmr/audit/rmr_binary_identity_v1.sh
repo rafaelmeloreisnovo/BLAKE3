@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 # Copyright (c) 2024-2026 Rafael Melo Reis
-# Licensed under ../LICENSE_RMR.
+# Licensed under LICENSE_RMR.
 #
 # Exact-source, two-pass, six-ELF replay. Never edits an input file.
 # Run only from a trusted, exact-SHA checkout. Not a physical-device benchmark.
@@ -37,6 +37,7 @@ source_manifest() {
 }
 
 source_manifest > "$WORK/source_before.sha256"
+git ls-files -z -- rmr | xargs -0 -r stat -c "%n\t%s" | LC_ALL=C sort > "$WORK/source_size_before.tsv"
 if [ ! -s "$WORK/source_before.sha256" ]; then
   echo "RMR_BIT_IDENTITY=FAIL_EMPTY_MANIFEST"
   exit 1
@@ -49,6 +50,7 @@ fi
   echo "target_set=x86_64,aarch64,armv7"
   echo "source_manifest_sha256=$(sha256sum "$WORK/source_before.sha256" | awk '{print $1}')"
   echo "source_file_count=$(wc -l < "$WORK/source_before.sha256" | tr -d ' ')"
+  echo "source_size_manifest_sha256=$(sha256sum "$WORK/source_size_before.tsv" | awk '{print $1}')"
   echo "build_script_sha256=$(sha256sum rmr/portable/build/build_cross_matrix.sh | awk '{print $1}')"
   echo "host_script_sha256=$(sha256sum rmr/portable/build/build_host_selftest.sh | awk '{print $1}')"
   echo "compiler=$(clang --version | head -n 1)"
@@ -102,6 +104,11 @@ for name in core-x86_64 core-aarch64 core-armv7 blake3-x86_64 blake3-aarch64 bla
 done
 
 source_manifest > "$WORK/source_after.sha256"
+git ls-files -z -- rmr | xargs -0 -r stat -c "%n\t%s" | LC_ALL=C sort > "$WORK/source_size_after.tsv"
+if ! cmp -s "$WORK/source_size_before.tsv" "$WORK/source_size_after.tsv"; then
+  echo "RMR_BIT_IDENTITY=FAIL_SOURCE_SIZES_CHANGED"
+  exit 1
+fi
 if ! cmp -s "$WORK/source_before.sha256" "$WORK/source_after.sha256"; then
   echo "RMR_BIT_IDENTITY=FAIL_SOURCE_BYTES_CHANGED"
   exit 1
