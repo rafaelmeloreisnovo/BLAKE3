@@ -20,7 +20,7 @@ if [ "$actual" != "$RMR_EXPECTED_SHA" ]; then
   exit 1
 fi
 
-for tool in git clang ld.lld readelf nm size stat sha256sum cmp sort xargs; do
+for tool in git clang ld.lld readelf nm size stat sha256sum cmp sort xargs python3; do
   if ! command -v "$tool" >/dev/null 2>&1; then
     echo "RMR_BIT_IDENTITY=BLOCKED_MISSING_TOOL:$tool"
     exit 1
@@ -36,6 +36,8 @@ source_manifest() {
   git ls-files -z -- rmr | xargs -0 -r sha256sum | LC_ALL=C sort
 }
 
+python3 rmr/audit/rmr_source_byte_census_v1.py --out "$WORK/source_census.jsonl"
+test -s "$WORK/source_census.jsonl" || { echo "RMR_BIT_IDENTITY=FAIL_BYTE_CENSUS_EMPTY"; exit 1; }
 source_manifest > "$WORK/source_before.sha256"
 git ls-files -z -- rmr | xargs -0 -r stat -c "%n\t%s" | LC_ALL=C sort > "$WORK/source_size_before.tsv"
 if [ ! -s "$WORK/source_before.sha256" ]; then
@@ -51,6 +53,10 @@ fi
   echo "source_manifest_sha256=$(sha256sum "$WORK/source_before.sha256" | awk '{print $1}')"
   echo "source_file_count=$(wc -l < "$WORK/source_before.sha256" | tr -d ' ')"
   echo "source_size_manifest_sha256=$(sha256sum "$WORK/source_size_before.tsv" | awk '{print $1}')"
+  echo "source_byte_census_sha256=$(sha256sum "$WORK/source_census.jsonl" | awk '{print $1}')"
+  echo "source_byte_census_file_count=$(wc -l < "$WORK/source_census.jsonl" | tr -d ' ')"
+  echo "source_byte_census_semantics=LEXICAL_ONLY"
+  echo "source_byte_census_gate=PASS_SCOPED_SOURCE_BYTES"
   echo "build_script_sha256=$(sha256sum rmr/portable/build/build_cross_matrix.sh | awk '{print $1}')"
   echo "host_script_sha256=$(sha256sum rmr/portable/build/build_host_selftest.sh | awk '{print $1}')"
   echo "compiler=$(clang --version | head -n 1)"
