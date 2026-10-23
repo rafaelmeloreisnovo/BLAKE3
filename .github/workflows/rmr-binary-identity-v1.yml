@@ -108,3 +108,27 @@ jobs:
               cat "$RMR_RECEIPT_OUTPUT"
             } >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: Always publish terminal gate diagnostics
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -s "$RMR_RECEIPT_OUTPUT" ]]; then
+            echo "RMR_TERMINAL_RECEIPT=OBSERVED"
+            cat "$RMR_RECEIPT_OUTPUT"
+            if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+              {
+                echo "### RMR binary audit — terminal receipt (PASS or FAIL)"
+                echo "Exact commit: $RMR_SOURCE_SHA"
+                echo '~~~text'
+                cat "$RMR_RECEIPT_OUTPUT"
+                echo '~~~'
+              } >> "$GITHUB_STEP_SUMMARY"
+            fi
+          else
+            echo "RMR_TERMINAL_RECEIPT=TOKEN_VAZIO_RECEIPT_NOT_CREATED"
+            if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+              echo "RMR audit receipt: TOKEN_VAZIO_RECEIPT_NOT_CREATED for $RMR_SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
