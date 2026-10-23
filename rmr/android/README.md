@@ -41,6 +41,16 @@ directories, three libraries per ABI, official license assets and APK
 debug signature. The DEBUG signature is installation-only, NOT authorial
 release signing.
 
+## Additive industrial campaign V3 (research, opt-in)
+
+The original two benchmark buttons remain available and unchanged. The new
+"Campanha industrial V3" button captures all 27 raw timings per provider and
+size across a balanced 3-block rotation for 4, 16, 64, 256 and 1024 KiB.
+It includes scoped equality checks, median/MAD/p95 and environment snapshots,
+but DOES NOT control thermal/CPU clocks or attest the device. See
+[INDUSTRIAL_BENCHMARK_V3.md](INDUSTRIAL_BENCHMARK_V3.md) for the protocol,
+negative-test gates, unknowns and rollback. Claim allowed remains false.
+
 ## On-device laboratory protocol
 
 1. APK displays actual ABI/Android API/phone model, exact fork and upstream SHAs.

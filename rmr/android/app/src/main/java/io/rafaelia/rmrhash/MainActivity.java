@@ -9,6 +9,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.BatteryManager;
+import android.os.PowerManager;
+import android.os.SystemClock;
+import android.content.IntentFilter;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,7 +36,7 @@ public final class MainActivity extends Activity {
 
     private TextView result;
     private EditText input;
-    private Button hashButton, smallButton, bigButton, shareButton;
+    private Button hashButton, smallButton, bigButton, industrialButton, shareButton;
     private volatile boolean busy = false;
     private boolean verified;
     private String lastReceipt = "STATE=NOT_RUN\nCLAIM_ALLOWED=false";
@@ -116,6 +120,7 @@ public final class MainActivity extends Activity {
         hashButton = addButton(root, "Comparar hashes do texto", v -> compareText());
         smallButton = addButton(root, "Benchmark local: 4 KiB", v -> benchmark(4096));
         bigButton = addButton(root, "Benchmark local: 1 MiB", v -> benchmark(1048576));
+        industrialButton = addButton(root, "Campanha industrial V3: 5 tamanhos + amostras", v -> industrialCampaign());
         shareButton = addButton(root, "Compartilhar recibo em texto", v -> shareReceipt());
         addButton(root, "Ver atribuições e licenças completas", v -> showNotices());
         result = new TextView(this);
@@ -149,6 +154,7 @@ public final class MainActivity extends Activity {
         hashButton.setEnabled(on);
         smallButton.setEnabled(on);
         bigButton.setEnabled(on);
+        industrialButton.setEnabled(on);
         shareButton.setEnabled(on && !busy);
     }
 
@@ -246,6 +252,70 @@ public final class MainActivity extends Activity {
                 setEnabledForHash(verified);
             });
         }, "b3-compare").start();
+    }
+
+    private String industrialSnapshot(int size, String phase) {
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+        String thermal = pm == null ? "TOKEN_VAZIO_UNAVAILABLE"
+            : Integer.toString(pm.getCurrentThermalStatus());
+        Intent state = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int batteryTemp = state == null ? Integer.MIN_VALUE
+            : state.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, Integer.MIN_VALUE);
+        String temperature = batteryTemp == Integer.MIN_VALUE ? "TOKEN_VAZIO_UNAVAILABLE"
+            : Integer.toString(batteryTemp);
+        int batteryStatus = state == null ? Integer.MIN_VALUE
+            : state.getIntExtra(BatteryManager.EXTRA_STATUS, Integer.MIN_VALUE);
+        String chargeState = batteryStatus == Integer.MIN_VALUE ? "TOKEN_VAZIO_UNAVAILABLE"
+            : Integer.toString(batteryStatus);
+        int level = state == null ? -1 : state.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = state == null ? -1 : state.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+        String batteryPercent = level < 0 || scale <= 0 ? "TOKEN_VAZIO_UNAVAILABLE"
+            : Integer.toString(level * 100 / scale);
+        return "phase:" + phase + ";bytes:" + size
+            + ";elapsed_realtime_ns:" + SystemClock.elapsedRealtimeNanos()
+            + ";wall_clock_ms_untrusted:" + System.currentTimeMillis()
+            + ";thermal_status_android:" + thermal
+            + ";battery_temp_tenths_c_not_cpu:" + temperature
+            + ";battery_status_code:" + chargeState
+            + ";battery_pct:" + batteryPercent
+            + ";cpu_frequency:TOKEN_VAZIO_NOT_READ";
+    }
+
+    private void industrialCampaign() {
+        if (!verified || busy) return;
+        busy = true;
+        setEnabledForHash(false);
+        result.setText("Campanha V3: igualdade + cinco tamanhos + 27 amostras/provedor/tamanho");
+        new Thread(() -> {
+            String receipt;
+            try {
+                String resultText = BenchmarkCampaignV3.execute(
+                    MainActivity::digest, System::nanoTime, this::industrialSnapshot);
+                boolean is64 = android.os.Process.is64Bit();
+                String[] candidateAbis = is64 ? Build.SUPPORTED_64_BIT_ABIS : Build.SUPPORTED_32_BIT_ABIS;
+                String actualAbi = candidateAbis.length > 0 ? candidateAbis[0] : "TOKEN_VAZIO_ABI";
+                receipt = resultText
+                    + "EFFECTIVE_PROCESS_BITS=" + (is64 ? 64 : 32) + "\n"
+                    + "EFFECTIVE_PROCESS_ABI_CANDIDATE=" + actualAbi + "\n"
+                    + "APK_SHA256=TOKEN_VAZIO_MATCH_WITH_CI_ARTIFACT\n"
+                    + "ENVIRONMENT_SNAPSHOTS=OBSERVED_NOT_CONTROLLED\n"
+                    + environment();
+            } catch (RuntimeException | LinkageError e) {
+                receipt = "RMR_BLAKE3_INDUSTRIAL_BENCH_V3\n"
+                    + "STATUS=BLOCKED_FAIL_CLOSED\n"
+                    + "CAUSE=" + e.getClass().getSimpleName() + "\n"
+                    + "RAW_SAMPLES=DISCARDED_PARTIAL\n"
+                    + "CLAIM_ALLOWED=false\n"
+                    + environment();
+            }
+            String resultReceipt = receipt;
+            runOnUiThread(() -> {
+                busy = false;
+                lastReceipt = resultReceipt;
+                result.setText(resultReceipt);
+                setEnabledForHash(verified);
+            });
+        }, "rmr-bench-v3").start();
     }
 
     private void shareReceipt() {
