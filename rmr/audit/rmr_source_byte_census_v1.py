@@ -26,6 +26,7 @@ DATE = re.compile(rb"\b(?:19|20)\d\d[-/]\d\d[-/]\d\d(?:[ T]\d\d:\d\d(?::\d\d)?)?
 VOID = re.compile(rb"\bvoid\b")
 WARN = re.compile(rb"-W(?:error|shadow|all|extra|pedantic|conversion|format(?:=2)?)\b")
 COMMENT = re.compile(rb"(?://|/\*|#)[^\r\n]*")
+ALIAS = re.compile(rb"\b(?:alias|__attribute__|weakref)\b")
 
 
 def sha256(b: bytes) -> str:
@@ -69,6 +70,7 @@ def main() -> int:
         local_oid = git("hash-object", "--no-filters", "--", path).decode().strip()
         changed = local_oid != git_oid
         source_changed += int(changed)
+        dates = DATE.findall(data)
         entry = {
             "path": path,
             "path_utf8_hex": raw_path.hex(),
@@ -80,14 +82,18 @@ def main() -> int:
             "bytes": len(data),
             "sha256": sha256(data),
             "header_prefix_256_sha256": sha256(data[:256]),
+            "header_prefix_256_hex": data[:256].hex(),
             "high_bit_bytes": non_ascii,
             "nul_bytes": data.count(b"\0"),
             "crlf_count": data.count(b"\r\n"),
             "lf_count": data.count(b"\n"),
             "void_lexemes": len(VOID.findall(data)) if is_source else 0,
+            "alias_attribute_lexemes": len(ALIAS.findall(data)) if is_source else 0,
             "warning_flag_lexemes": len(WARN.findall(data)) if is_source else 0,
             "comment_markers_lexical": len(COMMENT.findall(data)) if is_source else 0,
-            "date_time_lexemes": len(DATE.findall(data)),
+            "date_time_lexemes": len(dates),
+            "date_time_literal_hex_first_32": [b.hex() for b in dates[:32]],
+            "date_time_literal_truncated": len(dates) > 32,
             "semantics": "LEXICAL_ONLY_NOT_EXECUTION_PROOF",
         }
         records.append((raw_path, entry))
