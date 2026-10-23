@@ -1,0 +1,92 @@
+name: RMR Bit-Exact Binary Replay V1
+
+on:
+  pull_request:
+    paths:
+      - 'rmr/AGENTS.md'
+      - 'rmr/audit/rmr_binary_identity_v1.sh'
+      - '.github/workflows/rmr-binary-identity-v1.yml'
+  push:
+    paths:
+      - 'rmr/AGENTS.md'
+      - 'rmr/audit/rmr_binary_identity_v1.sh'
+      - '.github/workflows/rmr-binary-identity-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-source-two-pass:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      RMR_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      RMR_BASE_SHA: ${{ github.event.pull_request.base.sha || '' }}
+      RMR_RECEIPT_OUTPUT: ${{ runner.temp }}/rmr-binary-identity-v1-receipt.txt
+    steps:
+      - name: Exact HEAD checkout without third-party actions
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init .
+          git remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
+          git fetch --no-tags --depth=1 origin "$RMR_SOURCE_SHA"
+          git checkout --detach FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$RMR_SOURCE_SHA"
+          echo "RMR_EXACT_HEAD=$RMR_SOURCE_SHA"
+
+      - name: Protect all pre-existing source/binary-contract files
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "$RMR_BASE_SHA" ]]; then
+            git fetch --no-tags --depth=1 origin "$RMR_BASE_SHA"
+            if ! git diff --quiet "$RMR_BASE_SHA" "$RMR_SOURCE_SHA" -- \
+              c src reference_impl Cargo.toml build.rs \
+              rmr/portable rmr/fixed256 rmr/freestanding_custody16 \
+              rmr/build rmr/core rmr/hwif rmr/include rmr/topology; then
+              echo "RMR_ORIGINAL_SOURCE=FAIL_CHANGED"
+              git diff --name-only "$RMR_BASE_SHA" "$RMR_SOURCE_SHA" -- \
+                c src reference_impl Cargo.toml build.rs \
+                rmr/portable rmr/fixed256 rmr/freestanding_custody16 \
+                rmr/build rmr/core rmr/hwif rmr/include rmr/topology
+              exit 1
+            fi
+          else
+            echo "RMR_ORIGINAL_SOURCE_BASE_DIFF=TOKEN_VAZIO_DISPATCH"
+          fi
+          echo "RMR_ORIGINAL_SOURCE=UNCHANGED_IN_SCOPED_PR"
+
+      - name: Toolchain and provenance preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v clang
+          command -v readelf
+          command -v nm
+          command -v size
+          command -v sha256sum
+          command -v javac
+          if ! command -v ld.lld >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y lld-18
+            command -v ld.lld || sudo ln -s "$(command -v ld.lld-18)" /usr/local/bin/ld.lld
+          fi
+          clang --version | head -n 1
+          ld.lld --version | head -n 1
+          readelf --version | head -n 1
+          echo "RMR_EXTERNAL_ACTIONS=0"
+
+      - name: Bit-preserved host KAT and six-target two-pass cross-link
+        shell: bash
+        run: |
+          set -euo pipefail
+          RMR_EXPECTED_SHA="$RMR_SOURCE_SHA" sh rmr/audit/rmr_binary_identity_v1.sh
+          test -s "$RMR_RECEIPT_OUTPUT"
+          if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+            {
+              echo '### RMR bit-exact scope receipt'
+              cat "$RMR_RECEIPT_OUTPUT"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
