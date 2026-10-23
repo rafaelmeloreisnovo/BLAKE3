@@ -1,3 +1,8 @@
+<!--
+Copyright (c) 2024–2026 Rafael Melo Reis
+Licensed under LICENSE_RMR.
+-->
+
 # AGENTS.md — RMR byte-integrity / build observability
 
 Scope: `rmr/**`. Inherit the repository-root AGENTS.md; more-specific child rules stay authoritative for their own directories.
