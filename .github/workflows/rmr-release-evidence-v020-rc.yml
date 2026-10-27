@@ -1,0 +1,29 @@
+name: RMR release-evidence v0.2.0-rc.1 (draft-only)
+on:
+  pull_request:
+    paths:
+      - 'rmr/prospective_release_v020/**'
+      - '.github/workflows/rmr-release-evidence-v020-rc.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  host-gcc-clang:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        cc: [gcc, clang]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pure-core compile and negative controls
+        env:
+          CC: ${{ matrix.cc }}
+        run: sh rmr/prospective_release_v020/build/check.sh
+      - name: Fail closed on misleading release/licensing claims
+        run: |
+          grep -Fx 'PROMOTION=HOLD' rmr/prospective_release_v020/REVISION
+          grep -Fx 'LICENSING=PROSPECTIVE_DRAFT_NOT_ACTIVE' rmr/prospective_release_v020/REVISION
+          test -f rmr/LICENSE_RMR
+  # This workflow is a source/build gate, not a commercial/legal release.
