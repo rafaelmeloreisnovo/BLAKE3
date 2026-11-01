@@ -4,6 +4,7 @@
  * No private ZIPRAF implementation is copied into this public test.
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 #define MAX 3145728u
