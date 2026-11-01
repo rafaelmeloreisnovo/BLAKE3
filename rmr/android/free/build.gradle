@@ -1,0 +1,34 @@
+plugins {
+    id 'com.android.application'
+}
+android {
+    namespace 'io.rafaelia.rmrfree'
+    compileSdk 36
+    defaultConfig {
+        applicationId 'io.rafaelia.rmrfree'
+        minSdk 29
+        targetSdk 35
+        versionCode 1
+        versionName '0.1.0-free-experimental'
+        ndk { abiFilters 'armeabi-v7a', 'arm64-v8a' }
+        externalNativeBuild { cmake { cFlags '-std=c11 -Oz' } }
+    }
+    externalNativeBuild {
+        cmake { path file('src/main/cpp/CMakeLists.txt'); version '3.22.1' }
+    }
+    buildTypes {
+        debug { minifyEnabled false; shrinkResources false }
+        release { minifyEnabled false; shrinkResources false }
+    }
+}
+def freeNotices = layout.buildDirectory.dir('generated/free-notices')
+tasks.register('copyFreeNotices', Copy) {
+    from(rootProject.file('../../LICENSE_A2'))
+    from(rootProject.file('../../LICENSE_A2LLVM'))
+    from(rootProject.file('../../LICENSE_CC0'))
+    from(rootProject.file('../LICENSE_RMR'))
+    from(rootProject.file('../../THIRD_PARTY_NOTICES_RAFAELIA.md'))
+    into(freeNotices)
+}
+android.sourceSets.main.assets.srcDir(freeNotices)
+tasks.named('preBuild').configure { dependsOn('copyFreeNotices') }

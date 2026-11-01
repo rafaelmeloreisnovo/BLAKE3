@@ -7,3 +7,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = 'RmrBlake3Android'
 include ':app'
+include ':free'

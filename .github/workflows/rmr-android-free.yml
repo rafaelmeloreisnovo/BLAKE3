@@ -1,0 +1,103 @@
+name: RMR ZIPRAF FREE Android
+on:
+  pull_request:
+    paths: ['rmr/android/free/**', 'rmr/android/settings.gradle', 'c/blake3*', '.github/workflows/rmr-android-free.yml']
+  push:
+    paths: ['rmr/android/free/**', 'rmr/android/settings.gradle', 'c/blake3*', '.github/workflows/rmr-android-free.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: BLAKE3 KAT, roundtrip, corruption and bounds
+        shell: bash
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror \
+            -DRMR_ZRF_HOST_TEST \
+            -DBLAKE3_NO_SSE2 -DBLAKE3_NO_SSE41 -DBLAKE3_NO_AVX2 \
+            -DBLAKE3_NO_AVX512 -DBLAKE3_USE_NEON=0 -I c \
+            rmr/android/free/src/main/cpp/zipraf_free.c \
+            c/blake3.c c/blake3_dispatch.c c/blake3_portable.c \
+            rmr/android/free/tests/codec_test.c -o /tmp/zrf-core-test
+          /tmp/zrf-core-test
+          echo "SOURCE_COMMIT=$(git rev-parse HEAD)"
+          echo "ANDROID_DEVICE=NOT_RUN"
+  apk:
+    needs: core
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Pinned Android build prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$JAVA_HOME_17_X64"
+          echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME_17_X64/bin" >> "$GITHUB_PATH"
+          sdk="$ANDROID_SDK_ROOT"
+          if [ -z "$sdk" ]; then sdk="$ANDROID_HOME"; fi
+          test -n "$sdk"
+          "$sdk/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-36' \
+            'build-tools;36.0.0' 'ndk;27.2.12479018' 'cmake;3.22.1' </dev/null
+          echo "ANDROID_SDK_ROOT=$sdk" >> "$GITHUB_ENV"
+          version=8.11.1
+          expected=f397b287023acdba1e9f6fc5ea72d22dd63669d59ed4a289a29b1a76eee151c6
+          mkdir -p "$RUNNER_TEMP/rmr-gradle"
+          curl -fsSL "https://services.gradle.org/distributions/gradle-$version-bin.zip" -o "$RUNNER_TEMP/rmr-gradle/gradle.zip"
+          printf '%s  %s\n' "$expected" "$RUNNER_TEMP/rmr-gradle/gradle.zip" | sha256sum -c --strict
+          unzip -q "$RUNNER_TEMP/rmr-gradle/gradle.zip" -d "$RUNNER_TEMP/rmr-gradle"
+          echo "$RUNNER_TEMP/rmr-gradle/gradle-$version/bin" >> "$GITHUB_PATH"
+      - name: Build single dual-ABI client
+        shell: bash
+        run: gradle --project-dir rmr/android --no-daemon :free:assembleDebug
+      - name: Verify exact-size budgets and debug installer signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk=rmr/android/free/build/outputs/apk/debug/free-debug.apk
+          test -s "$apk"
+          for abi in armeabi-v7a arm64-v8a; do
+            entry="lib/$abi/librmrfree.so"
+            unzip -Z1 "$apk" | grep -Fx "$entry"
+            unzip -p "$apk" "$entry" > "$RUNNER_TEMP/lib-rmrfree.so"
+            bytes=$(stat -c '%s' "$RUNNER_TEMP/lib-rmrfree.so")
+            echo "NATIVE_BYTES=$bytes"
+            test "$bytes" -le 139264
+          done
+          for lic in LICENSE_A2 LICENSE_A2LLVM LICENSE_CC0 LICENSE_RMR; do
+            unzip -Z1 "$apk" | grep -Fx "assets/$lic"
+          done
+          bytes=$(stat -c '%s' "$apk")
+          echo "APK_BYTES=$bytes"
+          test "$bytes" -le 3145728
+          "$ANDROID_SDK_ROOT/build-tools/36.0.0/zipalign" -c -p 4 "$apk"
+          "$ANDROID_SDK_ROOT/build-tools/36.0.0/apksigner" verify --verbose "$apk"
+          mkdir -p rmr/android/free/build/receipts
+          {
+            echo "source_commit=$(git rev-parse HEAD)"
+            echo "apk_sha256=$(sha256sum "$apk" | cut -d' ' -f1)"
+            echo "apk_bytes=$bytes"
+            echo 'apk_max_bytes=3145728'
+            echo 'per_abi_native_max_bytes=139264'
+            echo 'supported_abis=armeabi-v7a,arm64-v8a'
+            echo 'native_libs=one_per_abi'
+            echo 'signature=DEBUG_ONLY'
+            echo 'device_execution=NOT_RUN'
+            echo 'release_claim_allowed=false'
+          } > rmr/android/free/build/receipts/size-gate.txt
+          cat rmr/android/free/build/receipts/size-gate.txt
+      - name: Preserve debug research artifact and receipt
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: rmr-zipraf-free-debug-${{ github.run_id }}
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            rmr/android/free/build/outputs/apk/debug/free-debug.apk
+            rmr/android/free/build/receipts/size-gate.txt
