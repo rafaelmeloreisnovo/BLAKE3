@@ -37,7 +37,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [ -n "$JAVA_HOME_17_X64" ]; then echo "$JAVA_HOME_17_X64/bin" >> "$GITHUB_PATH"; fi
+          test -n "$JAVA_HOME_17_X64"
+          echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME_17_X64/bin" >> "$GITHUB_PATH"
           sdk="$ANDROID_SDK_ROOT"
           if [ -z "$sdk" ]; then sdk="$ANDROID_HOME"; fi
           test -n "$sdk"
