@@ -60,7 +60,7 @@ static z_u32 z_rle(const z_u8 *src, z_u32 n, z_u8 *dst) {
   return o;
 }
 int rmr_zrf1_digest(const z_u8 *src, z_u32 n, z_u8 out[32]) {
-  if ((!src && n) || !out || n>Z_MAX) return -1;
+  if ((!src && n) || !out || n>Z_MAX+Z_HDR) return -1;
   z_hash(src,n,out); return 0;
 }
 int rmr_zrf1_pack(const z_u8 *src, z_u32 n,
@@ -129,7 +129,7 @@ Java_io_rafaelia_rmrfree_MainActivity_nativeDigest(
   (void)owner;
   if (!input) return 0;
   n=(*env)->GetArrayLength(env,input);
-  if (n<0 || (z_u32)n>Z_MAX) return 0;
+  if (n<0 || (z_u32)n>Z_MAX+Z_HDR) return 0;
   if (n) {
     p=(*env)->GetByteArrayElements(env,input,0);
     if (!p) return 0;
