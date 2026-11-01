@@ -179,7 +179,11 @@ Java_io_rafaelia_rmrfree_MainActivity_nativeUnpack(
   p=(*env)->GetByteArrayElements(env,input,0);
   if (!p) return 0;
   raw=z_get32((const z_u8*)p+6);
-  if (raw<=Z_MAX) {
+  if (raw==0u) {
+    z_u8 empty=0u;
+    if (rmr_zrf1_unpack((const z_u8*)p,(z_u32)n,&empty,0u,&written)==0)
+      ret=(*env)->NewByteArray(env,0);
+  } else if (raw<=Z_MAX) {
     ret=(*env)->NewByteArray(env,(jsize)raw);
     if (ret) {
       b=(*env)->GetByteArrayElements(env,ret,0);
