@@ -67,6 +67,8 @@ int main(void) {
   verify(memcmp(first,kat_empty,32)==0,"BLAKE3_EMPTY_KAT");
   for(k=0;k<sizeof(lens)/sizeof(lens[0]);++k)
     for(m=0;m<4u;++m) roundtrip(lens[k],m);
+  verify(rmr_zrf1_digest(packed,MAX+46u,first)==0,"full-container-digest");
+  verify(rmr_zrf1_digest(packed,MAX+47u,first)!=0,"oversized-digest");
   verify(rmr_zrf1_pack(source,MAX+1u,packed,sizeof(packed),&w)!=0,"oversized-input");
   verify(rmr_zrf1_pack(source,1u,packed,1u,&w)!=0,"small-output");
   verify(rmr_zrf1_pack(source,1u,packed,sizeof(packed),&w)==0,"prepare-header");
