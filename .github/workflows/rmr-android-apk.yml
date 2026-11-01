@@ -87,6 +87,8 @@ jobs:
           set -euo pipefail
           export JAVA_HOME="${JAVA_HOME_17_X64:-$JAVA_HOME}"
           export PATH="$JAVA_HOME/bin:$PATH"
+          echo "JAVA_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME/bin" >> "$GITHUB_PATH"
           java -version
           sdk="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
           test -n "$sdk"
