@@ -423,3 +423,8 @@ A separação não altera autoria nem semântica do BLAKE3 upstream.
 | `.github/workflows/rmr-android-apk.yml` | RMR Android build and artifact publication gate | RMR Module License; build-time external pinned upload-artifact action, not APK runtime dependency |
 
 The Android app links only the existing RMR portable BLAKE3 adapter and unchanged upstream C provider; it does not reclassify upstream authorship. The distributed APK is Android platform-linked and must not be described as a fully freestanding ELF. SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM. Same-SHA physical-device execution, release signing, long-file streaming, and security certification remain TOKEN_VAZIO until tested.
+
+### Registro append-only — 2026-11-02 — proveniência ChaCha/ED/SHA (DRAFT/HOLD)
+
+Índice de evidências por algoritmo: [`rmr/crypto/algorithms/PROVENANCE_CHAIN_RMR_20261102.md`](crypto/algorithms/PROVENANCE_CHAIN_RMR_20261102.md).
+Snapshot de código `master@365516a302f23f94c538c3a27e3d26e3d294098e`; acrescenta somente a matriz documental de ChaCha20-Poly1305, Ed25519, Ed448, SHA-256 e SHA-512, com Git blob SHA, norma, fonte, wrapper, testes-fonte e gates ausentes. Distingue OpenSSL 3 provider da implementação local RMR de SHA-256 e do BLAKE3 upstream. Arquivos antigos, licenças, algoritmos, API e recibos permanecem intactos; CI/executável/dispositivo neste HEAD ainda NÃO executados ou observados nesta auditoria. `claim_allowed=false`; revisão humana e provider antes do merge.
