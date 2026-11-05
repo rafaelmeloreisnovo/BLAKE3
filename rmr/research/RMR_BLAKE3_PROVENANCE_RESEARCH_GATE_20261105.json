@@ -1,0 +1,160 @@
+{
+  "schema": "rafaelia.rmr-blake3-provenance-research.v1",
+  "state": "DOCUMENTED_RESEARCH_DRAFT",
+  "claim_allowed": false,
+  "release_allowed": false,
+  "source": {
+    "repository": "rafaelmeloreisnovo/BLAKE3",
+    "base_commit": "26daf57b951ce5003177eadf3e15f638930176ba",
+    "upstream_baseline_declared_in_repo": "BLAKE3-team/BLAKE3@6aab490a26124663329dfd3961b8469f8fdb158b",
+    "rmr_core_path": "rmr/core/hash_blake3.c",
+    "rmr_core_blob_sha": "06aae29ae3a5e71a129bec86a7abe0221a0adaa3",
+    "agents_blob_sha": "9b555b3393deda9f70f6a42fb1f0709927a07f6c",
+    "readme_blob_sha": "05682b9db5882759c7d711a037ab29c7cff5c715"
+  },
+  "pre_research_gate": {
+    "provider": "Supabase Rafcodephi",
+    "table": "raf_private.omega_continuity_events_v1",
+    "event_id": "MU-RMR-BLAKE3-PROVENANCE-RESEARCH-20261105-S1-BEGIN",
+    "seq": 62,
+    "record_sha256": "49a0330991f5eaee7b3cbd3e7b98d365ddb726bfb679d286c59d4e3ab8873346",
+    "state": "READY_TO_TEST",
+    "evidence_result": "OBSERVED",
+    "claim_allowed": false
+  },
+  "research": {
+    "provider": "alphaXiv",
+    "query_scope": [
+      "BLAKE3 Merkle-tree hashing design",
+      "cryptographic provenance",
+      "reproducible builds",
+      "software artifact attestation",
+      "digital chain-of-custody limitations"
+    ],
+    "papers": [
+      {
+        "id": "2608.18180",
+        "url": "https://www.alphaxiv.org/abs/2608.18180",
+        "title": "Reproducibility is Not Enough: Artifact Verifiability in Decentralized-Build Package Ecosystems",
+        "read_state": "CONTENT_READ",
+        "mapped_support": "Artifact verification also requires recoverable source revision, build environment, dependencies and build instructions; reproducibility alone is insufficient.",
+        "does_not_support": "It does not prove that this BLAKE3/RMR repository or any artifact is reproducible or verifiable."
+      },
+      {
+        "id": "2605.21089",
+        "url": "https://www.alphaxiv.org/abs/2605.21089",
+        "title": "An Evidence-driven Protocol for Trustworthy CI Pipelines",
+        "read_state": "CONTENT_READ",
+        "mapped_support": "A CI evidence lifecycle can bind deterministic builds to attestations under an explicit trust model.",
+        "does_not_support": "TEE/Nix/TDX results do not transfer automatically to GitHub Actions, Termux, ARMv7 or the RMR implementation."
+      },
+      {
+        "id": "2605.08363",
+        "url": "https://www.alphaxiv.org/abs/2605.08363",
+        "title": "Kettle: Attested Builds for Verifiable Software Provenance",
+        "read_state": "CONTENT_READ",
+        "mapped_support": "Attested provenance can bind source commit, dependencies, toolchain, build environment and artifact digests.",
+        "does_not_support": "A digest or ordinary CI record alone does not prove the stated build process; no Kettle/TEE execution occurred here."
+      },
+      {
+        "id": "2602.01663",
+        "url": "https://www.alphaxiv.org/abs/2602.01663",
+        "title": "Witnessd: Proof-of-Process via Adversarial Collapse",
+        "read_state": "CONTENT_READ",
+        "mapped_support": "Digital signatures and hashes bind data or key possession but do not by themselves establish human authorship or process integrity.",
+        "does_not_support": "Its proposed proof-of-process mechanism was not implemented or tested in RMR."
+      },
+      {
+        "id": "2610.37982",
+        "url": "https://www.alphaxiv.org/abs/2610.37982",
+        "title": "Revision-Bound Evidence Cuts: Authenticated Queries and Contextual Witness Capacity",
+        "read_state": "CONTENT_READ",
+        "mapped_support": "Authenticated sources can still be recombined into unsupported claims; revision and qualification boundaries must be preserved.",
+        "does_not_support": "Its domain results do not validate BLAKE3 performance, authorship, custody completeness or implementation correctness."
+      },
+      {
+        "id": "2605.08586",
+        "url": "https://www.alphaxiv.org/abs/2605.08586",
+        "title": "Computer Science Conferences Should Require Nonrepudiable Experimental Results",
+        "read_state": "CONTENT_READ",
+        "mapped_support": "Reported numerical results should be bound to an observed computation by a tamper-evident record.",
+        "does_not_support": "This position paper and its reference implementation do not establish that any RMR benchmark was executed."
+      },
+      {
+        "id": "2609.01931",
+        "url": "https://www.alphaxiv.org/abs/2609.01931",
+        "title": "Agent Flight Recorder: Tamper-Evident Audit Trails with On-Chain Anchoring for Long-Horizon Tool-Using Agents",
+        "read_state": "CONTENT_READ",
+        "mapped_support": "Canonical events, predecessor hashes, intent/execution/effect separation and external anchoring can improve tamper evidence and auditability.",
+        "does_not_support": "A hash chain preserves integrity of recorded events, not completeness or truth of unrecorded events; no on-chain anchor is proposed for this change."
+      }
+    ]
+  },
+  "invariant": {
+    "origin_preserved": true,
+    "identity_preserved": true,
+    "distinctions_preserved": true,
+    "token_vazio_not_coerced": true,
+    "predecessor_preserved": true,
+    "evidence_scope_bounded": true,
+    "human_dignity_preserved": true,
+    "distinction": "SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM"
+  },
+  "architecture_gate": {
+    "components": [
+      "source identity",
+      "build recipe and environment",
+      "artifact digest",
+      "execution receipt",
+      "predecessor hash",
+      "falsifier result",
+      "independent verification"
+    ],
+    "acceptance": "Promote only the exact claim whose required fields and exact environment are present.",
+    "fail_closed": "Missing identity, source, authority, execution target, evidence rule or predecessor remains a typed TOKEN_VAZIO."
+  },
+  "typed_voids": [
+    {
+      "type": "TOKEN_VAZIO_RMR_BLAKE3_EXECUTION",
+      "next_gate": "Execute exact-head BLAKE3 KAT and RMR adapter tests with command, environment, binary hash and logs."
+    },
+    {
+      "type": "TOKEN_VAZIO_CURRENT_UPSTREAM_DIFF",
+      "next_gate": "Compare base commit to the declared upstream baseline without modifying upstream cryptographic logic."
+    },
+    {
+      "type": "TOKEN_VAZIO_INDEPENDENT_REPRODUCTION",
+      "next_gate": "Rebuild and rerun on an independent equivalent host; bind outputs to exact source and toolchain."
+    },
+    {
+      "type": "TOKEN_VAZIO_PHYSICAL_ARMV7_ARM64",
+      "next_gate": "Run the exact artifact on identified physical devices and record scoped receipts."
+    },
+    {
+      "type": "TOKEN_VAZIO_AUTHORSHIP_BEYOND_REVIEWED_RMR_FILES",
+      "next_gate": "Perform file-by-file commit and license review; do not infer authorship from a digest."
+    }
+  ],
+  "rollback": {
+    "base_commit": "26daf57b951ce5003177eadf3e15f638930176ba",
+    "procedure": "Close the isolated branch or revert only the additive documentation commit; preserve Supabase S1 and append a successor correction.",
+    "destructive_actions": false
+  },
+  "R3": {
+    "F_ok": [
+      "Canonical BLAKE3/RMR repository, exact base commit and reviewed blobs fixed.",
+      "Pre-research Supabase gate persisted and read back.",
+      "Seven alphaXiv sources mapped with explicit support and non-support boundaries."
+    ],
+    "F_gap": [
+      "No BLAKE3/RMR execution in this tranche.",
+      "No independent rebuild or physical ARM device evidence.",
+      "No authorship, universal performance, custody completeness or scientific-truth promotion."
+    ],
+    "F_next": [
+      "Create successor Supabase receipt bound to this Git commit.",
+      "Run exact-head KAT/negative tests under a separate execution gate.",
+      "Request human review before any merge or claim promotion."
+    ]
+  }
+}
