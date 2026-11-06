@@ -1,0 +1,109 @@
+{
+  "schema": "rmr.blake3.custody_completeness_gate.v1",
+  "record_id": "RMR-BLAKE3-CUSTODY-PHASE2-20261105",
+  "created_at": "2026-11-05T00:00:00Z",
+  "authority": {
+    "producer_repository": "rafaelmeloreisnovo/BLAKE3",
+    "base_commit": "26daf57b951ce5003177eadf3e15f638930176ba",
+    "upstream_baseline": "BLAKE3-team/BLAKE3@6aab490a26124663329dfd3961b8469f8fdb158b",
+    "pull_request": 187,
+    "supabase_pre_research_receipt": {
+      "sequence": 65,
+      "record_sha256": "b61c47bbb21633dfb6e5a07a493ae3f2cf3b53ebf9e3bf96716889a5fddc0a5a"
+    }
+  },
+  "epistemic_status": {
+    "state": "IMPLEMENTED_UNTESTED",
+    "claim_allowed": false,
+    "scope": "gate specification only; no RMR execution or physical-device attestation"
+  },
+  "research_delta": [
+    {
+      "paper": "2609.01992",
+      "title": "ClaimReceipt: Verifying Evidence Sufficiency and Coverage in Agent Evaluations",
+      "source": "https://www.alphaxiv.org/abs/2609.01992",
+      "direct_observation": "The paper separates recomputability from coverage and requires a prospectively committed expected universe.",
+      "gate_delta": "EXPECTED_UNIVERSE_MANIFEST"
+    },
+    {
+      "paper": "2608.17176",
+      "title": "The Acknowledgment Point Is the System: Durable Policy-Decision Receipts for AI Audit Evidence",
+      "source": "https://www.alphaxiv.org/abs/2608.17176",
+      "direct_observation": "The paper requires durable append/synchronization before acknowledging a durable receipt and fail-stop on append failure.",
+      "gate_delta": "EVIDENCE_BEFORE_ACK"
+    },
+    {
+      "paper": "2607.02820",
+      "title": "Git Hash Chain Malleability",
+      "source": "https://www.alphaxiv.org/abs/2607.02820",
+      "direct_observation": "The paper demonstrates multiple valid signed serializations of one logical commit, each with a different Git hash; it does not demonstrate a hash collision or content forgery.",
+      "gate_delta": "GIT_ID_PLUS_CONTENT_DIGEST"
+    }
+  ],
+  "required_gates": [
+    {
+      "id": "GATE-C1-EXPECTED-UNIVERSE",
+      "requirement": "Commit the expected record set before outcomes exist, including identifiers, retry policy, terminal-state policy, schema version, and canonical serialization profile.",
+      "pass": "Every expected identifier resolves to exactly one typed terminal receipt or one typed TOKEN_VAZIO with reason; no undeclared identifier appears.",
+      "fail": "Missing, duplicate, undeclared, or post-hoc expected-universe entry.",
+      "status": "TOKEN_VAZIO"
+    },
+    {
+      "id": "GATE-C2-ACK-DURABILITY",
+      "requirement": "A receipt marked durable may be acknowledged only after append and the declared synchronization boundary succeed.",
+      "pass": "Crash/restart recovery preserves an exact contiguous prefix; append/sync failure yields fail-stop and no success receipt.",
+      "fail": "Acknowledged durable receipt is absent after recovery, or sequence gaps are silently accepted.",
+      "status": "TOKEN_VAZIO"
+    },
+    {
+      "id": "GATE-C3-NON-EQUIVOCATION",
+      "requirement": "Publish or independently retain signed/checkpointed heads and compare them across at least two trust domains.",
+      "pass": "Observers converge on one successor relation for the same predecessor, or any fork is explicitly detected and preserved.",
+      "fail": "Conflicting valid heads are accepted without a fork witness.",
+      "status": "TOKEN_VAZIO"
+    },
+    {
+      "id": "GATE-C4-CONTENT-BINDING",
+      "requirement": "Bind Git commit ID, tree ID, canonical manifest digest, artifact digest, BLAKE3/RMR digest, and verifier version as distinct fields.",
+      "pass": "Independent readback recomputes all content digests and detects any alias or mismatch without treating Git Verified status as sufficient.",
+      "fail": "Trust is derived from commit ID or forge badge alone.",
+      "status": "TOKEN_VAZIO"
+    },
+    {
+      "id": "GATE-C5-INDEPENDENT-REPLAY",
+      "requirement": "A second verifier, outside the producer execution, reconstructs the manifest and verifies the receipt chain and selected artifact.",
+      "pass": "Independent verifier reproduces the same digests and typed verdict from retained inputs.",
+      "fail": "Only the producer's self-report is available.",
+      "status": "TOKEN_VAZIO"
+    }
+  ],
+  "falsifiers": [
+    "Delete one terminal receipt while preserving all remaining hashes: GATE-C1 must not PASS.",
+    "Acknowledge before fsync and simulate process termination: GATE-C2 must not PASS if the receipt disappears.",
+    "Serve two valid successor heads to isolated observers: GATE-C3 must detect the fork after head exchange.",
+    "Substitute a semantically equivalent signed Git serialization with a different commit ID: GATE-C4 must compare canonical content fields and preserve the alias.",
+    "Run verification only inside the producer trust domain: GATE-C5 remains TOKEN_VAZIO."
+  ],
+  "typed_token_vazio": [
+    "queued_workflow_terminal_state",
+    "expected_universe_manifest_execution",
+    "ack_durability_crash_test",
+    "external_non_equivocation_witness",
+    "rmr_execution",
+    "independent_reproduction",
+    "physical_armv7_arm64_attestation"
+  ],
+  "invariants": [
+    "SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM",
+    "TOKEN_VAZIO != 0",
+    "IMPLEMENTED_UNTESTED != PASS",
+    "hash_integrity != truth",
+    "git_commit_id != canonical_logical_content_id",
+    "claim_allowed=false until all claim-relative gates pass"
+  ],
+  "rollback": {
+    "mode": "append_only_supersession",
+    "action": "Do not delete prior records; add a successor record that identifies this record_id and the failed gate.",
+    "promotion": "forbidden"
+  }
+}
